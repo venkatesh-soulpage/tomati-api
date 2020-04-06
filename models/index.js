@@ -1,10 +1,7 @@
-// import User from './user'
-// import Token from './token';
+import Location from './location';
+import Account from './account';
 
-
-const models = {
-    // User,
-    // Token,
+export {
+    Location,
+    Account
 };
-
-export default models;
