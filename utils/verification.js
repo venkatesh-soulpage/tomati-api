@@ -12,7 +12,9 @@ const verification = (req, res, next) => {
     jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
         if (err) return res.status(500).send({ message: 'Failed to authenticate Token'});
 
-        req.userId = decoded.id;
+        req.id = decoded.id;
+        req.email = decoded.email;
+        req.is_admin = decoded.is_admin;
 
         next();
     })

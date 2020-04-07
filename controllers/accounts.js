@@ -63,25 +63,26 @@ const login = async (req, res, next) => {
     try {
 
         // Fetch account
-        const account = 
+        const accounts = 
             await models.Account.query()
                 .where('email', email);
 
         // Return if the account doesn't exist
-        if (!account || account.length < 1) return res.status(401).json("Incorrect password or email").send();
-        if (!account[0].is_email_verified) return res.status(401).json("Please verify your email").send(); 
+        if (!accounts || accounts.length < 1) return res.status(401).json("Incorrect password or email").send();
+        if (!accounts[0].is_email_verified) return res.status(401).json("Please verify your email").send(); 
 
         // Compare passwords
-        const isCorrectPassword = await bcrypt.compareSync(password, account[0].password_hash);
+        const isCorrectPassword = await bcrypt.compareSync(password, accounts[0].password_hash);
 
         // If the password is incorrect return
         if (!isCorrectPassword) return res.status(401).json("Incorrect password or email").send(); 
 
-        const token = await jwt.sign({id: account.id, }, process.env.SECRET_KEY, { expiresIn: '31d' });
+        const token = await jwt.sign({id: accounts[0].id, email: accounts[0].email, is_admin: accounts[0].is_admin }, process.env.SECRET_KEY, { expiresIn: '31d' });
                         
         return res.status(201).json(token);
 
     } catch (e) {
+        console.log(e)
         return res.status(500).json(JSON.stringify(e)).send();
     }
 }

@@ -1,0 +1,20 @@
+import Model from './model';
+
+export default class Role extends Model {
+    static get tableName () {
+      return 'roles'
+    }
+  
+    static get relationMappings () {
+      /*return {
+        account: {
+          relation: Model.BelongsToOneRelation,
+          modelClass: Account,
+          join: {
+            from: 'accounts.location_id',
+            to: 'locations.id'
+          }
+        }
+      } */
+    }
+  }
