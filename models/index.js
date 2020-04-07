@@ -1,7 +1,9 @@
 import Location from './location';
 import Account from './account';
+import Token from './token';
 
-export {
+export default {
     Location,
-    Account
+    Account,
+    Token,
 };

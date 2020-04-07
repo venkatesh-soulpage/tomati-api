@@ -1,15 +1,15 @@
 var express = require('express');
 var router = express.Router();
-import userController from '../controllers/users';
+import userController from '../controllers/accounts';
 
 /* GET Confirm the user */
 router.get('/confirmation/:token', userController.confirmation);
 
 /* POST Create new user. */
-router.post('/signup', userController.create);
+router.post('/signup', userController.signup);
 
 /* POST Login the user. */
-router.post('/login', userController.authenticate);
+router.post('/login', userController.login);
 
 /* POST Resend the verification email */
 router.post('/resend-verification', userController.resendToken);

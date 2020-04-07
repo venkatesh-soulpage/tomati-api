@@ -1,22 +1,7 @@
-import mongoose from 'mongoose';
+import Model from './model';
 
-const tokenSchema = new mongoose.Schema({
-    email: {
-        type: String,
-        required: true,
-    },
-    token: {
-        type: String,
-        required: true
-    },
-    createdAt: {
-        type: Date,
-        required: true,
-        default: Date.now,
-        expires: 2629800,
+export default class Token extends Model {
+    static get tableName () {
+      return 'tokens'
     }
-})
-
-const Token = mongoose.model('Token', tokenSchema);
-
-export default Token;
+  }

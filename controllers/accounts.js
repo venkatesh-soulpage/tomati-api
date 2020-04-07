@@ -6,7 +6,7 @@ import async from 'async'
 import fetch from 'node-fetch';
 import queryString from 'query-string';
 
-// import { sendConfirmationEmail, sendFotgotPasswordEmail } from './mailling';
+import { sendConfirmationEmail, sendFotgotPasswordEmail } from './mailling';
 
 
 // GET - Profile
@@ -22,135 +22,143 @@ const updateProfile = (req, res, next) => {
 
 
 // POST - Signup
-const create = (req, res, next) => {
+const signup = async (req, res, next) => {
 
-    /* const {email, token, username, firstName, lastName, password} = req.body.user;
+    const {email, password, first_name, last_name } = req.body;
 
-    async.waterfall([
-        // Validate the token with email
-        (done) => {
-            models.Token.findOne({email, token}, (err, userToken) => {
-                if (err) return done(err.errmsg);
-                if (!userToken) return done('Invalid token');
+    try { 
+        // Check if the account doesn't exist
+        const account = 
+        await models.Account.query()
+            .where('email', email);
 
-                done(null, userToken);
-            })
-        },
-        // If it was a token, create the user
-        (userToken, done) => {
-
-            const newUser = { 
-                username, email, firstName, lastName, password,
-                isVerified: true,
-            }
+        // If the account exist, return message        
+        if (account && account.length > 0) return res.status(400).json({msg: 'This email already exists'});
         
-            models.User.create(newUser, (err, user) => {
-                // If error return 500
-                if (err) return done(err.errmsg);
-                if (!user) return done('Error creating the user');
+        // Hash password
+        const salt = await bcrypt.genSalt(10);
+        const password_hash = await bcrypt.hash(password, salt);
+ 
+        // Add new account
+        const new_account = 
+            await models.Account.query()
+                .insert({
+                    email, first_name, last_name, password_hash,
+                    is_admin: false,
+                    is_email_verified: false,
+                    is_age_verified: false,
+                });
 
-                done(null, user, userToken);
+        // Create new token
+        const new_token = 
+            await models.Token.query().insert({
+                email: new_account.email,
+                token: crypto.randomBytes(16).toString('hex')
             })
-       },
-       // Delete the token
-       (user, userToken, done) => {
-            models.Token.findByIdAndDelete(userToken._id, (err, query) => {
-                if (err) return done(err.errmsg);
-                return res.status(201).json({message: 'User created', user});
-            })
-       },
-    ], (err, result) => {
-        console.log(err);
-        res.status(500).json(err).send();
-    })*/
+
+        // Send signup email
+        await sendConfirmationEmail(new_account, new_token);
+
+        // Return the account
+        return res.status(201).json({new_account, new_token}).send();
+
+    } catch (e) {
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
 }
 
 // POST - Login
-const authenticate = (req, res, next) => {
-    /* models.User.findOne({username: req.body.auth.username}, function(err, userInfo){
-        try {
-            if (err) {
-                next(err);
-            } else {
-                try {
-                    
-                    // Validate user verification
-                    if (!userInfo.isVerified) return res.status(403).json({message: "Please confirm your email address."})
+const login = async (req, res, next) => {
 
-                    if(bcrypt.compareSync(req.body.auth.password, userInfo.password)) {
-                        const token = jwt.sign({id: userInfo._id, role: userInfo.role}, process.env.SECRET_KEY, { expiresIn: '31d' });
-                        res.status(201).json(token);
-                    }else{
-                        res.status(403).json({message: "The user or password are incorrect"});
-                    }
-                } catch(e) {
-                    res.status(403).json({message: "The user or password are incorrect"});
-                }
-            }
-        } catch (e) {
-            res.status(500);
-        }
-    }); */
+    const {email, password} = req.body;
+
+    try {
+
+        // Fetch account
+        const account = 
+            await models.Account.query()
+                .where('email', email);
+
+        // Return if the account doesn't exist
+        if (!account || account.length < 1) return res.status(401).json("Incorrect password or email").send();
+        if (!account[0].is_email_verified) return res.status(401).json("Please verify your email").send(); 
+
+        // Compare passwords
+        const isCorrectPassword = await bcrypt.compareSync(password, account[0].password_hash);
+
+        // If the password is incorrect return
+        if (!isCorrectPassword) return res.status(401).json("Incorrect password or email").send(); 
+
+        const token = await jwt.sign({id: account.id, }, process.env.SECRET_KEY, { expiresIn: '31d' });
+                        
+        return res.status(201).json(token);
+
+    } catch (e) {
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
 }
 
 // GET - Verify the signup email
-const confirmation = (req, res, next) => {
+const confirmation = async (req, res, next) => {
 
-    /* models.Token.findOne({ token: req.params.token }, (err, token) => {
-        // If the token wasn't found return an error
-        if (!token) return res.status(400).send({message: 'Invalid Token'});
+    try {
+        
+        const {token} = req.params;
 
-        // If the token was found update the user
-        models.User.findOne({_id: token._userId }, (err, user) => {
-            // If no user was found return 400
-            if (err) return res.status(500)
-            if (!user) return res.status(400).send({ message: 'Unable to find user for the token provided.'}); 
-            if (user.isVerified) return res.status(400).send({message: 'This user is already verified'});
+        // Find a token
+        const tokens = 
+            await models.Token.query()
+                .where('token', token);
 
-            // Verify and save the user
-            user.isVerified = true;
-            user.save((userErrors) => {
-                if (userErrors) return res.status(500);
-                const redirectUrl = `${process.env.SCHEMA}://${process.env.FRONT_HOST}${process.env.FRONT_PORT && `:${process.env.FRONT_PORT}`}/login?email=${user.email}`
-                res.send(`<script>window.location.href="${redirectUrl}";</script>`)
-            })
-        })
-    })   */
+        // Validate if token exists
+        if (!tokens || token.length < 1) return res.status(400).json('Invalid token').send();
+
+        // Update account to verified
+        const updated_account = 
+            await models.Account.query()
+                .patch({ is_email_verified: true })
+                .where('email', tokens[0].email);
+
+        // Delete invalid token
+        await models.Token.query().deleteById(tokens[0].id);
+
+        // Return updated account
+        return res.status(201).json(updated_account).send();
+
+    } catch (e) {
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
 }
 
 
 // POST - Resend verification email token
-const resendToken = (req, res, next) => {
-    // Find if the user is valid
-    /* models.User.findOne({ email: req.body.email}, (err, user) => {
-        // If the user doesn't exist return 404
-        if (!user) return res.status(404).json({message: 'User not found'});
-        
-        // Create the token model
-        const newToken = {
-            _userId: user._id,
+const resendToken = async (req, res, next) => {
+
+    const {email} = req.body;
+
+    // Find the account
+    const accounts = 
+        await models.Account.query()
+        .where('email', email);
+
+
+    // Validate email 
+    if (!accounts[0] || accounts.length < 1) return res.status(401).json("The email is invalid").send();
+    if (accounts[0].is_email_verified) return res.status(401).json("The email was already verified").send();
+
+    // Create new token
+    const new_token = 
+        await models.Token.query().insert({
+            email: accounts[0].email,
             token: crypto.randomBytes(16).toString('hex')
-        }
-
-         // Save the new token to the database
-         models.Token.create(newToken, (err, token) => {
-            if (err) {
-                res.status(500);
-            } 
-
-            // Handle token creation
-            if (token) {
-                try {
-                    // Send confirmation email and return the status
-                    sendConfirmationEmail(req.body, token);
-                    res.status(200).json(`Email re-sent to ${user.email}`);
-                } catch (e) {
-                    res.send(500);
-                }
-                
-            }
         })
-    }) */
+
+    // Send signup email
+    await sendConfirmationEmail(accounts[0], new_token);
+
+    // Return the account
+    return res.status(201).json({account: accounts[0], new_token}).send();
+
 }
 
 // POST - Set the reset token and send an email with the url
@@ -229,8 +237,8 @@ const userController = {
     getProfile,
     updateProfile,
     // Auth
-    create,
-    authenticate,
+    signup,
+    login,
     confirmation, 
     resendToken,
     forgot,
