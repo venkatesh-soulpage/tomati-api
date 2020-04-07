@@ -43,7 +43,7 @@ const sendFotgotPasswordEmail = (user) => {
     const email = new Email({
         message: {
             from: process.env.SMTP_AUTH,
-            subject: 'Shifu Grammar - Reset Password',
+            subject: 'Booze Boss - Reset Password',
         },
         send: true,
         transport: transporter,
@@ -57,7 +57,7 @@ const sendFotgotPasswordEmail = (user) => {
         },
         locals: {
             email: user.email,
-            resetUrl: `${process.env.SCHEMA}://${process.env.FRONT_HOST}:${process.env.FRONT_PORT}/reset?email=${user.email}&token=${user.passwordResetToken}`
+            resetUrl: `${process.env.SCHEMA}://${process.env.FRONT_HOST}:${process.env.FRONT_PORT}/reset?email=${user.email}&token=${user.password_reset_token}`
         }
     })
     .then(/* console.log */)

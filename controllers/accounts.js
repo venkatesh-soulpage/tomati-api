@@ -9,18 +9,6 @@ import queryString from 'query-string';
 import { sendConfirmationEmail, sendFotgotPasswordEmail } from './mailling';
 
 
-// GET - Profile
-const getProfile = (req, res, next) => {
-    
-}
-
-// PATCH - Profile
-const updateProfile = (req, res, next) => {
-    
-
-}
-
-
 // POST - Signup
 const signup = async (req, res, next) => {
 
@@ -134,108 +122,116 @@ const confirmation = async (req, res, next) => {
 // POST - Resend verification email token
 const resendToken = async (req, res, next) => {
 
-    const {email} = req.body;
+    try {
+        const {email} = req.body;
 
-    // Find the account
-    const accounts = 
-        await models.Account.query()
-        .where('email', email);
+        // Find the account
+        const accounts = 
+            await models.Account.query()
+            .where('email', email);
 
 
-    // Validate email 
-    if (!accounts[0] || accounts.length < 1) return res.status(401).json("The email is invalid").send();
-    if (accounts[0].is_email_verified) return res.status(401).json("The email was already verified").send();
+        // Validate email 
+        if (!accounts[0] || accounts.length < 1) return res.status(401).json("The email is invalid").send();
+        if (accounts[0].is_email_verified) return res.status(401).json("The email was already verified").send();
 
-    // Create new token
-    const new_token = 
-        await models.Token.query().insert({
-            email: accounts[0].email,
-            token: crypto.randomBytes(16).toString('hex')
-        })
+        // Create new token
+        const new_token = 
+            await models.Token.query().insert({
+                email: accounts[0].email,
+                token: crypto.randomBytes(16).toString('hex')
+            })
 
-    // Send signup email
-    await sendConfirmationEmail(accounts[0], new_token);
+        // Send signup email
+        await sendConfirmationEmail(accounts[0], new_token);
 
-    // Return the account
-    return res.status(201).json({account: accounts[0], new_token}).send();
+        // Return the account
+        return res.status(201).json({account: accounts[0], new_token}).send();
+
+    } catch (e) {
+        
+        return res.status(500).json(JSON.stringify(e)).send();
+
+    }
 
 }
 
 // POST - Set the reset token and send an email with the url
-const forgot = (req, res, next) => {
-    // Get the user
-    /* models.User.findOne({email: req.body.email}, (err, user) => {
-        if (err) return res.status(500);
-        if (!user) return res.status(404).json({message: 'User not found'});
+const forgot = async (req, res, next) => {
 
-        // Calculate the token
-        crypto.randomBytes(16, (err, buff) => {
-            // Set the user values for expiration
-            user.passwordResetToken = buff.toString('hex');
-            user.passwordResetExpires = Date.now() + 3600000; 
+    try {
+        
+        const {email} = req.body;
 
-            // Save the user to the database
-            user.save((err) => {
-                if (err) return res.status(500);
-                // Send email
-                sendFotgotPasswordEmail(user);
-                res.status(201).json({message: 'Successful request'});
-            })
-        })
-    }) */
+        // Get the account
+        const accounts = 
+            await models.Account.query()
+                .where('email', email);
+
+        // Validate account
+        if (!accounts[0] || accounts.length < 1) return res.status(401).json("No account found").send();
+
+        // Generate a new password reset token and expiration
+        const password_reset_token = await crypto.randomBytes(16).toString('hex');
+        const password_reset_expiration = new Date(Date.now() + 3600000); 
+
+    
+        // Set the token password_reset_token and expiration
+        const updated_account = 
+            await models.Account.query()
+                .patch({ password_reset_token, password_reset_expiration})
+                .where('email', accounts[0].email);
+
+        // Send an email with recovery instructions
+        await sendFotgotPasswordEmail(accounts[0]);
+
+        return res.status(201).json(`An email was sent to ${accounts[0].email} with further instructions.`);
+
+    } catch (e) {
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
 }
 
 // POST - Set the new password comparing the token
-const reset = (req, res, next) => {
+const reset = async (req, res, next) => {
 
-    /* async.waterfall([
-        // Find the user
-        (done) => {
-            models.User.findOne({email: req.body.email} , (err, user) => {
-                // Handle possible errors
-                if (err) return res.status(500);
-                if (!user) return res.status(404).json({message: 'User not found'});
+    try {
+    
+        const {email, token, password} = req.body;
 
-                // Validate the token matches the db.
-                if (user.passwordResetToken === req.body.token) {
-                    // Vlidate expiration
-                    if ((new Date(user.passwordResetExpires).getTime() >= Date.now())) {
-                        // Set the new password and remove the token logic from the model
-                        user.password = req.body.password;
-                        user.passwordResetToken = undefined;
-                        user.passwordResetExpires = undefined;
+        // Get the account
+        const accounts = 
+            await models.Account.query()
+                .where('email', email);
 
-                        // Return the new user
-                        done(null, user);
-                    } else {
-                        return res.status(401).json({message: 'Expired token'})
-                    }
-                } else {
-                    return res.status(401).json({message: 'Invalid token'})
-                }            
-            })
-        },
-        // Save the user to the db
-        (user, done) => {
-            console.log('try to save user', user)
-            // Save the user
-            user.save((err) => {
-                if (err) return res.status(500);
-                console.log('User saved')
-                return res.status(201).json({message: 'Password updated'});
-            })
-        }
-    ], (err, result) => {
-        if (err) return res.status(500);
-    }) */
+        // Validate account
+        if (!accounts[0] || accounts.length < 1) return res.status(401).json("No account found").send();
+
+        // Validate token and expiration
+        if (token !== accounts[0].password_reset_token) return res.status(401).json("Invalid token").send();
+        if (Date.now() > new Date(accounts[0].password_reset_expiration)) return res.status(401).json("Expired token").send();
+
+        // Hash password
+        const salt = await bcrypt.genSalt(10);
+        const password_hash = await bcrypt.hash(password, salt);
+
+        // Update account
+        await models.Account.query()
+                .patch({ 
+                    password_hash,
+                    password_reset_token: null,
+                    password_reset_expiration: null,
+                })
+                .where('email', accounts[0].email);
+
+        return res.status(201).json(`Password updated!`);
+
+    } catch (e) {
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
 }
 
-
-
 const userController = {
-    // User
-    getProfile,
-    updateProfile,
     // Auth
     signup,
     login,

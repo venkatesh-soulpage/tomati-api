@@ -11,6 +11,8 @@ exports.up = async (knex) => {
         table.boolean('is_admin').notNullable()
         table.boolean('is_email_verified').notNullable()
         table.boolean('is_age_verified').notNullable()
+        table.string('password_reset_token')
+        table.timestamp('password_reset_expiration')
         table.timestamp('age_verified_at')
         table.timestamp('created_at').defaultTo(knex.fn.now()).notNullable()
         table.timestamp('updated_at').defaultTo(knex.fn.now()).notNullable()
