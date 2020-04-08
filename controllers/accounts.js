@@ -77,7 +77,20 @@ const login = async (req, res, next) => {
         // If the password is incorrect return
         if (!isCorrectPassword) return res.status(401).json("Incorrect password or email").send(); 
 
-        const token = await jwt.sign({id: accounts[0].id, email: accounts[0].email, is_admin: accounts[0].is_admin }, process.env.SECRET_KEY, { expiresIn: '31d' });
+        // Get the scope and role of the account
+        const scope = accounts[0].is_admin ? 'ADMIN' : 'TODO';
+        const role = accounts[0].is_admin ? 'ADMIN' : 'TODO';
+
+        const token = await jwt.sign(
+            {
+                id: accounts[0].id, 
+                email: accounts[0].email, 
+                scope,
+                role,
+            }, 
+            process.env.SECRET_KEY, 
+            { expiresIn: '31d' }
+        );
                         
         return res.status(201).json(token);
 
