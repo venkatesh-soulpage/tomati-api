@@ -39,6 +39,32 @@ const sendConfirmationEmail = (user, token) => {
     .catch(console.error);
 }
 
+const clientInviteEmail = (account_email, token) => {
+
+    const email = new Email({
+        message: {
+            from: process.env.SMTP_AUTH,
+            subject: 'You have been invited to join Booze Boss',
+        },
+        send: true,
+        transport: transporter,
+    })
+
+    email
+    .send({
+        template: 'invite_client',
+        message: {
+            to: account_email,
+        },
+        locals: {
+            email: account_email,
+            signupUrl: `${process.env.SCHEMA}://${process.env.FRONT_HOST}:${process.env.FRONT_PORT}/client-signup?email=${account_email}&token=${token.token}`
+        }
+    })
+    .then(/* console.log */)
+    .catch(console.error);
+}
+
 const sendFotgotPasswordEmail = (user) => {
     const email = new Email({
         message: {
@@ -64,4 +90,4 @@ const sendFotgotPasswordEmail = (user) => {
     .catch(console.error);
 }
 
-export { sendConfirmationEmail, sendFotgotPasswordEmail };
+export { sendConfirmationEmail, sendFotgotPasswordEmail, clientInviteEmail };

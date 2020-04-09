@@ -14,7 +14,8 @@ const verification = (req, res, next) => {
 
         req.id = decoded.id;
         req.email = decoded.email;
-        req.is_admin = decoded.is_admin;
+        req.scope = decoded.scope;
+        req.role = decoded.role;
 
         next();
     })

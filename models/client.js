@@ -1,4 +1,5 @@
 import Model from './model';
+import models from '../models'
 
 export default class Client extends Model {
     static get tableName () {
@@ -9,7 +10,7 @@ export default class Client extends Model {
       return {
         owner: {
           relation: Model.BelongsToOneRelation,
-          modelClass: Account,
+          modelClass: models.Client,
           join: {
             from: 'clients.owner_id',
             to: 'accounts.id'
@@ -17,7 +18,7 @@ export default class Client extends Model {
         },
         location: {
             relation: Model.BelongsToOneRelation,
-            modelClass: Location,
+            modelClass: models.Location,
             join: {
               from: 'clients.location_id',
               to: 'locations.id'

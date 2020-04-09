@@ -1,4 +1,5 @@
 import Model from './model';
+import models from '../models'
 
 export default class Account extends Model {
     static get tableName () {
@@ -7,9 +8,9 @@ export default class Account extends Model {
   
     static get relationMappings () {
       return {
-        account: {
+        location: {
           relation: Model.BelongsToOneRelation,
-          modelClass: Account,
+          modelClass: models.Location,
           join: {
             from: 'accounts.location_id',
             to: 'locations.id'
