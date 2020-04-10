@@ -36,7 +36,9 @@ const inviteClient = async (req, res, next) => {
         const client = 
             await models.Client.query()
                 .insert({
-                    name, description
+                    name, 
+                    description, 
+                    contact_email: owner_email,
                 })
 
         // Create new token to validate owner email

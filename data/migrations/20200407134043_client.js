@@ -7,6 +7,7 @@ exports.up = async (knex) => {
         table.integer('location_id').references('locations.id')
         table.string('name').notNullable()
         table.string('description')
+        table.string('contact_email')
         table.timestamp('created_at').defaultTo(knex.fn.now()).notNullable()
         table.timestamp('updated_at').defaultTo(knex.fn.now()).notNullable()
       })

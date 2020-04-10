@@ -55,6 +55,97 @@ const signup = async (req, res, next) => {
     }
 }
 
+// POST - Client Signup
+const clientSignup = async (req, res, next) => {
+
+    try { 
+
+        const {email, password, first_name, last_name, token } = req.body;
+
+        // Check if the account doesn't exist
+        const account = 
+        await models.Account.query()
+            .where('email', email);
+
+        // If the account exist, return message        
+        if (account && account.length > 0) return res.status(400).json({msg: 'This email already exists'});
+
+        // Check if the token sent is valid
+        const tokens = 
+            await models.Token.query()
+                .where('token', token)
+                .where('email', email);
+
+        // If there aren't tokens return error
+        if (!tokens || tokens.length < 1) return res.status(400).json({msg: 'The email or token are invalid'});
+
+        // Hash password
+        const salt = await bcrypt.genSalt(10);
+        const password_hash = await bcrypt.hash(password, salt);
+ 
+        // Add new account
+        const new_account = 
+            await models.Account.query()
+                .insert({
+                    email, first_name, last_name, password_hash,
+                    is_admin: false,
+                    is_email_verified: true,
+                    is_age_verified: true,
+                });
+
+        // Update the Client organization owner_id and fetch the id
+        await models.Client.query()
+                .patch({owner_id: new_account.id})
+                .where('contact_email', email)
+
+        const updated_clients = 
+            await models.Client.query()
+                .where('contact_email', email)
+
+        // Delete confirmation token
+        await models.Token.query()
+                .delete()
+                .where('token', token)
+                .where('email', email);
+
+        // Search for Brand Owner Role
+        const role = 
+                await models.Role.query()
+                    .where('scope','BRAND')
+                    .where('name','OWNER')
+
+        // Add a client collaborator
+        await models.ClientCollaborator.query()
+                .insert({
+                    role_id: role[0].id,
+                    account_id: new_account.id,
+                    client_id: updated_clients[0].id,
+                })
+        
+        // Generate the login token
+        const jwt_token = await jwt.sign(
+            {
+                id: new_account.id, 
+                email: new_account.email, 
+                scope: role[0].scope,
+                role: role[0].name,
+            }, 
+            process.env.SECRET_KEY, 
+            { expiresIn: '31d' }
+        );
+
+        // Send signup email
+        // await sendConfirmationEmail(new_account, new_token);
+
+        // Return the account
+        return res.status(201).json(jwt_token).send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 // POST - Login
 const login = async (req, res, next) => {
 
@@ -248,6 +339,7 @@ const reset = async (req, res, next) => {
 const userController = {
     // Auth
     signup,
+    clientSignup,
     login,
     confirmation, 
     resendToken,

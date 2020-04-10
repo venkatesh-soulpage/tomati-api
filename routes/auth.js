@@ -8,6 +8,9 @@ router.get('/confirmation/:token', accountController.confirmation);
 /* POST Create new user. */
 router.post('/signup', accountController.signup);
 
+/* POST Create new client */
+router.post('/client-signup', accountController.clientSignup);
+
 /* POST Login the user. */
 router.post('/login', accountController.login);
 
