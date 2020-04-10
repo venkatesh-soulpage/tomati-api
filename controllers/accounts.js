@@ -168,9 +168,24 @@ const login = async (req, res, next) => {
         // If the password is incorrect return
         if (!isCorrectPassword) return res.status(401).json("Incorrect password or email").send(); 
 
-        // Get the scope and role of the account
-        const scope = accounts[0].is_admin ? 'ADMIN' : 'TODO';
-        const role = accounts[0].is_admin ? 'ADMIN' : 'TODO';
+        // Validate if account has BRAND scope
+        const brandCollaborators = 
+            await models.ClientCollaborator.query()
+                .where('account_id', accounts[0].id)
+                .withGraphFetched('role');
+
+        let scope;
+        let role;
+
+        // Asign the brandCollaborator scope and role
+        if (brandCollaborators.length > 0) {
+            scope = brandCollaborators[0].role.scope;
+            role = brandCollaborators[0].role.name;
+        } else {
+            // Get the scope and role of the account
+            scope = accounts[0].is_admin ? 'ADMIN' : 'TODO';
+            role = accounts[0].is_admin ? 'ADMIN' : 'TODO';
+        }
 
         const token = await jwt.sign(
             {
