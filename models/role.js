@@ -1,4 +1,5 @@
 import Model from './model';
+import models from '../models';
 
 export default class Role extends Model {
     static get tableName () {
@@ -6,15 +7,15 @@ export default class Role extends Model {
     }
   
     static get relationMappings () {
-      /*return {
-        account: {
-          relation: Model.BelongsToOneRelation,
-          modelClass: Account,
+      return {
+        client_collaborators: {
+          relation: Model.HasManyRelation,
+          modelClass: models.ClientCollaborator,
           join: {
-            from: 'accounts.location_id',
-            to: 'locations.id'
+            from: 'roles.id',
+            to: 'client_collaborators.role_id'
           }
         }
-      } */
+      }
     }
   }

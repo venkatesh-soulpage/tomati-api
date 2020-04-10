@@ -24,6 +24,14 @@ export default class Client extends Model {
               to: 'locations.id'
             }
         },
+        client_collaborators: {
+          relation: Model.HasManyRelation,
+          modelClass: models.ClientCollaborator,
+          join: {
+            from: 'clients.id',
+            to: 'client_collaborators.client_id'
+          }
+        }
       }
     }
   }

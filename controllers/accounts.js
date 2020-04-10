@@ -288,7 +288,7 @@ const forgot = async (req, res, next) => {
                 .where('email', accounts[0].email);
 
         // Send an email with recovery instructions
-        await sendFotgotPasswordEmail(accounts[0]);
+        await sendFotgotPasswordEmail(accounts[0], password_reset_token);
 
         return res.status(201).json(`An email was sent to ${accounts[0].email} with further instructions.`);
 

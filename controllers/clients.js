@@ -14,7 +14,11 @@ const getClients = async (req, res, next) => {
 
         // Get the clients
         const clients = 
-            await models.Client.query();
+            await models.Client.query()
+                .withGraphFetched('[client_collaborators, client_collaborators.[account, role]]')
+                .modifyGraph('client_collaborators', builder => {
+                    builder.select('id');
+                })
 
         // Send the clients
         return res.status(201).json(clients).send();

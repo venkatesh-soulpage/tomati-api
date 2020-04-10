@@ -65,7 +65,7 @@ const clientInviteEmail = (account_email, token) => {
     .catch(console.error);
 }
 
-const sendFotgotPasswordEmail = (user) => {
+const sendFotgotPasswordEmail = (user, token) => {
     const email = new Email({
         message: {
             from: process.env.SMTP_AUTH,
@@ -83,7 +83,7 @@ const sendFotgotPasswordEmail = (user) => {
         },
         locals: {
             email: user.email,
-            resetUrl: `${process.env.SCHEMA}://${process.env.FRONT_HOST}:${process.env.FRONT_PORT}/reset?email=${user.email}&token=${user.password_reset_token}`
+            resetUrl: `${process.env.SCHEMA}://${process.env.FRONT_HOST}:${process.env.FRONT_PORT}/reset?email=${user.email}&token=${token}`
         }
     })
     .then(/* console.log */)
