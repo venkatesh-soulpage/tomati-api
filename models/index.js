@@ -5,6 +5,7 @@ import Role from './role';
 import Client from './client';
 import ClientCollaborator from './client_collaborator';
 import Agency from './agency';
+import AgencyCollaborator from './agency_collaborators';
 
 export default {
     Location,
@@ -13,5 +14,6 @@ export default {
     Role,
     Client,
     ClientCollaborator,
-    Agency
+    Agency,
+    AgencyCollaborator
 };

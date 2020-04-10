@@ -6,7 +6,7 @@ import async from 'async'
 import fetch from 'node-fetch';
 import queryString from 'query-string';
 
-import { } from './mailling';
+import { agencyInviteEmail } from './mailling';
 
 // GET - Get a list of agencies
 const getAgencies = async (req, res, next) => {
@@ -38,15 +38,21 @@ const getAgencies = async (req, res, next) => {
 // POST - Create a new Agency organization and send an email to the owner
 const inviteAgency = async (req, res, next) => {
     try {
-        /* Todo add client organization logic 
+        // Todo add client organization logic 
         const {name, description, owner_email} = req.body;
 
-        // Create client
-        const client = 
-            await models.Client.query()
+        // Get the Brand of the client
+        const client_collaborator = 
+            await models.ClientCollaborator.query()
+                .where('account_id', req.account_id);
+
+        // Create Agency
+        const agency = 
+            await models.Agency.query()
                 .insert({
                     name, 
                     description, 
+                    invited_by: client_collaborator[0].client_id,
                     contact_email: owner_email,
                 })
 
@@ -58,9 +64,9 @@ const inviteAgency = async (req, res, next) => {
             })
 
         // TODO send invite email
-        await clientInviteEmail(owner_email, new_token);
+        await agencyInviteEmail(owner_email, new_token);
 
-        return res.status(201).json(client).send(); */
+        return res.status(201).json(agency).send();
     } catch (e) {
         console.log(e);
         return res.status(500).json(JSON.stringify(e)).send();

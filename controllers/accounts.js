@@ -168,25 +168,42 @@ const login = async (req, res, next) => {
         // If the password is incorrect return
         if (!isCorrectPassword) return res.status(401).json("Incorrect password or email").send(); 
 
-        // Validate if account has BRAND scope
-        const brandCollaborators = 
-            await models.ClientCollaborator.query()
-                .where('account_id', accounts[0].id)
-                .withGraphFetched('role');
+        // Validate by admin first
+        let scope = accounts[0].is_admin && 'ADMIN';
+        let role = accounts[0].is_admin && 'ADMIN';
 
-        let scope;
-        let role;
 
-        // Asign the brandCollaborator scope and role
-        if (brandCollaborators.length > 0) {
-            scope = brandCollaborators[0].role.scope;
-            role = brandCollaborators[0].role.name;
-        } else {
-            // Get the scope and role of the account
-            scope = accounts[0].is_admin ? 'ADMIN' : 'TODO';
-            role = accounts[0].is_admin ? 'ADMIN' : 'TODO';
+        // Validate by brand if it isn't admin
+        if (!scope || role) {
+
+            const brandCollaborators = 
+                await models.ClientCollaborator.query()
+                    .where('account_id', accounts[0].id)
+                    .withGraphFetched('role');
+
+                if (brandCollaborators.length > 0) {
+                    scope = brandCollaborators[0].role.scope;
+                    role = brandCollaborators[0].role.name;
+                }
         }
 
+        // Validate by Agency if it isn't brand
+        if (!scope || role) {
+
+            const agencyCollaborators = 
+                await models.AgencyCollaborator.query()
+                    .where('account_id', accounts[0].id)
+                    .withGraphFetched('role');
+
+                if (agencyCollaborators.length > 0) {
+                    scope = brandCollaborators[0].role.scope;
+                    role = brandCollaborators[0].role.name;
+                }
+        }
+        
+        if (!scope || !role ) return res.status(401).send({mesg: 'Invalid account'});
+
+        // Sign token
         const token = await jwt.sign(
             {
                 id: accounts[0].id, 
