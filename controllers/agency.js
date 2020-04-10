@@ -13,16 +13,20 @@ const getAgencies = async (req, res, next) => {
 
     try {
 
-        // Get the clients
-        /* const clients = 
-            await models.Client.query()
-                .withGraphFetched('[client_collaborators, client_collaborators.[account, role]]')
-                .modifyGraph('client_collaborators', builder => {
-                    builder.select('id');
-                })
+        // Get the Brand of the client
+        const client_collaborator = 
+            await models.ClientCollaborator.query()
+                .where('account_id', req.account_id);
+
+        if (!client_collaborator[0]) return res.status(400).send({msg: 'Brand Collaborator does not exist'});
+    
+        // Get Client agencies
+        const brands = 
+            await models.Agency.query()
+                .where('invited_by', client_collaborator[0].client_id);
 
         // Send the clients */
-        return res.status(201).json().send();
+        return res.status(201).json(brands).send();
 
     } catch (e) {
         console.log(e);
