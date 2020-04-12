@@ -15,7 +15,16 @@ export default class Account extends Model {
             from: 'accounts.location_id',
             to: 'locations.id'
           }
-        }
+        },
+        agencies: {
+          relation: Model.HasManyRelation,
+          modelClass: models.Agency,
+          join: {
+            from: 'accounts.id',
+            to: 'agencies.owner_id'
+          }
+        },
+
       }
     }
   }

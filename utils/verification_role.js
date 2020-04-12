@@ -5,7 +5,7 @@ const verification_role = (scope, roles) => {
     return (req, res, next) => {
 
         // Add required permission to SUPERADMIN
-        if (req.scope === 'ADMIN' && req.role === 'ADMIN') next();
+        if (req.scope === 'ADMIN' && req.role === 'ADMIN') return next();
  
         // Verify Scope
         if (scope !== req.scope) return res.status(403).send({message: `${scope} scope required`});

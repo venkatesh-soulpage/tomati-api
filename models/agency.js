@@ -16,6 +16,14 @@ export default class Agency extends Model {
             to: 'accounts.id'
           }
         },
+        client: {
+          relation: Model.BelongsToOneRelation,
+          modelClass: models.Client,
+          join: {
+            from: 'agencies.invited_by',
+            to: 'clients.id'
+          }
+        },
         location: {
             relation: Model.BelongsToOneRelation,
             modelClass: models.Location,
@@ -24,14 +32,14 @@ export default class Agency extends Model {
               to: 'locations.id'
             }
         },
-        /*agency_collaborators: {
+        agency_collaborators: {
           relation: Model.HasManyRelation,
-          modelClass: models.ClientCollaborator,
+          modelClass: models.AgencyCollaborator,
           join: {
-            from: 'clients.id',
-            to: 'client_collaborators.client_id'
+            from: 'agencies.id',
+            to: 'agency_collaborators.agency_id'
           }
-        }*/
+        }
       }
     }
   }
