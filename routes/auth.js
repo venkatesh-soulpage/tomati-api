@@ -11,6 +11,9 @@ router.post('/signup', accountController.signup);
 /* POST Create new client */
 router.post('/client-signup', accountController.clientSignup);
 
+/* POST Create new agency */
+router.post('/agency-signup', accountController.agencySignup);
+
 /* POST Login the user. */
 router.post('/login', accountController.login);
 
