@@ -34,7 +34,10 @@ const getClients = async (req, res, next) => {
 const inviteClient = async (req, res, next) => {
     try {
         /* Todo add client organization logic */
-        const {name, description, owner_email} = req.body;
+        const {
+            name, description, owner_email,
+            collaborator_limit, briefs_limit, brands_limit, warehouses_limit, locations_limit
+        } = req.body;
 
         // Create client
         const client = 
@@ -43,6 +46,11 @@ const inviteClient = async (req, res, next) => {
                     name, 
                     description, 
                     contact_email: owner_email,
+                    collaborator_limit, 
+                    briefs_limit, 
+                    brands_limit, 
+                    warehouses_limit,
+                    locations_limit
                 })
 
         // Create new token to validate owner email

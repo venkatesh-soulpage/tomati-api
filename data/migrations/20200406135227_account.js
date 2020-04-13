@@ -7,6 +7,7 @@ exports.up = async (knex) => {
         table.string('first_name').notNullable()
         table.string('last_name').notNullable()
         table.string('email').notNullable()
+        table.string('phone_number')
         table.string('password_hash').notNullable()
         table.boolean('is_admin').notNullable()
         table.boolean('is_email_verified').notNullable()

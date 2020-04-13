@@ -5,6 +5,7 @@ exports.up = async (knex) => {
         table.increments('id').primary()
         table.string('scope').notNullable()
         table.string('name').notNullable()
+        table.string('description')
         table.timestamp('created_at').defaultTo(knex.fn.now()).notNullable()
         table.timestamp('updated_at').defaultTo(knex.fn.now()).notNullable()
       })
