@@ -60,7 +60,7 @@ const clientSignup = async (req, res, next) => {
 
     try { 
 
-        const {email, password, first_name, last_name, token } = req.body;
+        const {email, password, first_name, last_name, phone_number, token } = req.body;
 
         // Check if the account doesn't exist
         const account = 
@@ -87,7 +87,7 @@ const clientSignup = async (req, res, next) => {
         const new_account = 
             await models.Account.query()
                 .insert({
-                    email, first_name, last_name, password_hash,
+                    email, first_name, last_name, phone_number, password_hash,
                     is_admin: false,
                     is_email_verified: true,
                     is_age_verified: true,
@@ -151,7 +151,7 @@ const agencySignup = async (req, res, next) => {
 
     try { 
 
-        const {email, password, first_name, last_name, token } = req.body;
+        const {email, password, first_name, phone_number, last_name, token } = req.body;
 
         // Check if the account doesn't exist
         const account = 
@@ -178,7 +178,7 @@ const agencySignup = async (req, res, next) => {
         const new_account = 
             await models.Account.query()
                 .insert({
-                    email, first_name, last_name, password_hash,
+                    email, first_name, last_name, phone_number, password_hash,
                     is_admin: false,
                     is_email_verified: true,
                     is_age_verified: true,
