@@ -114,27 +114,24 @@ const inviteClient = async (req, res, next) => {
 const inviteCollaborator = async (req, res, next) => {
     try {
         
-        const { account_id } = req;
-        const { email, role_id } = req.body;
+        const { email, role_id, client_id } = req.body;
 
-        if (!email || !role_id) return res.status(400);
+        if (!email || !role_id || !client_id) return res.status(400).json('Missing fields').send();
 
         // Get Client id by ClientCollaborator relation
-        const collaborators = 
-            await models.ClientCollaborator
-                .query()
-                .where('account_id', account_id)
-                .withGraphFetched('client')
+        const client = 
+            await models.Client.query()
+                .findById(client_id);
 
-        const collaborator = collaborators[0];
+        if (!client) return res.status(400).json('Invalid client_id').send(); 
 
         const client_collaborators =
             await models.ClientCollaborator
                 .query()
-                .where('client_id', collaborator.client_id);
+                .where('client_id', client.id);
             
         // Validate that the Client has remaining collaborators
-        if (collaborator.client.collaborator_limit <= client_collaborators.length) return res.status(401).json('You had exceed your collaborators limit').send();
+        if (client.collaborator_limit <= client_collaborators.length) return res.status(401).json('You had exceed your collaborators limit').send();
 
         // Search for the role object
         const role = 
@@ -146,7 +143,7 @@ const inviteCollaborator = async (req, res, next) => {
         const token = await jwt.sign(
             {  
                 role_id,
-                client_id: collaborator.client_id,
+                client_id: client.id,
                 scope: role[0].scope,
                 name: role[0].name
             }, 
