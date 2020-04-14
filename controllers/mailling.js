@@ -39,7 +39,7 @@ const sendConfirmationEmail = (user, token) => {
     .catch(console.error);
 }
 
-const clientInviteEmail = (account_email, token) => {
+const clientInviteEmail = (account_email, token, role) => {
 
     const email = new Email({
         message: {
@@ -50,6 +50,10 @@ const clientInviteEmail = (account_email, token) => {
         transport: transporter,
     })
 
+    const capitalizeFirstLetter = (string) => {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
     email
     .send({
         template: 'invite_client',
@@ -58,6 +62,7 @@ const clientInviteEmail = (account_email, token) => {
         },
         locals: {
             email: account_email,
+            role: `${capitalizeFirstLetter(role.scope)} ${capitalizeFirstLetter(role.name)}`,
             signupUrl: `${process.env.SCHEMA}://${process.env.FRONT_HOST}:${process.env.FRONT_PORT}/client-signup?email=${account_email}&token=${token.token}`
         }
     })

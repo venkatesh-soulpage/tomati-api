@@ -24,6 +24,7 @@
     "email-templates": "^6.0.3",
     "esm": "^3.2.25",
     "express": "~4.16.1",
+    "express-validator": "^6.4.0",
     "http-errors": "^1.6.3",
     "jade": "^1.11.0",
     "jsonwebtoken": "^8.5.1",

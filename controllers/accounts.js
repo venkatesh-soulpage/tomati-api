@@ -64,13 +64,18 @@ const clientSignup = async (req, res, next) => {
 
         // Check if the account doesn't exist
         const account = 
-        await models.Account.query()
-            .where('email', email);
+            await models.Account.query()
+                .where('email', email);
 
         // If the account exist, return message        
         if (account && account.length > 0) return res.status(400).json({msg: 'This email already exists'});
 
-        // Check if the token sent is valid
+
+        // Validate the token signature
+        const decoded = await jwt.verify(token, process.env.SECRET_KEY);
+        if (!decoded) return res.status(400).json({msg: 'The email or token are invalid'});
+
+        // Check if the token sent is on the database
         const tokens = 
             await models.Token.query()
                 .where('token', token)
@@ -78,6 +83,7 @@ const clientSignup = async (req, res, next) => {
 
         // If there aren't tokens return error
         if (!tokens || tokens.length < 1) return res.status(400).json({msg: 'The email or token are invalid'});
+
 
         // Hash password
         const salt = await bcrypt.genSalt(10);
@@ -93,14 +99,13 @@ const clientSignup = async (req, res, next) => {
                     is_age_verified: true,
                 });
 
-        // Update the Client organization owner_id and fetch the id
-        await models.Client.query()
+        // Update the Client organization owner_id
+        if (decoded.scope === 'BRAND' && decoded.name === 'OWNER') {
+            
+            await models.Client.query()
                 .patch({owner_id: new_account.id})
                 .where('contact_email', email)
-
-        const updated_clients = 
-            await models.Client.query()
-                .where('contact_email', email)
+        }
 
         // Delete confirmation token
         await models.Token.query()
@@ -111,15 +116,15 @@ const clientSignup = async (req, res, next) => {
         // Search for Brand Owner Role
         const role = 
                 await models.Role.query()
-                    .where('scope','BRAND')
-                    .where('name','OWNER')
+                    .where('scope', decoded.scope)
+                    .where('name', decoded.name)
 
         // Add a client collaborator
         await models.ClientCollaborator.query()
                 .insert({
                     role_id: role[0].id,
                     account_id: new_account.id,
-                    client_id: updated_clients[0].id,
+                    client_id: decoded.client_id,
                 })
         
         // Generate the login token
@@ -292,7 +297,7 @@ const login = async (req, res, next) => {
                 }
         }
         
-        if (!scope || !role ) return res.status(401).send({mesg: 'Invalid account'});
+        if (!scope || !role ) return res.status(401).json('Invalid account').send();
 
         // Sign token
         const token = await jwt.sign(
