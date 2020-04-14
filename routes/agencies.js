@@ -20,5 +20,13 @@ router.post(
     agencyController.inviteAgency
 );
 
+/* POST - Invite new collaborator */
+router.post(
+    '/invite-collaborator',
+    VerifyToken,
+    VerifyRole(['ADMIN', 'AGENCY'], ['ADMIN', 'MANAGER']),
+    agencyController.inviteCollaborator
+);
+
 
 module.exports = router;

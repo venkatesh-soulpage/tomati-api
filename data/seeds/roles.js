@@ -8,6 +8,7 @@ exports.seed = function(knex) {
         {scope: 'BRAND', name: 'OWNER'},
         {scope: 'BRAND', name: 'MANAGER'},
         {scope: 'BRAND', name: 'WAREHOUSE_MANAGER'},
+        {scope: 'AGENCY', name: 'OWNER'},
         {scope: 'AGENCY', name: 'MANAGER'},
         {scope: 'AGENCY', name: 'STAFF'},
         {scope: 'GUEST', name: 'VVIP'},

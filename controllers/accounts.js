@@ -151,22 +151,27 @@ const clientSignup = async (req, res, next) => {
     }
 }
 
-// POST - Agency Signup
+// POST - Client Signup
 const agencySignup = async (req, res, next) => {
 
     try { 
 
-        const {email, password, first_name, phone_number, last_name, token } = req.body;
+        const {email, password, first_name, last_name, phone_number, token } = req.body;
 
         // Check if the account doesn't exist
         const account = 
-        await models.Account.query()
-            .where('email', email);
+            await models.Account.query()
+                .where('email', email);
 
         // If the account exist, return message        
         if (account && account.length > 0) return res.status(400).json({msg: 'This email already exists'});
 
-        // Check if the token sent is valid
+
+        // Validate the token signature
+        const decoded = await jwt.verify(token, process.env.SECRET_KEY);
+        if (!decoded) return res.status(400).json({msg: 'The email or token are invalid'});
+
+        // Check if the token sent is on the database
         const tokens = 
             await models.Token.query()
                 .where('token', token)
@@ -174,6 +179,7 @@ const agencySignup = async (req, res, next) => {
 
         // If there aren't tokens return error
         if (!tokens || tokens.length < 1) return res.status(400).json({msg: 'The email or token are invalid'});
+
 
         // Hash password
         const salt = await bcrypt.genSalt(10);
@@ -189,14 +195,13 @@ const agencySignup = async (req, res, next) => {
                     is_age_verified: true,
                 });
 
-        // Update the Client organization owner_id and fetch the id
-        await models.Agency.query()
+        // Update the Client organization owner_id
+        if (decoded.scope === 'AGENCY' && decoded.name === 'OWNER') {
+            
+            await models.Agency.query()
                 .patch({owner_id: new_account.id})
                 .where('contact_email', email)
-
-        const updated_agencies = 
-            await models.Agency.query()
-                .where('contact_email', email)
+        }
 
         // Delete confirmation token
         await models.Token.query()
@@ -207,15 +212,15 @@ const agencySignup = async (req, res, next) => {
         // Search for Brand Owner Role
         const role = 
                 await models.Role.query()
-                    .where('scope','AGENCY')
-                    .where('name','MANAGER')
+                    .where('scope', decoded.scope)
+                    .where('name', decoded.name)
 
         // Add a client collaborator
         await models.AgencyCollaborator.query()
                 .insert({
                     role_id: role[0].id,
                     account_id: new_account.id,
-                    agency_id: updated_agencies[0].id,
+                    agency_id: decoded.agency_id,
                 })
         
         // Generate the login token
@@ -284,7 +289,7 @@ const login = async (req, res, next) => {
         }
 
         // Validate by Agency if it isn't brand
-        if (!scope || role) {
+        if (!scope || !role) {
 
             const agencyCollaborators = 
                 await models.AgencyCollaborator.query()
