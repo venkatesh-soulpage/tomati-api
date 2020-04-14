@@ -12,6 +12,8 @@ import { sendConfirmationEmail, sendFotgotPasswordEmail, clientInviteEmail } fro
 const getClients = async (req, res, next) => {
     try {
 
+        const {account_id} = req;
+
         // Get the clients depending on admin or client
         let clients; 
         
