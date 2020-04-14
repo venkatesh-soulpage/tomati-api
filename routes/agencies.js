@@ -8,7 +8,7 @@ import VerifyRole from '../utils/verification_role'
 router.get(
     '/', 
     VerifyToken, 
-    VerifyRole('BRAND', ['OWNER']),
+    VerifyRole(['ADMIN', 'BRAND', 'AGENCY'], ['ADMIN','OWNER','MANAGER']),
     agencyController.getAgencies
 );
 

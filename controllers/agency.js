@@ -13,38 +13,54 @@ const getAgencies = async (req, res, next) => {
 
     try {
 
-        // Get the Brand of the client
-        let client_collaborator = 
-            await models.ClientCollaborator.query()
-                .where('account_id', req.account_id);;
-
-
-        const is_admin = (req.scope === 'ADMIN' && req.role === 'ADMIN');
-
-        // If there isn't any brand collaborators and the user isn't admin return
-        if (!client_collaborator[0] && !is_admin) return res.status(400).send({msg: 'Brand Collaborator does not exist'});
     
-        // Get Client agencies by invited role or all if not admin
-        let brands;
-        if (is_admin) {
-            brands = 
-            await models.Agency.query()
-                .withGraphFetched('[owner, client, agency_collaborators.[account, role]]')
-                .modifyGraph('agency_collaborators', builder => {
-                    builder.select('id');
-                });
-        } else {
-            brands = 
+        // Get Agencies according to scope;
+        // ADMIN - All agencies
+        // BRAND - Only agencies registered under brand 
+        // AGENCY - Only my agency
+        let agencies;
+        if (req.scope === 'ADMIN') {
+
+            agencies = 
+                await models.Agency.query()
+                    .withGraphFetched('[owner, client, agency_collaborators.[account, role]]')
+                    .modifyGraph('agency_collaborators', builder => {
+                        builder.select('id');
+                    });
+
+        } else if (req.scope === 'BRAND') {
+
+            let client_collaborator = 
+                await models.ClientCollaborator.query()
+                    .where('account_id', req.account_id);;
+
+            agencies = 
                 await models.Agency.query()
                     .where('invited_by', client_collaborator[0].client_id)
                     .withGraphFetched('[owner, client, agency_collaborators.[account, role]]')
                     .modifyGraph('agency_collaborators', builder => {
                         builder.select('id');
                     });
+
+        } else if (req.scope === 'AGENCY') {
+
+            let agency_collaborator = 
+                await models.AgencyCollaborator.query()
+                    .where('account_id', req.account_id);;
+
+            agencies = 
+                await models.Agency.query()
+                    .where('id', agency_collaborator[0].agency_id)
+                    .withGraphFetched('[owner, client, agency_collaborators.[account, role]]')
+                    .modifyGraph('agency_collaborators', builder => {
+                        builder.select('id');
+                    });
         }
 
+        if (!agencies) return res.status(400).json('Invalid').send();
+
         // Send the clients */
-        return res.status(201).json(brands).send();
+        return res.status(201).json(agencies).send();
 
     } catch (e) {
         console.log(e);

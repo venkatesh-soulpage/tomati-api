@@ -297,8 +297,8 @@ const login = async (req, res, next) => {
                     .withGraphFetched('role');
 
                 if (agencyCollaborators.length > 0) {
-                    scope = brandCollaborators[0].role.scope;
-                    role = brandCollaborators[0].role.name;
+                    scope = agencyCollaborators[0].role.scope;
+                    role = agencyCollaborators[0].role.name;
                 }
         }
         
