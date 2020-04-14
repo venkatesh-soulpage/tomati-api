@@ -164,7 +164,7 @@ const inviteCollaborator = async (req, res, next) => {
         // Send invite email
         await clientInviteEmail(email, new_token, role[0]);
 
-        return res.status(201).json('Collaborator invited').send();
+        return res.status(201).json(`We sent an invite email to ${email}`).send();
     } catch (e) {
         console.log(e);
         return res.status(500).json(JSON.stringify(e)).send();
