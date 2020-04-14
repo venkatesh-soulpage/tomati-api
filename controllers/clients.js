@@ -12,13 +12,34 @@ import { sendConfirmationEmail, sendFotgotPasswordEmail, clientInviteEmail } fro
 const getClients = async (req, res, next) => {
     try {
 
-        // Get the clients
-        const clients = 
-            await models.Client.query()
-                .withGraphFetched('[client_collaborators, client_collaborators.[account, role]]')
-                .modifyGraph('client_collaborators', builder => {
-                    builder.select('id');
-                })
+        // Get the clients depending on admin or client
+        let clients; 
+        
+        if (req.scope === 'ADMIN') {
+            clients = 
+                await models.Client.query()
+                    .withGraphFetched('[client_collaborators, client_collaborators.[account, role]]')
+                    .modifyGraph('client_collaborators', builder => {
+                        builder.select('id');
+                    })
+        } else {
+            // Get Client id by ClientCollaborator relation
+            const collaborators = 
+                await models.ClientCollaborator
+                    .query()
+                    .where('account_id', account_id)
+                    .withGraphFetched('client')
+
+            const collaborator = collaborators[0];
+            
+            clients =
+                await models.Client.query()
+                    .where('id', collaborator.client_id)
+                    .withGraphFetched('[client_collaborators, client_collaborators.[account, role]]')
+                    .modifyGraph('client_collaborators', builder => {
+                        builder.select('id');
+                    }) 
+        }            
 
         // Send the clients
         return res.status(201).json(clients).send();

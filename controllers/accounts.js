@@ -270,7 +270,7 @@ const login = async (req, res, next) => {
 
 
         // Validate by brand if it isn't admin
-        if (!scope || role) {
+        if (!scope || !role) {
 
             const brandCollaborators = 
                 await models.ClientCollaborator.query()

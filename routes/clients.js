@@ -6,7 +6,12 @@ import VerifyAdmin from '../utils/verification_admin'
 import VerifyRole from '../utils/verification_role'
 
 /* GET - Get a list of client organizations */
-router.get('/', VerifyToken, VerifyAdmin, clientController.getClients);
+router.get(
+    '/', 
+    VerifyToken, 
+    VerifyRole(['ADMIN', 'BRAND'], ['ADMIN', 'OWNER', 'MANAGER']),
+    clientController.getClients
+);
 
 /* POST - Create a new client organization and invite a new client */
 router.post('/invite', VerifyToken, VerifyAdmin, clientController.inviteClient);
