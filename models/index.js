@@ -7,6 +7,8 @@ import ClientCollaborator from './client_collaborator';
 import Agency from './agency';
 import AgencyCollaborator from './agency_collaborators';
 import Venue from './venue';
+import Brief from './brief';
+import BriefEvent from './brief_event';
 
 export default {
     Location,
@@ -17,5 +19,7 @@ export default {
     ClientCollaborator,
     Agency,
     AgencyCollaborator,
-    Venue
+    Venue,
+    Brief,
+    BriefEvent
 };

@@ -32,6 +32,14 @@ export default class ClientCollaborator extends Model {
               to: 'clients.id'
             }
         },
+        briefs: {
+          relation: Model.HasManyRelation,
+          modelClass: models.Briefs,
+          join: {
+            from: 'client_collaborators.id',
+            to: 'briefs.created_by'
+          }
+        },
       }
     }
   }
