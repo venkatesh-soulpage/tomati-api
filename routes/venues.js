@@ -20,5 +20,13 @@ router.post(
     venueController.createVenue
 );
 
+/* DELETE - Delete a venue */
+router.delete(
+    '/:venue_id', 
+    VerifyToken, 
+    VerifyRole(['ADMIN', 'BRAND'], ['ADMIN','OWNER', 'MANAGER']),
+    venueController.deleteVenue
+);
+
 
 module.exports = router;
