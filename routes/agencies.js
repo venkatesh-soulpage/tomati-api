@@ -24,7 +24,7 @@ router.post(
 router.post(
     '/invite-collaborator',
     VerifyToken,
-    VerifyRole(['ADMIN', 'AGENCY'], ['ADMIN', 'MANAGER']),
+    VerifyRole(['ADMIN', 'AGENCY'], ['ADMIN', 'OWNER', 'MANAGER']),
     agencyController.inviteCollaborator
 );
 

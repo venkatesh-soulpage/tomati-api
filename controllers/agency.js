@@ -142,7 +142,7 @@ const inviteCollaborator = async (req, res, next) => {
         // Get Client id by ClientCollaborator relation
         const agency = 
             await models.Agency.query()
-                .findById(agency);
+                .findById(agency_id);
 
         if (!agency) return res.status(400).json('Invalid agency_id').send(); 
 

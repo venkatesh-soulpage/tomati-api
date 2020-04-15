@@ -6,6 +6,7 @@ import Client from './client';
 import ClientCollaborator from './client_collaborator';
 import Agency from './agency';
 import AgencyCollaborator from './agency_collaborators';
+import Venue from './venue';
 
 export default {
     Location,
@@ -15,5 +16,6 @@ export default {
     Client,
     ClientCollaborator,
     Agency,
-    AgencyCollaborator
+    AgencyCollaborator,
+    Venue
 };

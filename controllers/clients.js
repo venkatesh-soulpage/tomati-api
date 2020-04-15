@@ -20,7 +20,7 @@ const getClients = async (req, res, next) => {
         if (req.scope === 'ADMIN') {
             clients = 
                 await models.Client.query()
-                    .withGraphFetched('[client_collaborators, client_collaborators.[account, role]]')
+                    .withGraphFetched('[venues, client_collaborators.[account, role]]')
                     .modifyGraph('client_collaborators', builder => {
                         builder.select('id');
                     })
@@ -37,7 +37,7 @@ const getClients = async (req, res, next) => {
             clients =
                 await models.Client.query()
                     .where('id', collaborator.client_id)
-                    .withGraphFetched('[client_collaborators, client_collaborators.[account, role]]')
+                    .withGraphFetched('[venues, client_collaborators.[account, role]]')
                     .modifyGraph('client_collaborators', builder => {
                         builder.select('id');
                     }) 
