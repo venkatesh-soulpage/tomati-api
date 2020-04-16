@@ -3,6 +3,7 @@ exports.up = async (knex) => {
 
     return knex.schema.createTable('briefs', table => {
         table.increments('id').primary()
+        table.integer('client_id').references('clients.id').notNullable()
         table.integer('created_by').references('client_collaborators.id').notNullable()
         table.string('name').notNullable()
         table.string('description').notNullable()

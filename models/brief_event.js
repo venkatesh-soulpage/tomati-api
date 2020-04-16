@@ -24,6 +24,14 @@ export default class BriefEvent extends Model {
               to: 'brief_events.id'
             }
         },
+        venue: {
+            relation: Model.BelongsToOneRelation,
+            modelClass: models.Venue,
+            join: {
+              from: 'brief_events.venue_id',
+              to: 'venues.id'
+            }
+        },
       }
     }
   }

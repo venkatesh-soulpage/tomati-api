@@ -19,11 +19,12 @@ exports.up = async (knex) => {
         table.string('status')
         table.boolean('enabled')
         table.integer('parent_brief_event_id')
+        table.integer('venue_id').references('venues')
         table.timestamp('created_at').defaultTo(knex.fn.now()).notNullable()
         table.timestamp('updated_at').defaultTo(knex.fn.now()).notNullable()
       })
 }
 
 exports.down = async (knex) => {
-    return knex.schema.dropTable('clients')
+    return knex.schema.dropTable('brief_events')
 }

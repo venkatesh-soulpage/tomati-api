@@ -17,5 +17,5 @@ exports.up = async (knex) => {
 }
 
 exports.down = async (knex) => {
-    return knex.schema.dropTable('clients')
+    return knex.schema.dropTable('venues')
 }

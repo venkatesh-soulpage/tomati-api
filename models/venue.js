@@ -8,13 +8,21 @@ export default class Venue extends Model {
   
     static get relationMappings () {
       return {
-        location: {
+        client: {
             relation: Model.BelongsToOneRelation,
             modelClass: models.Client,
             join: {
               from: 'venues.created_by',
               to: 'clients.id'
             }
+        },
+        brief_events: {
+          relation: Model.HasManyRelation,
+          modelClass: models.BriefEvent,
+          join: {
+            from: 'venue.id',
+            to: 'brief_events.venue_id'
+          }
         },
       }
     }
