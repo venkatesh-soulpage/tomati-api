@@ -179,13 +179,53 @@ const deleteBrief = async (req, res, next) => {
 }
 
 
+// DELETE - Delete a brief
+const updateBriefStatus = async (req, res, next) => {
+    
+    try {    
+        const {account_id} = req;
+        const {brief_id} = req.params;
+        const {status} = req.body;
+
+        // Validate the collaborator
+        const client_collaborators = 
+            await models.ClientCollaborator.query()
+                .where('account_id', account_id);
+
+        const collaborator = client_collaborators[0];
+
+        if (!collaborator) return res.status(400).json('Invalid collaborator');
+
+        // Validate if the collaborator is able to delete the brief
+        const brief = await models.Brief.query().findById(brief_id);
+        if (!brief) return res.status(400).json('Invalid brief').send();
+        if (brief.client_id !== collaborator.client_id) return res.status(401).json("You don't have permissions to delete this brief").send();
+    
+        // Delete the brief
+        await models.Brief.query()
+            .update({status})
+            .where('id', brief_id);
+
+        // Send the clients
+        return res.status(200).json('Brief status updated').send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
+
+
+
 
 
 const briefController = {
     getBriefs,
     createBrief,
     addBriefEvent,
-    deleteBrief
+    deleteBrief,
+    updateBriefStatus
 }
 
 export default briefController;

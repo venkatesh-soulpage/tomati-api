@@ -37,5 +37,13 @@ router.post(
     briefController.addBriefEvent
 );
 
+/* PUT - Update brief status*/
+router.put(
+    '/:brief_id/update-status', 
+    VerifyToken, 
+    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    briefController.updateBriefStatus
+);
+
 
 module.exports = router;
