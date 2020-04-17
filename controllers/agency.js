@@ -60,7 +60,7 @@ const getAgencies = async (req, res, next) => {
         if (!agencies) return res.status(400).json('Invalid').send();
 
         // Send the clients */
-        return res.status(201).json(agencies).send();
+        return res.status(200).send(agencies);
 
     } catch (e) {
         console.log(e);

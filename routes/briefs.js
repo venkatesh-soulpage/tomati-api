@@ -4,7 +4,7 @@ import briefController from '../controllers/brief';
 import VerifyToken from '../utils/verification'
 import VerifyRole from '../utils/verification_role'
 
-// GET - Get a list of client organizations 
+// GET - Get a list of briefs for the client
 router.get(
     '/', 
     VerifyToken, 
@@ -13,12 +13,20 @@ router.get(
 );
 
 
-/* GET - Get a list of client organizations */
+/* POST - Create a new brief */
 router.post(
     '/', 
     VerifyToken, 
     VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
     briefController.createBrief
+);
+
+/* DELETE - Delete a brief  */
+router.delete(
+    '/:brief_id', 
+    VerifyToken, 
+    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    briefController.deleteBrief
 );
 
 
