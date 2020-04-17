@@ -4,6 +4,14 @@ import venueController from '../controllers/venue';
 import VerifyToken from '../utils/verification'
 import VerifyRole from '../utils/verification_role'
 
+/* GET - Get a list of venues */
+router.get(
+    '/', 
+    VerifyToken, 
+    VerifyRole(['ADMIN', 'BRAND'], ['ADMIN','OWNER', 'MANAGER']),
+    venueController.getVenues
+);
+
 /* GET - Get a list of client organizations */
 router.get(
     '/:client_id', 

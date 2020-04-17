@@ -29,5 +29,13 @@ router.delete(
     briefController.deleteBrief
 );
 
+/* POST - Create a new brief */
+router.post(
+    '/:brief_id/addBriefEvent', 
+    VerifyToken, 
+    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    briefController.addBriefEvent
+);
+
 
 module.exports = router;

@@ -8,7 +8,7 @@ export default class BriefEvent extends Model {
   
     static get relationMappings () {
       return {
-        brief_parent: {
+        brief: {
           relation: Model.BelongsToOneRelation,
           modelClass: models.Brief,
           join: {

@@ -6,6 +6,39 @@ import fetch from 'node-fetch';
 import queryString from 'query-string';
 
 // GET - Get a list of venues
+const getVenues = async (req, res, next) => {
+    
+    try {    
+
+        const {account_id, scope} = req;
+    
+        // Validate the account is a client collaborator
+        const client_collaborators = 
+            await models.ClientCollaborator.query()
+                .where('account_id', account_id)
+            
+        const collaborator = client_collaborators[0];
+        if (!collaborator) return res.status(400).send('Invalid account');
+
+        // Search venues by client_id if its a collaborator just return the client_id venues
+        const venues =  
+            await models.Venue.query()
+                .modify((queryBuilder) => {
+                    if (scope === 'BRAND') {
+                        queryBuilder.where('created_by', collaborator.client_id); 
+                    }
+                }) 
+
+        // Send the clients
+        return res.status(200).send(venues);
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
+// GET - Get a list of venues
 const getVenuesByClient = async (req, res, next) => {
     
     try {    
@@ -61,7 +94,6 @@ const deleteVenue = async (req, res, next) => {
         const {account_id, scope} = req;
         const {venue_id} = req.params;
 
-        console.log(venue_id);
 
         // Validate the account is a client collaborator
         const client_collaborators = 
@@ -92,6 +124,7 @@ const deleteVenue = async (req, res, next) => {
 
 
 const venueController = {
+    getVenues,
     getVenuesByClient,
     createVenue,
     deleteVenue

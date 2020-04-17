@@ -16,6 +16,14 @@ export default class Brief extends Model {
               to: 'client_collaborators.id'
             }
         },
+        brief_events: {
+          relation: Model.HasManyRelation,
+          modelClass: models.BriefEvent,
+          join: {
+            from: 'briefs.id',
+            to: 'brief_events.brief_id',
+          }
+        }
       }
     }
   }
