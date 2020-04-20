@@ -26,7 +26,7 @@ const getRoles = async (req, res, next) => {
                 }) 
 
         // Send the clients
-        return res.status(201).json(roles).send();
+        return res.status(201).send(roles);
 
     } catch (e) {
         console.log(e);

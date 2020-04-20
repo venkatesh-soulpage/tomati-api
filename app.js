@@ -8,6 +8,7 @@ var cors = require('cors')
 
 var indexRouter = require('./routes/index');
 var authRouter = require('./routes/auth');
+var locationsRouter = require('./routes/locations');
 var clientsRouter = require('./routes/clients');
 var agenciesRouter = require('./routes/agencies');
 var rolesRouter = require('./routes/roles');
@@ -31,6 +32,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/locations', locationsRouter);
 app.use('/api/clients', clientsRouter);
 app.use('/api/agencies', agenciesRouter);
 app.use('/api/roles', rolesRouter);
