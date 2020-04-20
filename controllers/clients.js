@@ -16,11 +16,13 @@ const getClients = async (req, res, next) => {
 
         // Get the clients depending on admin or client
         let clients; 
+
+        const query = '[locations.[location], venues, client_collaborators.[account, role]]';
         
         if (req.scope === 'ADMIN') {
             clients = 
                 await models.Client.query()
-                    .withGraphFetched('[venues, client_collaborators.[account, role]]')
+                    .withGraphFetched(query)
                     .modifyGraph('client_collaborators', builder => {
                         builder.select('id');
                     })
@@ -37,7 +39,7 @@ const getClients = async (req, res, next) => {
             clients =
                 await models.Client.query()
                     .where('id', collaborator.client_id)
-                    .withGraphFetched('[venues, client_collaborators.[account, role]]')
+                    .withGraphFetched(query)
                     .modifyGraph('client_collaborators', builder => {
                         builder.select('id');
                     }) 
@@ -59,7 +61,8 @@ const inviteClient = async (req, res, next) => {
         /* Todo add client organization logic */
         const {
             name, description, owner_email,
-            collaborator_limit, briefs_limit, brands_limit, warehouses_limit, locations_limit
+            collaborator_limit, briefs_limit, brands_limit, warehouses_limit, locations_limit,
+            identity_verifications_limit, agencies_limit, agency_collaborators_limit, selected_locations,
         } = req.body;
 
         // Create client
@@ -73,8 +76,26 @@ const inviteClient = async (req, res, next) => {
                     briefs_limit, 
                     brands_limit, 
                     warehouses_limit,
-                    locations_limit
+                    locations_limit,
+                    identity_verifications_limit, 
+                    agencies_limit, 
+                    agency_collaborators_limit
                 })
+
+        // Create client locations
+        // Validate that there are locations
+        const locations = selected_locations.map(selected => {
+            return {
+                location_id: selected.id,
+                client_id: client.id,
+            }
+        });
+
+        if (locations.length > 0) {
+            await models.ClientLocations
+                .query()
+                .insert(locations);
+        }
 
         // Create new token to validate owner email
         const role = 
@@ -103,7 +124,15 @@ const inviteClient = async (req, res, next) => {
         // TODO send invite email
         await clientInviteEmail(owner_email, new_token, {scope: 'BRAND', name: 'OWNER'});
 
-        return res.status(201).json(client).send();
+        const new_client = 
+            await models.Client.query()
+                .findById(client.id)
+                .withGraphFetched('[locations.[location], venues, client_collaborators.[account, role]]')
+                .modifyGraph('client_collaborators', builder => {
+                    builder.select('id');
+                }) 
+
+        return res.status(201).json(new_client).send();
     } catch (e) {
         console.log(e);
         return res.status(500).json(JSON.stringify(e)).send();

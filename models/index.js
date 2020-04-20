@@ -4,6 +4,7 @@ import Token from './token';
 import Role from './role';
 import Client from './client';
 import ClientCollaborator from './client_collaborator';
+import ClientLocations from './client_locations';
 import Agency from './agency';
 import AgencyCollaborator from './agency_collaborators';
 import Venue from './venue';
@@ -17,6 +18,7 @@ export default {
     Role,
     Client,
     ClientCollaborator,
+    ClientLocations,
     Agency,
     AgencyCollaborator,
     Venue,
