@@ -83,9 +83,11 @@ const addBriefEvent = async (req, res, next) => {
         const {account_id} = req;
         const {brief_id} = req.params;
         const { 
+            setup_time,
             start_time, 
             end_time, 
             recee_required,
+            recee_time,
             expected_guests,
             hourly_expected_guests,
             cocktails_enabled,
@@ -118,9 +120,11 @@ const addBriefEvent = async (req, res, next) => {
             await models.BriefEvent.query()
                 .insert({
                     brief_id,
+                    setup_time,
                     start_time, 
                     end_time,
                     recee_required,
+                    recee_time,
                     expected_guests,
                     hourly_expected_guests,
                     cocktails_enabled,
