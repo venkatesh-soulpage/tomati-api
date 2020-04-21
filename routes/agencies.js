@@ -12,6 +12,12 @@ router.get(
     agencyController.getAgencies
 );
 
+/* GET - Get a sla for an agency */
+router.get(
+    '/:agency_id/sla', 
+    agencyController.getAgencySla
+);
+
 /* POST - Create a new client organization and invite a new client */
 router.post(
     '/invite',

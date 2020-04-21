@@ -199,7 +199,10 @@ const agencySignup = async (req, res, next) => {
         if (decoded.scope === 'AGENCY' && decoded.name === 'OWNER') {
             
             await models.Agency.query()
-                .patch({owner_id: new_account.id})
+                .patch({
+                    owner_id: new_account.id,
+                    sla_accepted: true,
+                })
                 .where('contact_email', email)
         }
 

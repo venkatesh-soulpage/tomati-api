@@ -68,11 +68,36 @@ const getAgencies = async (req, res, next) => {
     }
 }
 
+const getAgencySla = async (req, res, next) => {
+    try {
+
+        const {agency_id} = req.params; 
+        
+        const agency = 
+            await models.Agency.query()
+                .findById(agency_id);
+
+        if (!agency) return res.status(400).json('Invalid agency');
+
+        const sla = {
+            sla_terms: agency.sla_terms,
+            sla_hours_before_event_creation: agency.sla_hours_before_event_creation,
+            sla_hours_before_event_update: agency.sla_hours_before_event_update,
+        }
+
+        return res.status(200).send(sla);
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 // Invite Agency
 const inviteAgency = async (req, res, next) => {
     try {
         /* Todo add client organization logic */
-        const { name, description, owner_email } = req.body;
+        const { name, description, owner_email, sla_terms, sla_hours_before_event_creation,  sla_hours_before_event_update } = req.body;
         let {client_id} = req.body;
 
         // If there isn't a client_id use the token
@@ -95,6 +120,10 @@ const inviteAgency = async (req, res, next) => {
                     description, 
                     contact_email: owner_email,
                     invited_by: client_id,
+                    sla_terms, 
+                    sla_hours_before_event_creation,  
+                    sla_hours_before_event_update,
+                    sla_accepted: false
                 })
 
         // Create new token to validate owner email
@@ -193,6 +222,7 @@ const inviteCollaborator = async (req, res, next) => {
 const agencyController = {
     // Client
     getAgencies,
+    getAgencySla,
     inviteAgency,
     inviteCollaborator
 }
