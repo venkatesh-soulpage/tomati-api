@@ -14,6 +14,7 @@ var agenciesRouter = require('./routes/agencies');
 var rolesRouter = require('./routes/roles');
 var venuesRouter = require('./routes/venues');
 var briefsRoute = require('./routes/briefs');
+var brandsRoute = require('./routes/brands');
 
 var app = express();
 
@@ -38,6 +39,7 @@ app.use('/api/agencies', agenciesRouter);
 app.use('/api/roles', rolesRouter);
 app.use('/api/venues', venuesRouter);
 app.use('/api/briefs', briefsRoute);
+app.use('/api/brands', brandsRoute);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

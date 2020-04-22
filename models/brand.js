@@ -16,6 +16,14 @@ export default class Brand extends Model {
             to: 'products.brand_id'
           }
         },
+        client: {
+          relation: Model.HasOneRelation,
+          modelClass: models.Client,
+          join: {
+            from: 'brands.client_id',
+            to: 'clients.id'
+          }
+        },
 
       }
     }

@@ -17,7 +17,7 @@ const getClients = async (req, res, next) => {
         // Get the clients depending on admin or client
         let clients; 
 
-        const query = '[locations.[location], venues, client_collaborators.[account, role]]';
+        const query = '[locations.[location], venues, brands, client_collaborators.[account, role]]';
         
         if (req.scope === 'ADMIN') {
             clients = 

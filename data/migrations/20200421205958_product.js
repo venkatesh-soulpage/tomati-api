@@ -8,7 +8,6 @@ exports.up = async (knex) => {
         table.string('description').notNullable()
         table.integer('stock').notNullable()
         table.string('metric').notNullable()
-        table.float('units').notNullable()
         table.string('sku').notNullable()
         table.float('base_price').notNullable()
         table.boolean('is_cocktail').notNullable().defaultTo(false)

@@ -40,6 +40,14 @@ export default class Client extends Model {
             to: 'venues.created_by'
           }
         },
+        brands: {
+          relation: Model.HasManyRelation,
+          modelClass: models.Brand,
+          join: {
+            from: 'clients.id',
+            to: 'brands.client_id'
+          }
+        },
         locations: {
           relation: Model.HasManyRelation,
           modelClass: models.ClientLocations,
