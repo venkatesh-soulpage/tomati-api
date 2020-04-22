@@ -16,6 +16,14 @@ export default class Brief extends Model {
               to: 'client_collaborators.id'
             }
         },
+        agency: {
+            relation: Model.BelongsToOneRelation,
+            modelClass: models.Agency,
+            join: {
+              from: 'briefs.agency_id',
+              to: 'agencies.id'
+            }
+        },
         brief_events: {
           relation: Model.HasManyRelation,
           modelClass: models.BriefEvent,

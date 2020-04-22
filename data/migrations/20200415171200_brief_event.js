@@ -16,6 +16,7 @@ exports.up = async (knex) => {
         table.integer('cocktails_per_guest')
         table.boolean('free_drinks_enabled').defaultTo(false).notNullable()
         table.integer('free_drinks_per_guest')
+        table.string('name')
         table.string('cash_collected_by')
         table.string('comments')
         table.string('status')

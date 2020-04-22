@@ -24,7 +24,7 @@ const getBriefs = async (req, res, next) => {
         const briefs = 
             await models.Brief.query()
                 .where('client_id', collaborator.client_id)
-                .withGraphFetched('[brief_events.[venue]]')
+                .withGraphFetched('[brief_events.[venue], agency]')
                 /* .modifyGraph('brief_events', builder => {
                     builder.select('id');
                 }); */
@@ -45,7 +45,7 @@ const createBrief = async (req, res, next) => {
     
     try {    
         const {account_id} = req;
-        const {name, description} = req.body;
+        const {name, description, agency_id} = req.body;
 
         // Validate the collaborator
         const client_collaborators = 
@@ -62,10 +62,12 @@ const createBrief = async (req, res, next) => {
                 .insert({
                     client_id: collaborator.client_id,
                     created_by: collaborator.id,
+                    agency_id: agency_id,
                     name,
                     description,
                     status: 'DRAFT',
                 })
+                .withGraphFetched('[brief_events.[venue], agency]')
 
         // Send the clients
         return res.status(200).send(new_brief);
@@ -83,6 +85,7 @@ const addBriefEvent = async (req, res, next) => {
         const {account_id} = req;
         const {brief_id} = req.params;
         const { 
+            name,
             setup_time,
             start_time, 
             end_time, 
@@ -119,6 +122,7 @@ const addBriefEvent = async (req, res, next) => {
         const new_brief_event =
             await models.BriefEvent.query()
                 .insert({
+                    name,
                     brief_id,
                     setup_time,
                     start_time, 

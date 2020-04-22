@@ -39,6 +39,14 @@ export default class Agency extends Model {
             from: 'agencies.id',
             to: 'agency_collaborators.agency_id'
           }
+        },
+        briefs: {
+          relation: Model.HasManyRelation,
+          modelClass: models.Brief,
+          join: {
+            from: 'agencies.id',
+            to: 'briefs.agency_id'
+          }
         }
       }
     }
