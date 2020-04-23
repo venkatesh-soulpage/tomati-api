@@ -13,6 +13,7 @@ import BriefEvent from './brief_event';
 import Brand from './brand';
 import Product from './product';
 import ProductIngredient from './product_ingredient';
+import Warehouse from './warehouse';
 
 export default {
     Location,
@@ -29,5 +30,6 @@ export default {
     BriefEvent,
     Brand,
     Product,
-    ProductIngredient
+    ProductIngredient,
+    Warehouse
 };

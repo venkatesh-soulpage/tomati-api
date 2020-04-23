@@ -17,7 +17,7 @@ const getClients = async (req, res, next) => {
         // Get the clients depending on admin or client
         let clients; 
 
-        const query = '[locations.[location], venues, brands, client_collaborators.[account, role]]';
+        const query = '[locations.[location], venues, brands, warehouses.[location], client_collaborators.[account, role]]';
         
         if (req.scope === 'ADMIN') {
             clients = 
@@ -124,10 +124,13 @@ const inviteClient = async (req, res, next) => {
         // TODO send invite email
         await clientInviteEmail(owner_email, new_token, {scope: 'BRAND', name: 'OWNER'});
 
+        const query = '[locations.[location], venues, brands, warehouses.[location], client_collaborators.[account, role]]';
+        
+
         const new_client = 
             await models.Client.query()
                 .findById(client.id)
-                .withGraphFetched('[locations.[location], venues, client_collaborators.[account, role]]')
+                .withGraphFetched(query)
                 .modifyGraph('client_collaborators', builder => {
                     builder.select('id');
                 }) 

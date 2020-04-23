@@ -32,6 +32,14 @@ export default class Location extends Model {
             to: 'locations.id'
           }
         },
+        warehouses: {
+          relation: Model.HasManyRelation,
+          modelClass: models.Warehouse,
+          join: {
+            from: 'locations.id',
+            to: 'warehouses.location_id'
+          }
+        }
       }
     }
   }
