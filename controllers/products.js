@@ -42,7 +42,7 @@ const createProduct = async (req, res, next) => {
     try {    
 
         const {account_id, scope} = req;
-        const {name, brand_id, description, metric, metric_amount, sku, base_price, is_cocktail} = req.body;
+        const {name, brand_id, description, metric, metric_amount, sku, base_price, is_cocktail, cocktail_ingredients} = req.body;
     
         // Validate the account is a client collaborator
         const client_collaborators = 
@@ -56,8 +56,22 @@ const createProduct = async (req, res, next) => {
         const new_product = 
             await models.Product.query()
                 .insert({
+                    client_id: collaborator.client_id,
                     name, brand_id, description, metric, metric_amount, sku, base_price, is_cocktail
                 })              
+
+        // If its cocktail save the cocktail ingredients
+        if (is_cocktail && cocktail_ingredients) {
+            const ingredients = cocktail_ingredients.map(ingredient => {
+                return {
+                    product_parent_id: new_product.id,
+                    ...ingredient
+                }
+            })
+            await models.ProductIngredient
+                .query()
+                .insert(ingredients);
+        }
             
 
         // Send the clients

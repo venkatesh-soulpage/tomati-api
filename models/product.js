@@ -9,14 +9,10 @@ export default class Product extends Model {
     static get relationMappings () {
       return {
         client: {
-            relation: Model.HasOneThroughRelation,
+            relation: Model.HasOneRelation,
             modelClass: models.Client,
             join: {
-                from: 'products.brand_id',
-                through: {
-                    from: 'brands.id',
-                    to: 'brands.client_id'
-                },
+                from: 'products.client_id',
                 to: 'clients.id'
             }
         },

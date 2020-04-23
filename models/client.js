@@ -49,15 +49,11 @@ export default class Client extends Model {
           }
         },
         products: {
-          relation: Model.ManyToManyRelation,
+          relation: Model.HasManyRelation,
           modelClass: models.Product,
           join: {
               from: 'clients.id',
-              through: {
-                  from: 'brands.client_id',
-                  to: 'brands.id',
-              },
-              to: 'products.brand_id'
+              to: 'products.client_id'
           }
         },
         locations: {
