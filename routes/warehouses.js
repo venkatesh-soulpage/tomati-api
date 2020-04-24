@@ -28,5 +28,13 @@ router.post(
     warehousesController.createWarehouseStock
 );
 
+/* POST - Create or update a stock inventory */
+router.post(
+    '/:warehouse_id/remove-stock', 
+    VerifyToken, 
+    VerifyRole(['BRAND'], ['OWNER', 'WAREHOUS_MANAGER']),
+    warehousesController.removeWarehouseStock
+);
+
 
 module.exports = router;

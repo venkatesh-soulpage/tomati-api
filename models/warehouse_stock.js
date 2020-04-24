@@ -29,7 +29,7 @@ export default class WarehouseStock extends Model {
             modelClass: models.WarehouseTransaction,
             join: {
                 from: 'warehouse_stocks.product_id',
-                to: 'warehouse_transacions.product_id'
+                to: 'warehouse_transactions.product_id'
             }
         }
       }

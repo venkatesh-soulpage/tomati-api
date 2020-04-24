@@ -18,7 +18,7 @@ const getWarehouses = async (req, res, next) => {
 
         const warehouses =  
             await models.Warehouse.query()
-                .withGraphFetched('[location, stocks.[product]]')
+                .withGraphFetched('[location, stocks.[product, transactions]]')
                 .modify((queryBuilder) => {
                     if (scope !== 'ADMIN') {
                         queryBuilder.where('client_id', client_collaborators[0].client_id);
@@ -84,7 +84,7 @@ const createWarehouseStock = async (req, res, next) => {
             await models.Warehouse.query()
                 .findById(warehouse_id);
 
-        if (warehouse.id !== client_collaborators[0].client_id) return res.status(400).json('You dont have permission to do this').send();
+        if (warehouse.client_id !== client_collaborators[0].client_id) return res.status(400).json('You dont have permission to do this').send();
 
         // Validate if the product is on stock
         const stock = 
@@ -123,11 +123,62 @@ const createWarehouseStock = async (req, res, next) => {
     }
 }
 
+const removeWarehouseStock = async (req, res, next) => {
+    try {    
+        const {account_id, scope} = req;
+        const {warehouse_id} = req.params;
+        const {product_id, quantity} = req.body;
+
+        // Validate the account is a client collaborator
+        const client_collaborators = 
+            await models.ClientCollaborator.query()
+                .where('account_id', account_id)
+
+        const warehouse =
+            await models.Warehouse.query()
+                .findById(warehouse_id);
+
+        if (warehouse.client_id !== client_collaborators[0].client_id) return res.status(400).json('You dont have permission to do this').send();
+
+        // Validate if the product is on stock
+        const stock = 
+            await models.WarehouseStock.query()
+                .where('product_id', product_id)
+                .where('warehouse_id', warehouse_id);
+
+        if (stock[0].quantity <= 0) return res.status(400).json('No stock left').send();
+        
+        // Validate stock 
+        const new_stock = new Number(stock[0].quantity) -  new Number(quantity);
+        const new_amount = new_stock <= 0 ? 0 : new_stock;
+
+        await models.WarehouseStock.query()
+            .patch({quantity: new_amount})
+            .where('id', stock[0].id);
+        
+        // Register the transaction
+        await models.WarehouseTransaction.query()
+            .insert({
+                warehouse_id, product_id, 
+                quantity,
+                action: 'REMOVE'
+            })
+
+        // Send the clients
+        return res.status(201).json('Stock successfully removed').send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 
 const warehouseController = {
     getWarehouses,
     createWarehouse,
-    createWarehouseStock
+    createWarehouseStock,
+    removeWarehouseStock
 }
 
 export default warehouseController;
