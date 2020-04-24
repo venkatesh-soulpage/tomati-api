@@ -1,0 +1,1 @@
+web: knex migrate:rollback --all && knex:migrate:latest && knex seed:run && npm run start
