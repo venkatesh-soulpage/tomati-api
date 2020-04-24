@@ -39,7 +39,7 @@ const getBriefs = async (req, res, next) => {
         // Create the brief
         const briefs = 
             await models.Brief.query()
-                .withGraphFetched('[brief_events.[venue], agency]')
+                .withGraphFetched('[brief_events.[venue], products.[product.[brand]], agency]')
                 .modify((queryBuilder) => {
                     if (scope === 'BRAND') {
                         queryBuilder.where('client_id', collaborator.client_id)
@@ -47,6 +47,7 @@ const getBriefs = async (req, res, next) => {
                     if (scope === 'AGENCY') {
                         queryBuilder
                             .where('client_id', collaborator.client.id)
+                            .where('agency_id', collaborator.agency_id)
                             .where('status', 'SUBMITTED');
                     }
                 }) 
@@ -175,6 +176,73 @@ const addBriefEvent = async (req, res, next) => {
     }
 }
 
+// POST - Create a new brief event
+const addBriefProduct = async (req, res, next) => {
+    
+    try {    
+        const {account_id} = req;
+        const {brief_id} = req.params;
+        const { product_id, limit } = req.body;
+
+        // Validate that brief exists
+        const brief = await models.Brief.query().findById(brief_id);
+        if (!brief) return res.status(400).send('Invalid brief');
+
+        // Validate that the event is created by a collaborator of the organization
+        const client_collaborators = 
+            await models.ClientCollaborator.query()
+                .where('account_id', account_id);
+
+        const collaborator = client_collaborators[0];
+        if (!collaborator) return res.status(400).send("You don't have permissions to edit this brief");
+        
+        // Create brief product
+        await models.BriefProducts.query()
+                .insert({
+                    brief_id,
+                    product_id,
+                    limit
+                })
+
+        return res.status(201).json('Brief product added succesfully').send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
+// DELETE - Create a new brief event
+const deleteBriefProduct = async (req, res, next) => {
+    
+    try {    
+        const {account_id} = req;
+        const {brief_id, brief_product_id} = req.params;
+
+        // Validate that brief exists
+        const brief = await models.Brief.query().findById(brief_id);
+        if (!brief) return res.status(400).send('Invalid brief');
+
+        // Validate that the event is created by a collaborator of the organization
+        const client_collaborators = 
+            await models.ClientCollaborator.query()
+                .where('account_id', account_id);
+
+        const collaborator = client_collaborators[0];
+        if (!collaborator) return res.status(400).send("You don't have permissions to edit this brief");
+        
+        // Create brief product
+        await models.BriefProducts.query()
+                .deleteById(brief_product_id)
+
+        return res.status(201).json('Brief product deleted succesfully').send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 // DELETE - Delete a brief
 const deleteBrief = async (req, res, next) => {
     
@@ -255,6 +323,8 @@ const briefController = {
     getBriefs,
     createBrief,
     addBriefEvent,
+    addBriefProduct,
+    deleteBriefProduct,
     deleteBrief,
     updateBriefStatus
 }

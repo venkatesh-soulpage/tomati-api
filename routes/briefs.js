@@ -31,10 +31,26 @@ router.delete(
 
 /* POST - Create a new brief */
 router.post(
-    '/:brief_id/addBriefEvent', 
+    '/:brief_id/add-event', 
     VerifyToken, 
     VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
     briefController.addBriefEvent
+);
+
+/* POST - Create a new brief */
+router.post(
+    '/:brief_id/add-product', 
+    VerifyToken, 
+    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    briefController.addBriefProduct
+);
+
+/* DELETE - Delete a brief product*/
+router.delete(
+    '/:brief_id/delete-product/:brief_product_id', 
+    VerifyToken, 
+    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    briefController.deleteBriefProduct
 );
 
 /* PUT - Update brief status*/

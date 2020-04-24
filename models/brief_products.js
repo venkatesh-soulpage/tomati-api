@@ -16,6 +16,14 @@ export default class BriefProducts extends Model {
             to: 'briefs.id'
           }
         },
+        product: {
+            relation: Model.BelongsToOneRelation,
+            modelClass: models.Product,
+            join: {
+                from: 'brief_products.product_id',
+                to: 'products.id'
+            }
+        }
       }
     }
   }
