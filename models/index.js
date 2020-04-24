@@ -10,6 +10,7 @@ import AgencyCollaborator from './agency_collaborators';
 import Venue from './venue';
 import Brief from './brief';
 import BriefEvent from './brief_event';
+import BriefProducts from './brief_products';
 import Brand from './brand';
 import Product from './product';
 import ProductIngredient from './product_ingredient';
@@ -30,6 +31,7 @@ export default {
     Venue,
     Brief,
     BriefEvent,
+    BriefProducts,
     Brand,
     Product,
     ProductIngredient,

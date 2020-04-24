@@ -26,12 +26,24 @@ export default class AgencyCollaborator extends Model {
         },
         agency: {
             relation: Model.BelongsToOneRelation,
-            modelClass: models.Client,
+            modelClass: models.Agency,
             join: {
               from: 'agency_collaborators.agency_id',
               to: 'agencies.id'
             }
         },
+        client: {
+          relation: Model.HasOneThroughRelation,
+          modelClass: models.Client,
+          join: {
+            from: 'agency_collaborators.agency_id',
+            through: {
+              from :'agencies.id',
+              to: 'agencies.invited_by',
+            },
+            to: 'clients.id'
+          }
+        }
       }
     }
   }

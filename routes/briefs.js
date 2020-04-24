@@ -8,7 +8,7 @@ import VerifyRole from '../utils/verification_role'
 router.get(
     '/', 
     VerifyToken, 
-    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    VerifyRole(['BRAND', 'AGENCY'], ['OWNER', 'MANAGER']),
     briefController.getBriefs
 );
 

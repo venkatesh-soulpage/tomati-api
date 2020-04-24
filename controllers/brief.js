@@ -11,26 +11,43 @@ const getBriefs = async (req, res, next) => {
         
         const {scope, account_id} = req;
 
-        // Validate the collaborator
-        const client_collaborators = 
-            await models.ClientCollaborator.query()
-                .where('account_id', account_id);
+        // Validate the collaborators
+        let collaborator;
 
-        const collaborator = client_collaborators[0];
+        // If client query client collaborators
+        if (scope === 'BRAND') {
+            const client_collaborators = 
+                        await models.ClientCollaborator.query()
+                            .where('account_id', account_id);
 
+            collaborator = client_collaborators[0];
+        } 
+
+        // If agency bring Agency collaborators with client graph
+        if (scope === 'AGENCY') {
+                const agency_collaborators = 
+                        await models.AgencyCollaborator.query()
+                            .where('account_id', account_id)
+                            .withGraphFetched('[client]')
+                            
+            collaborator = agency_collaborators[0];
+        }
+
+        
         if (!collaborator) return res.status(400).json('Invalid collaborator').send();
 
         // Create the brief
         const briefs = 
             await models.Brief.query()
-                .where('client_id', collaborator.client_id)
                 .withGraphFetched('[brief_events.[venue], agency]')
                 .modify((queryBuilder) => {
-                    if (scope) {
-                        queryBuilder.where('scope', scope);
+                    if (scope === 'BRAND') {
+                        queryBuilder.where('client_id', collaborator.client_id)
                     }
-                    if (name) {
-                        queryBuilder.where('name', name);
+                    if (scope === 'AGENCY') {
+                        queryBuilder
+                            .where('client_id', collaborator.client.id)
+                            .where('status', 'SUBMITTED');
                     }
                 }) 
                 

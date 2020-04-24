@@ -31,6 +31,14 @@ export default class Brief extends Model {
             from: 'briefs.id',
             to: 'brief_events.brief_id',
           }
+        },
+        products: {
+          relation: Model.HasManyRelation,
+          modelClass: models.BriefProducts,
+          join: {
+            from: 'briefs.id',
+            to: 'brief_products.brief_id',
+          }
         }
       }
     }
