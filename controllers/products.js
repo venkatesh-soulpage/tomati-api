@@ -83,9 +83,52 @@ const createProduct = async (req, res, next) => {
     }
 }
 
+// UPDATE - Update product
+const updateProduct = async (req, res, next) => {
+    
+    try {    
+
+        const {account_id, scope} = req;
+        const { product_id } = req.params;
+        const {name, description, metric, metric_amount, sku, base_price } = req.body;
+    
+        // Validate the account is a client collaborator
+        const client_collaborators = 
+            await models.ClientCollaborator.query()
+                .where('account_id', account_id)
+            
+        const collaborator = client_collaborators[0];
+        if (!collaborator) return res.status(400).send('Invalid account');
+
+
+        const product =
+            await models.Product.query().findById(product_id);
+        
+        // alidate product
+        if (!product) return res.status(400).json('Invalid product').send();
+
+        if (product.client_id !== collaborator.client_id) return res.status(400).json("You don't have permission to do that").send();
+
+
+        // Query builder for product update
+        const new_product = 
+            await models.Product.query()
+                .where('id', product_id)
+                .update({name, description, metric, metric_amount, sku, base_price})
+
+        // Send the clients
+        return res.status(200).json(`Product ${name} updated successfully`).send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 const productsController = {
     getProducts,
-    createProduct
+    createProduct,
+    updateProduct
 }
 
 export default productsController;

@@ -4,7 +4,7 @@ import productsController from '../controllers/products';
 import VerifyToken from '../utils/verification'
 import VerifyRole from '../utils/verification_role'
 
-/* GET - Get a list of venues */
+/* GET - Update a new product */
 router.get(
     '/', 
     VerifyToken, 
@@ -12,12 +12,20 @@ router.get(
     productsController.getProducts
 );
 
-/* GET - Get a list of venues */
+/* POST - Create a new product */
 router.post(
     '/', 
     VerifyToken, 
     VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
     productsController.createProduct
+);
+
+/* PUT - Update a product information */
+router.put(
+    '/:product_id', 
+    VerifyToken, 
+    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    productsController.updateProduct
 );
 
 module.exports = router;

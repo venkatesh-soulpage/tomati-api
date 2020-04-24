@@ -9,7 +9,7 @@ import queryString from 'query-string';
 const getBriefs = async (req, res, next) => {
     try {    
         
-        const {account_id} = req;
+        const {scope, account_id} = req;
 
         // Validate the collaborator
         const client_collaborators = 
@@ -25,9 +25,15 @@ const getBriefs = async (req, res, next) => {
             await models.Brief.query()
                 .where('client_id', collaborator.client_id)
                 .withGraphFetched('[brief_events.[venue], agency]')
-                /* .modifyGraph('brief_events', builder => {
-                    builder.select('id');
-                }); */
+                .modify((queryBuilder) => {
+                    if (scope) {
+                        queryBuilder.where('scope', scope);
+                    }
+                    if (name) {
+                        queryBuilder.where('name', name);
+                    }
+                }) 
+                
 
         // Send the briefs
         return res.status(200).send(briefs);
