@@ -24,6 +24,14 @@ export default class Warehouse extends Model {
             to: 'locations.id'
           }
         },
+        stocks: {
+          relation: Model.HasManyRelation,
+          modelClass: models.WarehouseStock,
+          join: {
+            from: 'warehouses.id',
+            to: 'warehouse_stocks.warehouse_id'
+          }
+        },
       }
     }
   }

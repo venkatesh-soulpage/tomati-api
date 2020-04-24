@@ -32,6 +32,14 @@ export default class Product extends Model {
             to: 'product_ingredients.product_id'
           }
         },
+        stocks: {
+          relation: Model.HasManyRelation,
+          modelClass: models.WarehouseStock,
+          join: {
+            from: 'products.id',
+            to: 'warehouse_stocks.product_id'
+          }
+        }
 
       }
     }

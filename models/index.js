@@ -14,6 +14,8 @@ import Brand from './brand';
 import Product from './product';
 import ProductIngredient from './product_ingredient';
 import Warehouse from './warehouse';
+import WarehouseStock from './warehouse_stock';
+import WarehouseTransaction from './warehouse_transaction';
 
 export default {
     Location,
@@ -31,5 +33,7 @@ export default {
     Brand,
     Product,
     ProductIngredient,
-    Warehouse
+    Warehouse,
+    WarehouseStock,
+    WarehouseTransaction
 };
