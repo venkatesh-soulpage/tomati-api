@@ -18,7 +18,7 @@ const getWarehouses = async (req, res, next) => {
 
         const warehouses =  
             await models.Warehouse.query()
-                .withGraphFetched('[location, stocks.[product, transactions]]')
+                .withGraphFetched('[location, stocks.[product, transactions.[account]]]')
                 .modify((queryBuilder) => {
                     if (scope !== 'ADMIN') {
                         queryBuilder.where('client_id', client_collaborators[0].client_id);
@@ -110,7 +110,7 @@ const createWarehouseStock = async (req, res, next) => {
         // Register the transaction
         await models.WarehouseTransaction.query()
             .insert({
-                warehouse_id, product_id, quantity,
+                warehouse_id, product_id, account_id, quantity,
                 action: 'ADD'
             })
 
@@ -159,7 +159,7 @@ const removeWarehouseStock = async (req, res, next) => {
         // Register the transaction
         await models.WarehouseTransaction.query()
             .insert({
-                warehouse_id, product_id, 
+                warehouse_id, product_id, account_id,
                 quantity,
                 action: 'REMOVE'
             })

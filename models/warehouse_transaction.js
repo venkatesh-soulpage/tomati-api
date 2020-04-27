@@ -31,6 +31,14 @@ export default class WarehouseStock extends Model {
                 from: 'warehouse_transactions.product_id',
                 to: 'warehouse_stock.product_id',
             }
+        },
+        account: {
+            relation: Model.BelongsToOneRelation,
+            modelClass: models.Account,
+            join: {
+                from: 'warehouse_transactions.account_id',
+                to: 'accounts.id',
+            }
         }
       }
     }

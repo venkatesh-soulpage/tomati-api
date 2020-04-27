@@ -24,6 +24,14 @@ export default class Account extends Model {
             to: 'agencies.owner_id'
           }
         },
+        transactions: {
+          relation: Model.HasManyRelation,
+          modelClass: models.WarehouseTransaction,
+          join: {
+            from: 'account.id',
+            to: 'warehouse_transactions.account_id'
+          }
+        },
 
       }
     }
