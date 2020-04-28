@@ -3,11 +3,35 @@ import models from '../models'
 
 export default class Requisition extends Model {
     static get tableName () {
-      return 'briefs'
+      return 'requisitions'
     }
   
     static get relationMappings () {
       return {
+        client: {
+            relation: Model.HasOneThroughRelation,
+            modelClass: models.Client,  
+            join: {
+                from: 'requisitions.brief_id',
+                through: {
+                    from: 'briefs.id',
+                    to: 'briefs.client_id'
+                }, 
+                to: 'clients.id'
+          }
+        },
+        agency: {
+          relation: Model.HasOneThroughRelation,
+          modelClass: models.Agency,  
+          join: {
+              from: 'requisitions.brief_id',
+              through: {
+                  from: 'briefs.id',
+                  to: 'briefs.agency_id'
+              }, 
+              to: 'agencies.id'
+          }
+        },
         brief: {
             relation: Model.BelongsToOneRelation,
             modelClass: models.Brief,
