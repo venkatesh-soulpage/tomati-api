@@ -131,8 +131,14 @@ const addBriefEvent = async (req, res, next) => {
         } = req.body;
 
         // Validate that brief exists
-        const brief = await models.Brief.query().findById(brief_id);
+        const brief = await models.Brief.query().findById(brief_id).withGraphFetched('[brief_events.[venue], agency]');
         if (!brief) return res.status(400).send('Invalid brief');
+
+        // Validate Brief SLA terms
+        const sla_limit = (new Date()).setHours((new Date()).getHours() + brief.agency.sla_hours_before_event_creation);
+        if (setup_time.getTime() < sla_limit || start_time.getTime() < sla_limit || end_time.getTime() < sla_limit) {
+            return res.status(400).json('Invalid times').send();
+        } 
 
         // Validate that the event is created by a collaborator of the organization
         const client_collaborators = 
