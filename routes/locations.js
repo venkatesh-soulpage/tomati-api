@@ -8,7 +8,7 @@ import VerifyRole from '../utils/verification_role'
 router.get(
     '/', 
     VerifyToken, 
-    VerifyRole(['ADMIN'], ['ADMIN']),
+    VerifyRole(['ADMIN', 'BRAND'], ['ADMIN', 'OWNER', 'MANAGER']),
     locationsController.getLocations
 );
 

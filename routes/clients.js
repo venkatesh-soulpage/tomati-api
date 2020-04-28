@@ -24,5 +24,13 @@ router.post(
     clientController.inviteCollaborator
 );
 
+/* POST - Invite new collaborator */
+router.post(
+    '/:client_id/add-location',
+    VerifyToken,
+    VerifyRole(['ADMIN', 'BRAND'], ['ADMIN', 'OWNER']),
+    clientController.addLocation
+);
+
 
 module.exports = router;

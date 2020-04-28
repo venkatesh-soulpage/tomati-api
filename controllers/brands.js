@@ -87,41 +87,6 @@ const createBrand = async (req, res, next) => {
     }
 }
 
-// DELETE - Delete a venue
-/* const deleteVenue = async (req, res, next) => {
-    
-    try {    
-        const {account_id, scope} = req;
-        const {venue_id} = req.params;
-
-
-        // Validate the account is a client collaborator
-        const client_collaborators = 
-            await models.ClientCollaborator.query()
-                .where('account_id', account_id)
-
-        // Validate that the venue exists
-        const venue = await models.Venue.query().findById(venue_id);
-
-        if (!venue) return res.status(400).json('Invalid venue').send();
-
-        // Validate that the client had created the venue
-        const is_same_client = client_collaborators[0] && client_collaborators[0].client_id === venue.created_by;
-        if (!is_same_client && scope !== 'ADMIN') return res.status(401).json("Do you don't have permission to create this venue").send();
-
-        await models.Venue.query().deleteById(venue_id);
-
-        // Send the clients
-        return res.status(200).json('Venue successfully deleted').send();
-
-    } catch (e) {
-        console.log(e);
-        return res.status(500).json(JSON.stringify(e)).send();
-    }
-}*/
-
-
-
 
 const brandController = {
     getBrands,

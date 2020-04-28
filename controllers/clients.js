@@ -200,11 +200,48 @@ const inviteCollaborator = async (req, res, next) => {
     }
 }
 
+/* POST - Add more locations to a client */
+const addLocation = async (req, res, next) => {
+    try {    
+        const {account_id, scope} = req;
+        const { client_id } = req.params;
+        const { location_id } = req.body;
+
+        // Validate the account is a client collaborator
+        const client_collaborators = 
+            await models.ClientCollaborator.query()
+                .where('account_id', account_id)
+                .withGraphFetched('[client.[locations]]')
+
+        const collaborator = client_collaborators[0];
+
+        // Validate client
+        if (`${collaborator.client_id}` !== client_id) return res.status(400).json('Invalid client').send();
+
+        // Validate SLA 
+        if (collaborator.client.locations.length >= collaborator.client.locations_limit ) return res.status(400).json('Locations limit reach').send();
+
+        await models.ClientLocations.query()
+            .insert({
+                location_id, client_id,
+            })
+
+        return res.status(200).json('Location successfully created').send()
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+
+}
+
+
 const clientController = {
     // Client
     getClients,
     inviteClient,
-    inviteCollaborator
+    inviteCollaborator,
+    addLocation
 }
 
 export default clientController;
