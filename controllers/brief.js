@@ -136,7 +136,7 @@ const addBriefEvent = async (req, res, next) => {
 
         // Validate Brief SLA terms
         const sla_limit = (new Date()).setHours((new Date()).getHours() + brief.agency.sla_hours_before_event_creation);
-        if (setup_time.getTime() < sla_limit || start_time.getTime() < sla_limit || end_time.getTime() < sla_limit) {
+        if (new Date(setup_time).getTime() < sla_limit || new Date(start_time).getTime() < sla_limit || new Date(end_time).getTime() < sla_limit) {
             return res.status(400).json('Invalid times').send();
         } 
 

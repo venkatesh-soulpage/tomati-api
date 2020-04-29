@@ -36,6 +36,38 @@ const getProducts = async (req, res, next) => {
     }
 }
 
+
+const getClientProducts = async (req, res, next) => {
+    try {
+        const {account_id} = req;
+        const {client_id} = req.params;
+
+        const agency_collaborators =
+             await models.AgencyCollaborator.query()
+                .withGraphFetched('[client]')
+                .where('account_id', account_id)
+
+        // Validate collaborator
+        if (!agency_collaborators || agency_collaborators.length < 1) return res.status(400).json('Invalid collaborator').send();
+        const collaborator = agency_collaborators[0]; 
+
+        // Validate client
+        if (`${collaborator.client.id}` !== client_id) return res.status(400).json("You don't have access to this client").send();
+
+        const products = 
+            await models.Product.query()
+                .withGraphFetched('[ingredients]')
+                .where('client_id', client_id);
+
+        return res.status(200).send(products);
+
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 // GET - Get a list of venues
 const createProduct = async (req, res, next) => {
     
@@ -127,6 +159,7 @@ const updateProduct = async (req, res, next) => {
 
 const productsController = {
     getProducts,
+    getClientProducts,
     createProduct,
     updateProduct
 }

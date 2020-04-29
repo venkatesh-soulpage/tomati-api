@@ -29,7 +29,7 @@ export default class Product extends Model {
           modelClass: models.ProductIngredient,
           join: {
             from: 'products.id',
-            to: 'product_ingredients.product_id'
+            to: 'product_ingredients.product_parent_id'
           }
         },
         stocks: {

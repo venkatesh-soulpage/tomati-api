@@ -12,6 +12,14 @@ router.get(
     productsController.getProducts
 );
 
+/* GET - Get new client products */
+router.get(
+    '/:client_id', 
+    VerifyToken, 
+    VerifyRole(['AGENCY'], ['OWNER', 'MANAGER']),
+    productsController.getClientProducts
+);
+
 /* POST - Create a new product */
 router.post(
     '/', 

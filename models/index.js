@@ -18,7 +18,7 @@ import Warehouse from './warehouse';
 import WarehouseStock from './warehouse_stock';
 import WarehouseTransaction from './warehouse_transaction';
 import Requisition from './requistion';
-import RequisitionEvent from './requisition_event';
+import RequisitionOrder from './requisition_order';
 
 export default {
     Location,
@@ -41,5 +41,5 @@ export default {
     WarehouseStock,
     WarehouseTransaction,
     Requisition,
-    RequisitionEvent
+    RequisitionOrder
 };

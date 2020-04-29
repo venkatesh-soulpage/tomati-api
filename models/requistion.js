@@ -48,12 +48,12 @@ export default class Requisition extends Model {
               to: 'requisitions.id'
             }
         },
-        products: {
+        orders: {
           relation: Model.HasManyRelation,
-          modelClass: models.RequisitionEvent,
+          modelClass: models.RequisitionOrder,
           join: {
             from: 'requisitions.id',
-            to: 'requisition_events.id',
+            to: 'requisition_orders.requisition_id',
           }
         }
       }

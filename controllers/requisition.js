@@ -37,7 +37,7 @@ const getRequisitions = async (req, res, next) => {
         // Get the requisitions
         const requisitions = 
             await models.Requisition.query()
-                .withGraphFetched('[brief]')
+                .withGraphFetched('[orders.[product], brief.[brief_events.[venue], products.[product]]]')
                 .modifyGraph('brief', builder => {
                     if (scope === 'AGENCY') {
                         builder.where('agency_id', collaborator.agency_id);
@@ -98,9 +98,27 @@ const createRequisition = async (req, res, next) => {
     }
 }
 
+const createRequisitionOrder = async (req, res, next) => {
+    try {
+        const {account_id} = req;
+        const {requisition_id} = req.params;
+        const {brief_event_id, product_id, price, units} = req.body;
+
+        await models.RequisitionOrder.query()
+            .insert({requisition_id, brief_event_id, product_id, price, units});
+
+        return res.status(200).json('Order created').send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 const requisitionController = {
     getRequisitions,
-    createRequisition
+    createRequisition,
+    createRequisitionOrder,
 }
 
 export default requisitionController;

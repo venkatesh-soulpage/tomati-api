@@ -20,4 +20,12 @@ router.post(
     requisitionController.createRequisition
 );
 
+// POST - Get a list of briefs for the client
+router.post(
+    '/:requisition_id/add-order', 
+    VerifyToken, 
+    VerifyRole(['AGENCY'], ['OWNER', 'MANAGER']),
+    requisitionController.createRequisitionOrder
+);
+
 module.exports = router;
