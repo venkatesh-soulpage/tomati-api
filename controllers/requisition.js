@@ -42,7 +42,6 @@ const getRequisitions = async (req, res, next) => {
                     if (scope === 'AGENCY') {
                         builder.where('agency_id', collaborator.agency_id);
                     }
-
                     if (scope === 'BRAND') {
                         builder.where('client_id', collaborator.client_id)
                     }                
@@ -115,10 +114,27 @@ const createRequisitionOrder = async (req, res, next) => {
     }
 }
 
+const deleteRequisitionOrder = async (req, res, next) => {
+    try {
+        const {account_id} = req;
+        const {requisition_id, requisition_order_id} = req.params;
+
+        await models.RequisitionOrder.query()
+            .deleteById(requisition_order_id);
+
+        return res.status(200).json('Order deleted').send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 const requisitionController = {
     getRequisitions,
     createRequisition,
     createRequisitionOrder,
+    deleteRequisitionOrder,
 }
 
 export default requisitionController;

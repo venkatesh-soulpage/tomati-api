@@ -28,4 +28,13 @@ router.post(
     requisitionController.createRequisitionOrder
 );
 
+
+// POST - Get a list of briefs for the client
+router.delete(
+    '/:requisition_id/delete-order/:requisition_order_id', 
+    VerifyToken, 
+    VerifyRole(['AGENCY'], ['OWNER', 'MANAGER']),
+    requisitionController.deleteRequisitionOrder
+);
+
 module.exports = router;
