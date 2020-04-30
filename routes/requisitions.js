@@ -20,6 +20,14 @@ router.post(
     requisitionController.createRequisition
 );
 
+// PUT - Get a list of briefs for the client
+router.put(
+    '/:requisition_id/update-status', 
+    VerifyToken, 
+    VerifyRole(['AGENCY'], ['OWNER', 'MANAGER']),
+    requisitionController.updateRequisitionStatus
+);
+
 // POST - Get a list of briefs for the client
 router.post(
     '/:requisition_id/add-order', 

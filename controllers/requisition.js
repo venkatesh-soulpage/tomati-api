@@ -107,14 +107,39 @@ const createRequisition = async (req, res, next) => {
     }
 }
 
+const updateRequisitionStatus = async (req, res, next) => {
+    try {
+
+        const {requisition_id} =req.params;
+        const { status } = req.body;
+
+        const requisition = 
+            await models.Requisition.query().findById(requisition_id);
+
+        await models.Requisition.query()
+            .patch({status})
+            .where('id', requisition_id);
+
+        await models.Brief.query()
+            .patch({status: 'WAITING APPROVAL'})
+            .where('id', requisition.brief_id);
+
+        return res.status(200).json('Requisition updated!').send();
+        
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 const createRequisitionOrder = async (req, res, next) => {
     try {
         const {account_id} = req;
         const {requisition_id} = req.params;
-        const {brief_event_id, product_id, price, units} = req.body;
+        const {brief_event_id, product_id, price, units, is_display} = req.body;
 
         await models.RequisitionOrder.query()
-            .insert({requisition_id, brief_event_id, product_id, price, units});
+            .insert({requisition_id, brief_event_id, product_id, price, units, is_display});
 
         return res.status(200).json('Order created').send();
 
@@ -140,9 +165,11 @@ const deleteRequisitionOrder = async (req, res, next) => {
     }
 }
 
+
 const requisitionController = {
     getRequisitions,
     createRequisition,
+    updateRequisitionStatus,
     createRequisitionOrder,
     deleteRequisitionOrder,
 }
