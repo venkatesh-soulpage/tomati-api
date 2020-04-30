@@ -37,7 +37,17 @@ const getRequisitions = async (req, res, next) => {
         // Get the requisitions
         const requisitions = 
             await models.Requisition.query()
-                .withGraphFetched('[orders.[product], brief.[brief_events.[venue], products.[product]]]')
+                .withGraphFetched(
+                    `[
+                        orders.[
+                            product.[ingredients]
+                        ],
+                        brief.[
+                            brief_events.[venue], 
+                            products.[product]
+                        ]
+                    ]`
+                )
                 .modifyGraph('brief', builder => {
                     if (scope === 'AGENCY') {
                         builder.where('agency_id', collaborator.agency_id);
