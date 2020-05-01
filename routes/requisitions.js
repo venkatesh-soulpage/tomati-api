@@ -4,15 +4,15 @@ import requisitionController from '../controllers/requisition';
 import VerifyToken from '../utils/verification'
 import VerifyRole from '../utils/verification_role'
 
-// GET - Get a list of briefs for the client
+// GET - Get a list of requisitions
 router.get(
     '/', 
     VerifyToken, 
-    VerifyRole(['BRAND', 'AGENCY'], ['OWNER', 'MANAGER']),
+    VerifyRole(['BRAND', 'AGENCY'], ['OWNER', 'MANAGER', 'WAREHOUSE_MANAGER']),
     requisitionController.getRequisitions
 );
 
-// POST - Get a list of briefs for the client
+// POST - Create a new requisition
 router.post(
     '/', 
     VerifyToken, 
@@ -20,15 +20,15 @@ router.post(
     requisitionController.createRequisition
 );
 
-// PUT - Get a list of briefs for the client
+// PUT - Update the requisition status
 router.put(
     '/:requisition_id/update-status', 
     VerifyToken, 
-    VerifyRole(['AGENCY'], ['OWNER', 'MANAGER']),
+    VerifyRole(['BRAND','AGENCY'], ['OWNER', 'MANAGER']),
     requisitionController.updateRequisitionStatus
 );
 
-// POST - Get a list of briefs for the client
+// POST - Add a requisition order
 router.post(
     '/:requisition_id/add-order', 
     VerifyToken, 
@@ -37,12 +37,20 @@ router.post(
 );
 
 
-// POST - Get a list of briefs for the client
+// DELETE - Delete a requisition order
 router.delete(
     '/:requisition_id/delete-order/:requisition_order_id', 
     VerifyToken, 
     VerifyRole(['AGENCY'], ['OWNER', 'MANAGER']),
     requisitionController.deleteRequisitionOrder
 );
+
+// POST - Record and mark the requisition as delivered
+router.post(
+    '/:requisition_id/deliver-orders', 
+    VerifyToken, 
+    VerifyRole(['BRAND'], ['OWNER', 'MANAGER', 'WAREHOUSE_MANAGER']),
+    requisitionController.deliverRequisitionOrders
+)
 
 module.exports = router;

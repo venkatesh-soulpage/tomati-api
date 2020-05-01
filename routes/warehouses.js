@@ -8,7 +8,7 @@ import VerifyRole from '../utils/verification_role'
 router.get(
     '/', 
     VerifyToken, 
-    VerifyRole(['ADMIN', 'BRAND'], ['ADMIN','OWNER', 'MANAGER']),
+    VerifyRole(['ADMIN', 'BRAND'], ['ADMIN','OWNER', 'MANAGER', 'WAREHOUSE_MANAGER']),
     warehousesController.getWarehouses
 );
 
@@ -24,7 +24,7 @@ router.post(
 router.post(
     '/:warehouse_id/add-stock', 
     VerifyToken, 
-    VerifyRole(['BRAND'], ['OWNER', 'WAREHOUS_MANAGER']),
+    VerifyRole(['BRAND'], ['OWNER', 'WAREHOUSE_MANAGER']),
     warehousesController.createWarehouseStock
 );
 
@@ -32,7 +32,7 @@ router.post(
 router.post(
     '/:warehouse_id/remove-stock', 
     VerifyToken, 
-    VerifyRole(['BRAND'], ['OWNER', 'WAREHOUS_MANAGER']),
+    VerifyRole(['BRAND'], ['OWNER', 'WAREHOUSE_MANAGER']),
     warehousesController.removeWarehouseStock
 );
 

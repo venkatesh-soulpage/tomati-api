@@ -4,11 +4,11 @@ import productsController from '../controllers/products';
 import VerifyToken from '../utils/verification'
 import VerifyRole from '../utils/verification_role'
 
-/* GET - Update a new product */
+/* GET - Get products list */
 router.get(
     '/', 
     VerifyToken, 
-    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    VerifyRole(['BRAND'], ['OWNER', 'MANAGER', 'WAREHOUSE_MANAGER']),
     productsController.getProducts
 );
 

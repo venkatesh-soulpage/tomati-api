@@ -8,10 +8,10 @@ const verification_role = (scopes, roles) => {
         if (req.scope === 'ADMIN' && req.role === 'ADMIN') return next();
  
         // Verify Scope
-        if (scopes.indexOf(req.scope) < 0 ) return res.status(403).json(`${req.scope} scope required`).send();
+        if (scopes.indexOf(req.scope) < 0 ) return res.status(403).json(`${JSON.stringify(scopes)} scopes required`).send();
 
         // Verify Role
-        if (roles.indexOf(req.role) < 0) return res.status(403).json(`You don't have the required role to do this action`).send();
+        if (roles.indexOf(req.role) < 0) return res.status(403).json(`${JSON.stringify(roles)} roles required`).send();
 
         next();
     }
