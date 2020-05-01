@@ -1,5 +1,6 @@
 var createError = require('http-errors');
 var express = require('express');
+var fileUpload = require('express-fileupload');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
@@ -23,6 +24,12 @@ var app = express();
 
 // Cors
 app.use(cors())
+
+// Express file uploader middleware
+app.use(fileUpload({
+  createParentPath: true
+}));
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

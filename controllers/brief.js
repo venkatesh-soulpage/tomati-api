@@ -4,6 +4,17 @@ import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import fetch from 'node-fetch';
 import queryString from 'query-string';
+import AWS from 'aws-sdk';
+
+// Inititialize AWS 
+const s3 = new AWS.S3({
+    accessKeyId: process.env.BUCKETEER_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.BUCKETEER_AWS_SECRET_ACCESS_KEY,
+    region: process.env.BUCKETEER_AWS_REGION,
+  });
+
+
+
 
 // GET - Get briefs
 const getBriefs = async (req, res, next) => {
@@ -39,7 +50,7 @@ const getBriefs = async (req, res, next) => {
         // Create the brief
         const briefs = 
             await models.Brief.query()
-                .withGraphFetched('[brief_events.[venue], products.[product.[brand]], agency]')
+                .withGraphFetched('[brief_events.[venue], attachments, products.[product.[brand]], agency]')
                 .modify((queryBuilder) => {
                     if (scope === 'BRAND') {
                         queryBuilder.where('client_id', collaborator.client_id)
@@ -320,6 +331,78 @@ const updateBriefStatus = async (req, res, next) => {
     }
 }
 
+// POST - Upload a brief attachment
+const uploadBriefAttachment = async (req, res, next) => {
+    
+    try {    
+        const {brief_id} = req.params;
+    
+        const {file} = req.files;
+
+        const key = `public/briefs/${brief_id}/${file.name}`
+
+        let params = {
+            Key: key,
+            Bucket: process.env.BUCKETEER_BUCKET_NAME,
+            Body: file.data,
+        }
+
+        await s3.putObject(params, async (err, data) => {
+            if (err) {
+                console.log(err, err.stack).send();
+                return res.status(400).json('Upload failed').send();
+            } else {
+                
+                await models.BriefAttachment.query()
+                    .insert({
+                        brief_id,
+                        url: `https://s3.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
+                        file_name: file.name,
+                        file_type: file.mimetype,
+                    })
+
+                return res.status(200).json('Attachment successfully uploaded').send();
+            }
+        })
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
+// DELETE - Delete a brief attachment
+const deleteBriefAttachment = async (req, res, next) => {
+    
+    try {    
+        const {brief_id, brief_attachment_id} = req.params;
+
+        const brief_attachments = 
+            await models.BriefAttachment.query()
+                    .where('brief_id', brief_id)
+                    .where('id', brief_attachment_id);
+    
+        const brief_attachment = brief_attachments[0];
+        
+        s3.deleteObject({
+            Key: `public/briefs/${brief_id}/${brief_attachment.url.replace('https://s3.amazonaws.com/', '')}`,
+            Bucket: process.env.BUCKETEER_BUCKET_NAME,
+        }, 
+        async (err, data) => {
+            if (err) return res.status(400).json('Unable to remove attachment').send();
+            
+            await models.BriefAttachment.query()
+                .deleteById(brief_attachment.id);
+
+            return res.status(200).json('Attachment removed').send();
+        })
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 
 
 
@@ -332,7 +415,9 @@ const briefController = {
     addBriefProduct,
     deleteBriefProduct,
     deleteBrief,
-    updateBriefStatus
+    updateBriefStatus,
+    uploadBriefAttachment,
+    deleteBriefAttachment
 }
 
 export default briefController;

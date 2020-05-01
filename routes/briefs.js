@@ -61,5 +61,21 @@ router.put(
     briefController.updateBriefStatus
 );
 
+/* POST - Upload attachment */
+router.post(
+    '/:brief_id/upload-attachment', 
+    VerifyToken, 
+    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    briefController.uploadBriefAttachment
+);
+
+/* DELETE - Delete attachment */
+router.delete(
+    '/:brief_id/delete-attachment/:brief_attachment_id', 
+    VerifyToken, 
+    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    briefController.deleteBriefAttachment
+);
+
 
 module.exports = router;
