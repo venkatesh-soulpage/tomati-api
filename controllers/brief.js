@@ -59,7 +59,7 @@ const getBriefs = async (req, res, next) => {
                         queryBuilder
                             .where('client_id', collaborator.client.id)
                             .where('agency_id', collaborator.agency_id)
-                            .whereIn('status', ['SUBMITTED', 'ON PROGRESS', 'WAITING APPROVAL']);
+                            .whereNotIn('status', ['DRAFT']);
                     }
                 }) 
                 
