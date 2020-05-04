@@ -47,10 +47,20 @@ const createWarehouse = async (req, res, next) => {
         // Validate the account is a client collaborator
         const client_collaborators = 
             await models.ClientCollaborator.query()
+                .withGraphFetched('[client.[warehouses]]')
                 .where('account_id', account_id)
 
         if (client_collaborators[0].client_id !== client_id) return res.status(400).json('Invalid client').send();
 
+        // Validate warehouses
+        if (client_collaborators[0].client.warehouses_limit <= client_collaborators[0].client.warehouses.length) {
+            return res.status(400).json(
+                `
+                    Maximum number of warehouses have been added. Contact ; support@boozeboss.co  to upgrade your account.
+                `
+            ).send()
+        }
+    
         const new_warehouse =  
             await models.Warehouse.query()
                 .insert({

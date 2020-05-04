@@ -27,7 +27,7 @@ const getProducts = async (req, res, next) => {
                     .withGraphFetched('[products.[brand, stocks]]')                
             
 
-        // Send the clients
+        // Send the clientss
         return res.status(200).send(client.products);
 
     } catch (e) {

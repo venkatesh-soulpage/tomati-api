@@ -163,7 +163,14 @@ const inviteCollaborator = async (req, res, next) => {
                 .where('client_id', client.id);
             
         // Validate that the Client has remaining collaborators
-        if (client.collaborator_limit <= client_collaborators.length) return res.status(401).json('You had exceed your collaborators limit').send();
+        if (client.collaborator_limit <= client_collaborators.length) {
+            return res.status(401).json(
+                `
+                All seats are currently occupied.  
+                Contact support@boozeboss.co to upgrade your account.
+                `
+            ).send();
+        }
 
         // Search for the role object
         const role = 

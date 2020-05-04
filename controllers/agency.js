@@ -98,19 +98,28 @@ const inviteAgency = async (req, res, next) => {
     try {
         /* Todo add client organization logic */
         const { name, description, owner_email, sla_terms, sla_hours_before_event_creation,  sla_hours_before_event_update } = req.body;
-        let {client_id} = req.body;
 
-        // If there isn't a client_id use the token
-        if (!client_id) {
-            // Get the Brand of the client
-            const client_collaborator = 
-                await models.ClientCollaborator.query()
-                    .where('account_id', req.account_id);
-        
-            client_id = client_collaborator[0].client_id
+        const client_collaborators = 
+            await models.ClientCollaborator.query()
+                .withGraphFetched('[client.[warehouses, agencies]]')
+                .where('account_id', req.account_id);
+
+        const collaborator = client_collaborators[0];
+
+        // Validate client
+        if (!collaborator) return res.status(400).json('Invalid client').send();
+
+        console.log(collaborator);
+        // Validate limits
+        if (collaborator.client.agencies_limit <= collaborator.client.agencies.length) {
+            return res.status(400).json(
+                `
+                    Maximum number of agencies have been added. Contact ; support@boozeboss.co  to upgrade your account.
+                `
+            ).send();
         }
 
-        if (!client_id) return res.status(400).json('No client_id').send();
+
         
         // Create client
         const agency = 
@@ -178,10 +187,15 @@ const inviteCollaborator = async (req, res, next) => {
         const agency_collaborators =
             await models.AgencyCollaborator
                 .query()
+                .withGraphFetched('[client, agency.[agency_collaborators]]')
                 .where('agency_id', agency.id);
             
         // Validate that the Agency has remaining collaborators
-        // if (client.collaborator_limit <= client_collaborators.length) return res.status(401).json('You had exceed your collaborators limit').send();
+        if (agency_collaborators[0].client.agency_collaborators_limit <= agency_collaborators[0].agency.agency_collaborators.length) return res.status(401).json(
+            `
+                Maximum number of collaborators have been added. Contact ; support@boozeboss.co  to upgrade your account.
+            `
+        ).send();
 
         // Search for the role object
         const role = 
