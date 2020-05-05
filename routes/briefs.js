@@ -29,12 +29,28 @@ router.delete(
     briefController.deleteBrief
 );
 
-/* POST - Create a new brief */
+/* POST - Create a brief event*/
 router.post(
     '/:brief_id/add-event', 
     VerifyToken, 
     VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
     briefController.addBriefEvent
+);
+
+/* Update - Update a brief event*/
+router.put(
+    '/:brief_id/update-event/:brief_event_id', 
+    VerifyToken, 
+    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    briefController.updateBriefEvent
+);
+
+/* Delete - Delete a brief event*/
+router.delete(
+    '/:brief_id/delete-event/:brief_event_id', 
+    VerifyToken, 
+    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    briefController.deleteBriefEvent
 );
 
 /* POST - Create a new brief */

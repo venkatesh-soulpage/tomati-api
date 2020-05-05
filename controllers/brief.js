@@ -113,6 +113,7 @@ const createBrief = async (req, res, next) => {
     }
 }
 
+
 // POST - Create a new brief event
 const addBriefEvent = async (req, res, next) => {
     
@@ -186,6 +187,124 @@ const addBriefEvent = async (req, res, next) => {
                 })
 
         return res.status(201).json('Event created succesfully').send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
+// PUT - Update brief event
+const updateBriefEvent = async (req, res, next) => {
+    
+    try {    
+        const {account_id} = req;
+        const {brief_id, brief_event_id} = req.params;
+        const { 
+            name,
+            setup_time,
+            start_time, 
+            end_time, 
+            recee_required,
+            recee_time,
+            expected_guests,
+            hourly_expected_guests,
+            cocktails_enabled,
+            cocktails_per_guest,
+            drinks_enabled,
+            free_drinks_enabled,
+            free_drinks_per_guest,
+            cash_collected_by,
+            comments,
+            status,
+            enabled, 
+            parent_brief_event_id,
+            venue_id,
+        } = req.body;
+
+        // Validate that brief exists
+        const brief_events = 
+            await models.BriefEvent.query()
+                .withGraphFetched('[brief]')
+                .where('id', brief_event_id);
+                
+        if (!brief_events || (brief_events.length < 1) || (brief_events[0].brief.id !== Number(brief_id))) return res.status(400).json('Invalid brief').send();
+
+        // Validate Brief SLA terms
+        /* const sla_limit = (new Date()).setHours((new Date()).getHours() + brief.agency.sla_hours_before_event_update);
+        if (new Date(setup_time).getTime() < sla_limit || new Date(start_time).getTime() < sla_limit || new Date(end_time).getTime() < sla_limit) {
+            return res.status(400).json('Invalid times').send();
+        } */
+
+        // Validate that the event is created by a collaborator of the organization
+        const client_collaborators = 
+            await models.ClientCollaborator.query()
+                .where('account_id', account_id);
+
+        const collaborator = client_collaborators[0];
+        if (!collaborator) return res.status(400).send("You don't have permissions to edit this brief");
+        
+        // Create brief event
+            await models.BriefEvent.query()
+                .update({
+                    name,
+                    brief_id,
+                    setup_time,
+                    start_time, 
+                    end_time,
+                    recee_required,
+                    recee_time,
+                    expected_guests,
+                    hourly_expected_guests,
+                    cocktails_enabled,
+                    cocktails_per_guest,
+                    drinks_enabled,
+                    free_drinks_enabled,
+                    free_drinks_per_guest,
+                    cash_collected_by,
+                    comments, 
+                    status,
+                    enabled,
+                    parent_brief_event_id,
+                    venue_id,
+                })
+                .where('id', brief_event_id);
+
+        return res.status(201).json('Event updated succesfully').send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
+// DELETE - Delete brief event
+const deleteBriefEvent = async (req, res, next) => {
+    
+    try {    
+        const {account_id} = req;
+        const {brief_id, brief_event_id} = req.params;
+
+        // Validate that brief exists
+        const brief_events = 
+            await models.BriefEvent.query()
+                .withGraphFetched('[brief]')
+                .where('id', brief_event_id);
+                
+        if (!brief_events || (brief_events.length < 1) || (brief_events[0].brief.id !== Number(brief_id))) return res.status(400).json('Invalid brief').send();
+
+        // Validate that the event is created by a collaborator of the organization
+        const client_collaborators = 
+            await models.ClientCollaborator.query()
+                .where('account_id', account_id);
+
+        const collaborator = client_collaborators[0];
+        if (!collaborator) return res.status(400).send("You don't have permissions to edit this brief");
+        
+        // Create brief event
+            await models.BriefEvent.query().deleteById(brief_event_id);
+
+        return res.status(201).json('Event deleted succesfully').send();
 
     } catch (e) {
         console.log(e);
@@ -412,6 +531,8 @@ const briefController = {
     getBriefs,
     createBrief,
     addBriefEvent,
+    updateBriefEvent,
+    deleteBriefEvent,
     addBriefProduct,
     deleteBriefProduct,
     deleteBrief,
