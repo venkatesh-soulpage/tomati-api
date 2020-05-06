@@ -55,6 +55,14 @@ export default class Requisition extends Model {
             from: 'requisitions.id',
             to: 'requisition_orders.requisition_id',
           }
+        },
+        deliveries: {
+          relation: Model.HasManyRelation,
+          modelClass: models.RequisitionDelivery,
+          join: {
+            from: 'requisitions.id',
+            to: 'requisition_deliveries.requisition_id',
+          }
         }
       }
     }

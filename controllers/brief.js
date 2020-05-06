@@ -62,6 +62,7 @@ const getBriefs = async (req, res, next) => {
                             .whereNotIn('status', ['DRAFT']);
                     }
                 }) 
+                .orderBy('created_at', 'desc')
                 
 
         // Send the briefs

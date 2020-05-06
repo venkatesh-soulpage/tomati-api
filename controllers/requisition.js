@@ -45,6 +45,10 @@ const getRequisitions = async (req, res, next) => {
                         brief.[
                             brief_events.[venue], 
                             products.[product]
+                        ],
+                        deliveries.[
+                            warehouse,
+                            products.[product]
                         ]
                     ]`
                 )
@@ -62,6 +66,8 @@ const getRequisitions = async (req, res, next) => {
                             .whereIn('status', ['SUBMITTED', 'APPROVED', 'DELIVERED']);
                     }
                 })
+                .orderBy('created_at', 'desc')
+                
                 
 
         // Send the briefs
@@ -83,6 +89,7 @@ const createRequisition = async (req, res, next) => {
         // Validate the collaborators
         const agency_collaborators = 
                         await models.AgencyCollaborator.query()
+                            .withGraphFetched('[client]')
                             .where('account_id', account_id)
                 
         const collaborator = agency_collaborators[0];
@@ -91,7 +98,16 @@ const createRequisition = async (req, res, next) => {
                 
         // Create a new requisition
         await models.Requisition.query()
-            .insert({brief_id, brief_parent_id, status: 'DRAFT'});
+            .insert({
+                brief_id, 
+                brief_parent_id, 
+                status: 'DRAFT', 
+                serial_number: collaborator.client.requisition_current_serial + 1
+            });
+
+        // Update current client
+        await models.Client.query()
+            .update({requisition_current_serial: collaborator.client.requisition_current_serial + 1})
 
         // Update brief status to 'On progress'
         await models.Brief.query()
@@ -252,6 +268,89 @@ const deliverRequisitionOrders = async (req, res, next) => {
     }
 }
 
+const createRequisitionDelivery = async (req, res, next) => {
+    try {
+        const {account_id} = req;
+        const {requisition_id} = req.params;
+        const {waybill, warehouse_id, status, deliveryProducts} = req.body;
+
+
+        // Validate stock
+        for (const deliveryProduct of deliveryProducts) {
+
+            // Destruct order
+            const {order, units} = deliveryProduct;
+
+            // Iteraye trough all stocks
+            const stock = 
+                await models.WarehouseStock.query()
+                    .findOne({
+                        product_id: order.product_id,
+                        warehouse_id,
+                    })
+
+            if (Number(units) > Number(stock.quantity)) return res.status(400).json(`Stock unavailable for product with id ${product_id} at warehouse ${warehouse_id}`);
+        }
+
+        // Create a new delivery
+        const delivery = 
+            await models.RequisitionDelivery.query()
+                    .insert({
+                        requisition_id: Number(requisition_id),
+                        waybill,
+                        status,
+                        warehouse_id
+                    });
+
+        // If the stock exists for every product
+        for (const deliveryProduct of deliveryProducts) {
+
+            // Destruct order
+            const {order, units} = deliveryProduct;
+
+            // Used as an accountability table
+            
+            const stocks = 
+                await models.WarehouseStock.query()
+                    .where('product_id', order.product_id)
+                    .where('warehouse_id', warehouse_id)
+
+            const stock = stocks[0];
+
+            // Create a Delivery Product
+            await models.RequisitionDeliveryProduct.query()
+                    .insert({
+                        requisition_delivery_id: delivery.id,
+                        requisition_order_id: order.id,
+                        units
+                    })
+
+            // Record the transaction
+            await models.WarehouseTransaction.query()
+                    .insert({
+                        product_id: order.product_id,
+                        warehouse_id, 
+                        account_id,
+                        requisition_id,
+                        quantity: units,
+                        action: 'DELIVERY'
+                    })
+            
+            // Update the current amount
+            await models.WarehouseStock.query()
+                    .update({quantity: Number(stock.quantity) - Number(units)})
+                    .where('product_id', order.product_id)
+                    .where('warehouse_id', warehouse_id);
+            
+        }
+
+        return res.status(200).json('Delivery successfull created').send();
+
+    } catch (e) {
+
+    }
+}
+
 
 const requisitionController = {
     getRequisitions,
@@ -259,7 +358,8 @@ const requisitionController = {
     updateRequisitionStatus,
     createRequisitionOrder,
     deleteRequisitionOrder,
-    deliverRequisitionOrders
+    deliverRequisitionOrders,
+    createRequisitionDelivery
 }
 
 export default requisitionController;

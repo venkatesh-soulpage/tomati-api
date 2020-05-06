@@ -53,4 +53,12 @@ router.post(
     requisitionController.deliverRequisitionOrders
 )
 
+// POST - Add a requisition delivery and requisition delivery products
+router.post(
+    '/:requisition_id/add-delivery', 
+    VerifyToken, 
+    VerifyRole(['BRAND'], ['OWNER', 'WAREHOUSE_MANAGER']),
+    requisitionController.createRequisitionDelivery
+)
+
 module.exports = router;
