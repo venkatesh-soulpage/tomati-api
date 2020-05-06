@@ -1,4 +1,5 @@
 import Email from 'email-templates';
+import moment from 'moment';
 
 const transporter = {
     host: process.env.NODE_ENV === 'development' ? process.env.MAILTRAP_HOST : process.env.SMTP_SERVICE,
@@ -126,9 +127,38 @@ const sendFotgotPasswordEmail = (user, token) => {
     .catch(console.error);
 }
 
+const sendRequisitionToEmail = (requisition, account) => {
+    const email = new Email({
+        message: {
+            from: process.env.SMTP_AUTH,
+            subject: 'Booze Boss - Requisition',
+        },
+        send: true,
+        transport: transporter,
+    })
+
+    email
+    .send({
+        template: 'approve_requisition',
+        message: {
+            to: account.email,
+        },
+        locals: {
+            email: account.email,
+            account,
+            requisition,
+            moment,
+            route: `${process.env.SCHEMA}://${process.env.FRONT_HOST}${process.env.FRONT_PORT  && `:${process.env.FRONT_PORT}`}`
+        }
+    })
+    .then(/* console.log */)
+    .catch(console.error);
+}
+
 export { 
     sendConfirmationEmail,
     sendFotgotPasswordEmail,
     clientInviteEmail,
-    agencyInviteEmail
+    agencyInviteEmail,
+    sendRequisitionToEmail
 };

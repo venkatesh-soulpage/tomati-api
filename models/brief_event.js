@@ -32,6 +32,14 @@ export default class BriefEvent extends Model {
               to: 'venues.id'
             }
         },
+        orders: {
+          relation: Model.HasManyRelation,
+          modelClass: models.RequisitionOrder,
+          join: {
+            from: 'brief_events.id',
+            to: 'requisition_orders.brief_event_id',
+          }
+        }
       }
     }
   }

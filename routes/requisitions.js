@@ -61,4 +61,12 @@ router.post(
     requisitionController.createRequisitionDelivery
 )
 
+// PUT - Update a requisition delivery
+router.put(
+    '/:requisition_id/update-delivery/:requisition_delivery_id', 
+    VerifyToken, 
+    VerifyRole(['BRAND'], ['OWNER', 'WAREHOUSE_MANAGER']),
+    requisitionController.updateRequisitionDelivery
+)
+
 module.exports = router;

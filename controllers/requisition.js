@@ -5,6 +5,8 @@ import jwt from 'jsonwebtoken';
 import fetch from 'node-fetch';
 import queryString from 'query-string';
 
+import { sendRequisitionToEmail } from './mailling'
+
 // GET - Get briefs
 const getRequisitions = async (req, res, next) => {
     try {    
@@ -125,12 +127,28 @@ const createRequisition = async (req, res, next) => {
 
 const updateRequisitionStatus = async (req, res, next) => {
     try {
-
+        const {account_id} = req;
         const {requisition_id} =req.params;
         const { status } = req.body;
 
         const requisition = 
-            await models.Requisition.query().findById(requisition_id);
+            await models.Requisition.query()
+                    .withGraphFetched(`
+                        [
+                            client.[
+                                client_collaborators.[
+                                    account
+                                ]
+                            ],
+                            brief.[
+                                brief_events.[
+                                    orders.[
+                                        product
+                                    ]
+                                ]
+                            ]
+                        ]`)
+                    .findById(requisition_id);
 
         await models.Requisition.query()
             .patch({status})
@@ -139,6 +157,12 @@ const updateRequisitionStatus = async (req, res, next) => {
         await models.Brief.query()
             .patch({status: 'WAITING APPROVAL'})
             .where('id', requisition.brief_id);
+
+        // MAIL notifications
+        for (const collaborator of requisition.client.client_collaborators) {
+            await sendRequisitionToEmail(requisition, collaborator.account);
+        }
+
 
         return res.status(200).json('Requisition updated!').send();
         
@@ -347,7 +371,27 @@ const createRequisitionDelivery = async (req, res, next) => {
         return res.status(200).json('Delivery successfull created').send();
 
     } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
 
+const updateRequisitionDelivery = async (req, res, next) => {
+    try {
+        const {account_id} = req;
+        const {requisition_id, requisition_delivery_id} = req.params;
+        const {waybill, status} = req.body;
+
+        await models.RequisitionDelivery.query()
+                .update({waybill, status, updated_at: new Date()})
+                .where('requisition_id', requisition_id)
+                .where('id', requisition_delivery_id);
+
+        return res.status(200).json('Delivery updated successfully').send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
     }
 }
 
@@ -359,7 +403,8 @@ const requisitionController = {
     createRequisitionOrder,
     deleteRequisitionOrder,
     deliverRequisitionOrders,
-    createRequisitionDelivery
+    createRequisitionDelivery,
+    updateRequisitionDelivery
 }
 
 export default requisitionController;

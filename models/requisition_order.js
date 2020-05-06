@@ -9,7 +9,7 @@ export default class RequisitionOrder extends Model {
     static get relationMappings () {
       return {
         requisition: {
-            relation: Model.HasOneThroughRelation,
+            relation: Model.HasOneRelation,
             modelClass: models.Requisition,
             join: {
               from: 'requisition_orders.requisition_id',
