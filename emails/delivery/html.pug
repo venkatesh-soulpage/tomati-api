@@ -3,12 +3,15 @@ extends layout
 block content
   h1 ¡Hi, #{account.first_name} #{account.last_name}!
   p
-    | The requisition ##{requisition.serial_number} has been changed to 
+    | The delivery incoming from 
+    strong #{delivery.warehouse.name} 
+    | of requisition 
+    strong ##{delivery.requisition.serial_number} 
+    | has been changed to 
     strong #{status}
   p 
-    | Here is a list of the events: 
+    | Here is the content of the delivery: 
   div(display="flex", flexDirection="column")
-    each event in requisition.brief.brief_events
       div(style={
         'border-width': '1px',
         'border-color': 'gray',
@@ -28,9 +31,9 @@ block content
           }
         )
           b 
-            | #{event.name}
+            | Waybill: #{delivery.waybill}
           b
-            | From #{moment(event.start_time).format('DD/MM/YYYY HH:mm')} to #{moment(event.end_time).format('DD/MM/YYYY hh:mm')}
+            | Created at #{moment(delivery.created_at).format('DD/MM/YYYY HH:mm')}
         div(style={
             'display': 'flex',
             'flex-direction': 'row',
@@ -40,24 +43,16 @@ block content
               | Product
             b(style={'display': 'flex', 'flex': '1'})
               | Units
-            b(style={'display': 'flex', 'flex': '1'})
-              | Price
-            b(style={'display': 'flex', 'flex': '1'})
-              | Display
-        each order in event.orders
+        each delivery_product in delivery.products
           div(style={
             'display': 'flex',
             'flex-direction': 'row',
             'justify-content': 'space-between',
           })
             p(style={'display': 'flex', 'flex': '2'})
-              | #{order.product.name} #{order.product.metric_amount}#{order.product.metric}
+              | #{delivery_product.product.name} #{delivery_product.product.metric_amount}#{delivery_product.product.metric}
             p(style={'display': 'flex', 'flex': '1'}) 
-              | #{order.units}
-            p(style={'display': 'flex', 'flex': '1'})
-              | $#{order.price} 
-            p(style={'display': 'flex', 'flex': '1'})
-              | #{order.is_display || 'No'} 
+              | #{delivery_product.units}
 
   table.body-action(align='center', width='100%', cellpadding='0', cellspacing='0', role='presentation')
     tbody

@@ -127,11 +127,11 @@ const sendFotgotPasswordEmail = (user, token) => {
     .catch(console.error);
 }
 
-const sendRequisitionToEmail = (requisition, account) => {
+const sendRequisitionToEmail = (requisition, account, status) => {
     const email = new Email({
         message: {
             from: process.env.SMTP_AUTH,
-            subject: 'Booze Boss - Requisition',
+            subject: `Booze Boss - Requisition (${requisition.serial_number})`,
         },
         send: true,
         transport: transporter,
@@ -148,7 +148,37 @@ const sendRequisitionToEmail = (requisition, account) => {
             account,
             requisition,
             moment,
-            route: `${process.env.SCHEMA}://${process.env.FRONT_HOST}${process.env.FRONT_PORT  && `:${process.env.FRONT_PORT}`}`
+            route: `${process.env.SCHEMA}://${process.env.FRONT_HOST}${process.env.FRONT_PORT  && `:${process.env.FRONT_PORT}`}`,
+            status,
+        }
+    })
+    .then(/* console.log */)
+    .catch(console.error);
+}
+
+const sendDeliveryEmail = (delivery, account, status) => {
+    const email = new Email({
+        message: {
+            from: process.env.SMTP_AUTH,
+            subject: 'Booze Boss - You have a delivery update',
+        },
+        send: true,
+        transport: transporter,
+    })
+
+    email
+    .send({
+        template: 'delivery',
+        message: {
+            to: account.email,
+        },
+        locals: {
+            email: account.email,
+            account,
+            delivery,
+            moment,
+            route: `${process.env.SCHEMA}://${process.env.FRONT_HOST}${process.env.FRONT_PORT  && `:${process.env.FRONT_PORT}`}`,
+            status,
         }
     })
     .then(/* console.log */)
@@ -160,5 +190,6 @@ export {
     sendFotgotPasswordEmail,
     clientInviteEmail,
     agencyInviteEmail,
-    sendRequisitionToEmail
+    sendRequisitionToEmail,
+    sendDeliveryEmail
 };

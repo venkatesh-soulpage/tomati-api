@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import fetch from 'node-fetch';
 import queryString from 'query-string';
 
-import { sendRequisitionToEmail } from './mailling'
+import { sendRequisitionToEmail, sendDeliveryEmail } from './mailling'
 
 // GET - Get briefs
 const getRequisitions = async (req, res, next) => {
@@ -141,6 +141,11 @@ const updateRequisitionStatus = async (req, res, next) => {
                                 ]
                             ],
                             brief.[
+                                agency.[
+                                    agency_collaborators.[
+                                        account
+                                    ]
+                                ],
                                 brief_events.[
                                     orders.[
                                         product
@@ -154,13 +159,24 @@ const updateRequisitionStatus = async (req, res, next) => {
             .patch({status})
             .where('id', requisition_id);
 
-        await models.Brief.query()
+        if (status === 'APPROVED' ) {
+            await models.Brief.query()
+            .patch({status: 'APPROVED'})
+            .where('id', requisition.brief_id);
+
+            // MAIL notifications
+            for (const collaborator of requisition.brief.agency.agency_collaborators) {
+                await sendRequisitionToEmail(requisition, collaborator.account, status);
+            }
+        } else {
+            await models.Brief.query()
             .patch({status: 'WAITING APPROVAL'})
             .where('id', requisition.brief_id);
 
-        // MAIL notifications
-        for (const collaborator of requisition.client.client_collaborators) {
-            await sendRequisitionToEmail(requisition, collaborator.account);
+            // MAIL notifications
+            for (const collaborator of requisition.client.client_collaborators) {
+                await sendRequisitionToEmail(requisition, collaborator.account, status);
+            }
         }
 
 
@@ -368,6 +384,35 @@ const createRequisitionDelivery = async (req, res, next) => {
             
         }
 
+        // Populate new delivery model to send emails
+        const new_delivery = 
+            await models.RequisitionDelivery.query()
+                .withGraphFetched(`[
+                    requisition.[
+                        brief.[
+                            agency.[
+                                agency_collaborators.[
+                                    account
+                                ]
+                            ],
+                            brief_events.[
+                                orders.[
+                                    product
+                                ]
+                            ]
+                        ]
+                    ],
+                    warehouse,
+                    products.[
+                        product
+                    ]
+                ]`)
+                .findById(delivery.id)
+
+        for (const collaborator of new_delivery.requisition.brief.agency.agency_collaborators) {
+            await sendDeliveryEmail(new_delivery, collaborator.account, status);
+        } 
+
         return res.status(200).json('Delivery successfull created').send();
 
     } catch (e) {
@@ -386,6 +431,35 @@ const updateRequisitionDelivery = async (req, res, next) => {
                 .update({waybill, status, updated_at: new Date()})
                 .where('requisition_id', requisition_id)
                 .where('id', requisition_delivery_id);
+
+        // Populate new delivery model to send emails
+        const new_delivery = 
+            await models.RequisitionDelivery.query()
+                .withGraphFetched(`[
+                    requisition.[
+                        brief.[
+                            agency.[
+                                agency_collaborators.[
+                                    account
+                                ]
+                            ],
+                            brief_events.[
+                                orders.[
+                                    product
+                                ]
+                            ]
+                        ]
+                    ],
+                    warehouse,
+                    products.[
+                        product
+                    ]
+                ]`)
+                .findById(requisition_delivery_id)
+
+        for (const collaborator of new_delivery.requisition.brief.agency.agency_collaborators) {
+            await sendDeliveryEmail(new_delivery, collaborator.account, status);
+        } 
 
         return res.status(200).json('Delivery updated successfully').send();
 
