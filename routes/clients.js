@@ -32,5 +32,13 @@ router.post(
     clientController.addLocation
 );
 
+/* PUT - Update a client SLA */
+router.put(
+    '/:client_id/update-sla',
+    VerifyToken,
+    VerifyRole(['ADMIN'], ['ADMIN']),
+    clientController.editSla
+);
+
 
 module.exports = router;

@@ -118,8 +118,6 @@ const inviteAgency = async (req, res, next) => {
                 `
             ).send();
         }
-
-
         
         // Create client
         const agency = 
@@ -128,7 +126,7 @@ const inviteAgency = async (req, res, next) => {
                     name, 
                     description, 
                     contact_email: owner_email,
-                    invited_by: client_id,
+                    invited_by: collaborator.client_id,
                     sla_terms, 
                     sla_hours_before_event_creation,  
                     sla_hours_before_event_update,

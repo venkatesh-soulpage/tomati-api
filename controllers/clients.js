@@ -242,13 +242,35 @@ const addLocation = async (req, res, next) => {
 
 }
 
+// PATCH 
+const editSla = async (req, res, next) => {
+    try {
+        const {account_id} = req;
+        const {client_id} = req.params;
+        const {field, value} = req.body;
+
+        if (!client_id) return res.status(400).json('Invalid client');
+
+        await models.Client.query()
+                .update({[field]: value})
+                .where('id', client_id);
+            
+        return res.status(200).json('Client SLA successfully updated')
+        
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 
 const clientController = {
     // Client
     getClients,
     inviteClient,
     inviteCollaborator,
-    addLocation
+    addLocation,
+    editSla
 }
 
 export default clientController;
