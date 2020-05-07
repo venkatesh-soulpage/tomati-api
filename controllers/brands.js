@@ -62,7 +62,7 @@ const createBrand = async (req, res, next) => {
     
     try {    
         const {account_id, scope} = req;
-        const {name, description, client_id, product_type} = req.body;
+        const {name, description, client_id, product_type, product_subtype} = req.body;
 
         // Validate the account is a client collaborator
         const client_collaborators = 
@@ -75,7 +75,7 @@ const createBrand = async (req, res, next) => {
         const new_brand =  
             await models.Brand.query()
                 .insert({
-                    name, description, client_id, product_type
+                    name, description, client_id, product_type, product_subtype
                 }); 
 
         // Send the clients
