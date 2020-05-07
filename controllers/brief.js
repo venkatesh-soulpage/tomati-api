@@ -50,7 +50,21 @@ const getBriefs = async (req, res, next) => {
         // Create the brief
         const briefs = 
             await models.Brief.query()
-                .withGraphFetched('[brief_events.[venue], attachments, products.[product.[brand]], agency]')
+                .withGraphFetched(`
+                    [
+                        client,
+                        brief_events.[
+                            venue
+                        ], 
+                        attachments, 
+                        products.[
+                            product.[
+                                brand
+                            ]
+                        ], 
+                        agency
+                    ]`
+                )
                 .modify((queryBuilder) => {
                     if (scope === 'BRAND') {
                         queryBuilder.where('client_id', collaborator.client_id)
@@ -62,6 +76,9 @@ const getBriefs = async (req, res, next) => {
                             .whereNotIn('status', ['DRAFT']);
                     }
                 }) 
+                .modifyGraph('client', builder => {
+                    builder.select('brief_attachment_limits');
+                })
                 .orderBy('created_at', 'desc')
                 
 
@@ -479,6 +496,7 @@ const uploadBriefAttachment = async (req, res, next) => {
                         url: `https://s3.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
                         file_name: file.name,
                         file_type: file.mimetype,
+                        size: file.size,
                     })
 
                 return res.status(200).json('Attachment successfully uploaded').send();

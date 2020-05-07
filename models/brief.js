@@ -8,6 +8,14 @@ export default class Brief extends Model {
   
     static get relationMappings () {
       return {
+        client: {
+            relation: Model.BelongsToOneRelation,
+            modelClass: models.Client,
+            join: {
+              from: 'briefs.client_id',
+              to: 'clients.id'
+            }
+        },
         client_collaborator: {
             relation: Model.BelongsToOneRelation,
             modelClass: models.ClientCollaborator,
