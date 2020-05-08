@@ -6,6 +6,10 @@ import fetch from 'node-fetch';
 import queryString from 'query-string';
 import AWS from 'aws-sdk';
 
+// Hellosign 
+const hellosign = require('hellosign-sdk')({ key: process.env.HELLOSIGN_API_KEY });
+
+
 // Inititialize AWS 
 const s3 = new AWS.S3({
     accessKeyId: process.env.BUCKETEER_AWS_ACCESS_KEY_ID,
@@ -541,6 +545,52 @@ const deleteBriefAttachment = async (req, res, next) => {
     }
 }
 
+// Create hellosign doc 
+const getHelloSignUrl = async (req, res, next) => {
+    try {
+
+          const opts = {
+            test_mode: 1,
+            clientId: process.env.HELLOSIGN_CLIENT_ID,
+            template_id: 'dc087da5cce2513aa4480f0787973e7f6ee17730',
+            title: 'embedded draft test',
+            subject: 'embedded draft test',
+            message: 'embedded draft test',
+            signing_redirect_url: 'http://example.com/signed',
+            requesting_redirect_url: 'http://example.com/requested',
+          
+            signers: [
+              {
+                email_address: 'irvollo@gmail.com',
+                name: 'Alice',
+                role: 'BRAND',
+                pin: 'abcd1234'
+              },
+              {
+                email_address: 'irvollo@gmail.com',
+                name: 'Bob',
+                role: 'AGENCY',
+                pin: 'abcd1234'
+              }
+            ],
+            requester_email_address: 'irvollo@gmail.com'
+          };
+          
+          hellosign.unclaimedDraft.createEmbeddedWithTemplate(opts).then((hellosign_res) => {
+            // handle response
+            console.log(hellosign_res);
+            return res.status(200).json(hellosign_res).send();
+          }).catch((err) => {
+            // handle error
+            console.log(err);
+            return res.status(500).json(JSON.stringify(err)).send();
+          });
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
 
 
 
@@ -557,7 +607,8 @@ const briefController = {
     deleteBrief,
     updateBriefStatus,
     uploadBriefAttachment,
-    deleteBriefAttachment
+    deleteBriefAttachment,
+    getHelloSignUrl
 }
 
 export default briefController;

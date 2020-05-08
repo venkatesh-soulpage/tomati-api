@@ -93,5 +93,11 @@ router.delete(
     briefController.deleteBriefAttachment
 );
 
+/* GET - Testing hello sign */
+router.get(
+    '/hellosign', 
+    briefController.getHelloSignUrl
+);
+
 
 module.exports = router;
