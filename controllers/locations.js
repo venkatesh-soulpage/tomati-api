@@ -26,11 +26,11 @@ const getLocations = async (req, res, next) => {
 const createLocation = async (req, res, next) => {
     try {    
 
-        const {name, is_country, parent_location, passport_available, id_card_available} = req.body;
+        const {name, is_country, parent_location, passport_available, id_card_available, currency} = req.body;
 
         const location = 
             await models.Location.query()
-                .insert({name, is_country, parent_location, passport_available, id_card_available});
+                .insert({name, is_country, parent_location, passport_available, id_card_available, currency});
 
         return res.status(201).json('Location created successfully').send();
 

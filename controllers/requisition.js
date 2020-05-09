@@ -161,13 +161,25 @@ const updateRequisitionStatus = async (req, res, next) => {
 
         if (status === 'APPROVED' ) {
             await models.Brief.query()
-            .patch({status: 'APPROVED'})
-            .where('id', requisition.brief_id);
+                .patch({status: 'APPROVED'})
+                .where('id', requisition.brief_id);
 
             // MAIL notifications
             for (const collaborator of requisition.brief.agency.agency_collaborators) {
                 await sendRequisitionToEmail(requisition, collaborator.account, status);
             }
+
+            // Create Events from brief 
+            for (const brief_event of requisition.brief.brief_events ) {
+                 await models.Event.query()
+                        .insert({
+                            brief_event_id: brief_event.id,
+                            setup_at: brief_event.setup_time,
+                            started_at: brief_event.start_time,
+                            ended_at: brief_event.end_time,
+                        })
+            }
+
         } else {
             await models.Brief.query()
             .patch({status: 'WAITING APPROVAL'})
