@@ -20,4 +20,12 @@ router.post(
     eventsController.inviteGuest
 );
 
+/* POST - Invite a new user*/
+router.post(
+    '/:event_guest_id/resend-email', 
+    VerifyToken, 
+    VerifyRole(['AGENCY'], ['OWNER','MANAGER']),
+    eventsController.resendEmail
+);
+
 module.exports = router;

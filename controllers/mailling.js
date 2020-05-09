@@ -185,11 +185,40 @@ const sendDeliveryEmail = (delivery, account, status) => {
     .catch(console.error);
 }
 
+const sendInviteCode = (guest) => {
+    const email = new Email({
+        message: {
+            from: process.env.SMTP_AUTH,
+            subject: 'You have been invited to an Event - Booze Boss',
+        },
+        send: true,
+        transport: transporter,
+    })
+
+    email
+    .send({
+        template: 'invite_guest',
+        message: {
+            to: guest.email,
+        },
+        locals: {
+            guest,
+            event: guest.event[0].brief_event,
+            venue: guest.event[0].brief_event.venue,
+            moment,
+            signupUrl: `${process.env.SCHEMA}://${process.env.FRONT_HOST}${process.env.FRONT_PORT  && `:${process.env.FRONT_PORT}`}/client-signup?code=${guest.code}`,
+        }
+    })
+    .then(/* console.log */)
+    .catch(console.error);
+}
+
 export { 
     sendConfirmationEmail,
     sendFotgotPasswordEmail,
     clientInviteEmail,
     agencyInviteEmail,
     sendRequisitionToEmail,
-    sendDeliveryEmail
+    sendDeliveryEmail,
+    sendInviteCode
 };

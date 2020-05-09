@@ -5,6 +5,8 @@ import jwt from 'jsonwebtoken';
 import fetch from 'node-fetch';
 import queryString from 'query-string';
 
+import { sendInviteCode } from './mailling'
+
 // GET - Get a list of venues
 const getEvents = async (req, res, next) => {
     
@@ -58,34 +60,49 @@ const getEvents = async (req, res, next) => {
 const inviteGuest = async (req, res, next)  => {
     try { 
         const {account_id} = req;
-        const {event_id, first_name, last_name, email, phone_number } = req.body;
+        const {event_id, first_name, last_name, email, phone_number, send_email } = req.body;
 
         const code = Math.random().toString(36).substring(7).toUpperCase();
-
-        console.log(req.body);
-
         // Validate if the user is a BoozeBoss user
-        let guest;
+        let guest_account;
         if (email) {
             const guests = 
             await models.Account.query()
                     .where('email', email);
         
-            guest = guests[0];
+                    guest_account = guests[0];
         }
         
 
         // If the user has a boozeboss account assign the account
-        await models.EventGuest.query()
+        const event_guest =
+            await models.EventGuest.query()
                 .insert({
                     event_id, 
-                    account_id: guest ? guest.account_id : null,
+                    account_id: guest_account ? guest_account.id : null,
                     first_name, 
                     last_name, 
                     email, 
                     phone_number,
                     code
                 });        
+
+        // If the send_email flag is enabled send an email.
+        if (send_email) {
+            const created_guest = 
+                await models.EventGuest.query()
+                    .withGraphFetched(`
+                        [
+                            event.[
+                                brief_event.[
+                                    venue
+                                ]
+                            ]
+                        ]
+                    `)
+                    .findById(event_guest.id)
+            await sendInviteCode(created_guest);
+        }        
 
         return res.status(200).json('Guest created');
 
@@ -97,9 +114,37 @@ const inviteGuest = async (req, res, next)  => {
     }
 }
 
+const resendEmail = async (req, res, next) => {
+    try {
+        const {event_guest_id} = req.params;
+
+        const guest = 
+            await models.EventGuest.query()
+                        .withGraphFetched(`
+                        [
+                            event.[
+                                brief_event.[
+                                    venue
+                                ]
+                            ]
+                        ]
+                    `)
+                    .findById(event_guest_id);
+
+        if (!guest) return res.status(400).json('Invalid guest').send();
+
+        await sendInviteCode(guest);
+
+    } catch(e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 const eventsController = {
     getEvents,
-    inviteGuest
+    inviteGuest,
+    resendEmail
 }
 
 export default eventsController;
