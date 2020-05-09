@@ -141,9 +141,25 @@ const resendEmail = async (req, res, next) => {
     }
 }
 
+const revokeEventGuest = async (req, res, next) => {
+    try {
+        const {event_guest_id} = req.params;
+
+        await models.EventGuest.query()
+                .deleteById(event_guest_id);
+
+        return res.status(200).json('Succesfully removed');
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();  
+    }
+}
+ 
 const eventsController = {
     getEvents,
     inviteGuest,
+    revokeEventGuest,
     resendEmail
 }
 

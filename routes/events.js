@@ -28,4 +28,12 @@ router.post(
     eventsController.resendEmail
 );
 
+/* DELETE - Delete a user guest*/
+router.delete(
+    '/:event_guest_id', 
+    VerifyToken, 
+    VerifyRole(['AGENCY'], ['OWNER','MANAGER']),
+    eventsController.revokeEventGuest
+);
+
 module.exports = router;
