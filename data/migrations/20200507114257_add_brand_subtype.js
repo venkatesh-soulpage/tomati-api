@@ -2,7 +2,7 @@
 exports.up = async (knex) => {
 
     return knex.schema.alterTable('brands', table => {
-        table.string('product_subtype').notNullable()
+        table.string('product_subtype').notNullable().defaultTo('Other')
       })
 }
 
