@@ -11,6 +11,8 @@ const transporter = {
     }
 };
 
+console.log(transporter)
+
 const sendConfirmationEmail = (user, token) => {
 
     const email = new Email({
