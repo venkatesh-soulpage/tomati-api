@@ -30,7 +30,9 @@ const getEvents = async (req, res, next) => {
                     [
                         brief_events.[
                             event.[
-                                guests
+                                guests.[
+                                    role
+                                ]
                             ], 
                             venue
                         ]
@@ -60,7 +62,7 @@ const getEvents = async (req, res, next) => {
 const inviteGuest = async (req, res, next)  => {
     try { 
         const {account_id} = req;
-        const {event_id, first_name, last_name, email, phone_number, send_email } = req.body;
+        const {event_id, role_id, first_name, last_name, email, phone_number, send_email } = req.body;
 
         const code = Math.random().toString(36).substring(7).toUpperCase();
         // Validate if the user is a BoozeBoss user
@@ -80,6 +82,7 @@ const inviteGuest = async (req, res, next)  => {
                 .insert({
                     event_id, 
                     account_id: guest_account ? guest_account.id : null,
+                    role_id,
                     first_name, 
                     last_name, 
                     email, 
@@ -89,6 +92,7 @@ const inviteGuest = async (req, res, next)  => {
 
         // If the send_email flag is enabled send an email.
         if (send_email) {
+
             const created_guest = 
                 await models.EventGuest.query()
                     .withGraphFetched(`

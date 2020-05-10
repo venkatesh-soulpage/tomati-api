@@ -5,6 +5,7 @@ exports.up = async (knex) => {
         table.increments('id').primary()
         table.integer('event_id').references('events.id').notNullable()
         table.integer('account_id').references('accounts.id')
+        table.integer('role_id').references('roles.id').notNullable().defaultTo(9)
         table.string('first_name').notNullable()
         table.string('last_name')
         table.string('email')

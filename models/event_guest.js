@@ -16,6 +16,14 @@ export default class EventGuest extends Model {
             to: 'events.id'
           }
         },
+        role: {
+          relation: Model.HasOneRelation,
+          modelClass: models.Role,
+          join: {
+            from: 'event_guests.role_id',
+            to: 'roles.id'
+          }
+        }
       }
     }
   }
