@@ -148,7 +148,7 @@ const sendRequisitionToEmail = (requisition, account, status) => {
             account,
             requisition,
             moment,
-            route: `${process.env.SCHEMA}://${process.env.FRONT_HOST}${process.env.FRONT_PORT  && `:${process.env.FRONT_PORT}`}`,
+            route: `${process.env.SCHEMA}://${process.env.FRONT_HOST}${process.env.FRONT_PORT  && `:${process.env.FRONT_PORT}`}/requisitions`,
             status,
         }
     })

@@ -23,14 +23,15 @@ module.exports = {
     },
     seeds: { directory: './data/seeds' },
   },
-
   production: {
     client: 'pg',
-    connection: process.env.DB_URL,
+    connection: `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`,
     migrations: {
       directory: './data/migrations',
     },
-    seeds: { directory: './data/seeds' },
+    seeds: { 
+      directory: './data/seeds'
+    },
   },
 
 };
