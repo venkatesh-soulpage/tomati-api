@@ -11,6 +11,7 @@ import Venue from './venue';
 import Brief from './brief';
 import BriefEvent from './brief_event';
 import BriefProducts from './brief_products';
+import BriefBrand from './brief_brand';
 import BriefAttachment from './brief_attachment';
 import Brand from './brand';
 import Product from './product';
@@ -39,6 +40,7 @@ export default {
     Brief,
     BriefEvent,
     BriefProducts,
+    BriefBrand,
     BriefAttachment,
     Brand,
     Product,

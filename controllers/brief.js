@@ -60,12 +60,10 @@ const getBriefs = async (req, res, next) => {
                         brief_events.[
                             venue
                         ], 
+                        brands.[
+                            brand
+                        ],
                         attachments, 
-                        products.[
-                            product.[
-                                brand
-                            ]
-                        ], 
                         agency
                     ]`
                 )
@@ -335,12 +333,12 @@ const deleteBriefEvent = async (req, res, next) => {
 }
 
 // POST - Create a new brief event
-const addBriefProduct = async (req, res, next) => {
+const addBriefBrand = async (req, res, next) => {
     
     try {    
         const {account_id} = req;
         const {brief_id} = req.params;
-        const { product_id, limit } = req.body;
+        const { brand_id, limit } = req.body;
 
         // Validate that brief exists
         const brief = await models.Brief.query().findById(brief_id);
@@ -355,14 +353,14 @@ const addBriefProduct = async (req, res, next) => {
         if (!collaborator) return res.status(400).send("You don't have permissions to edit this brief");
         
         // Create brief product
-        await models.BriefProducts.query()
+        await models.BriefBrand.query()
                 .insert({
                     brief_id,
-                    product_id,
+                    brand_id,
                     limit
                 })
 
-        return res.status(201).json('Brief product added succesfully').send();
+        return res.status(201).json('Brief brand added succesfully').send();
 
     } catch (e) {
         console.log(e);
@@ -371,11 +369,11 @@ const addBriefProduct = async (req, res, next) => {
 }
 
 // DELETE - Create a new brief event
-const deleteBriefProduct = async (req, res, next) => {
+const deleteBriefBrand = async (req, res, next) => {
     
     try {    
         const {account_id} = req;
-        const {brief_id, brief_product_id} = req.params;
+        const {brief_id, brief_brand_id} = req.params;
 
         // Validate that brief exists
         const brief = await models.Brief.query().findById(brief_id);
@@ -390,10 +388,10 @@ const deleteBriefProduct = async (req, res, next) => {
         if (!collaborator) return res.status(400).send("You don't have permissions to edit this brief");
         
         // Create brief product
-        await models.BriefProducts.query()
-                .deleteById(brief_product_id)
+        await models.BriefBrand.query()
+                .deleteById(brief_brand_id)
 
-        return res.status(201).json('Brief product deleted succesfully').send();
+        return res.status(201).json('Brief brand deleted succesfully').send();
 
     } catch (e) {
         console.log(e);
@@ -602,8 +600,8 @@ const briefController = {
     addBriefEvent,
     updateBriefEvent,
     deleteBriefEvent,
-    addBriefProduct,
-    deleteBriefProduct,
+    addBriefBrand,
+    deleteBriefBrand,
     deleteBrief,
     updateBriefStatus,
     uploadBriefAttachment,

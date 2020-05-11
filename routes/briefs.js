@@ -55,18 +55,18 @@ router.delete(
 
 /* POST - Create a new brief */
 router.post(
-    '/:brief_id/add-product', 
+    '/:brief_id/add-brand', 
     VerifyToken, 
     VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
-    briefController.addBriefProduct
+    briefController.addBriefBrand
 );
 
 /* DELETE - Delete a brief product*/
 router.delete(
-    '/:brief_id/delete-product/:brief_product_id', 
+    '/:brief_id/delete-brand/:brief_brand_id', 
     VerifyToken, 
     VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
-    briefController.deleteBriefProduct
+    briefController.deleteBriefBrand
 );
 
 /* PUT - Update brief status*/

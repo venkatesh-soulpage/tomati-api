@@ -40,12 +40,12 @@ export default class Brief extends Model {
             to: 'brief_events.brief_id',
           }
         },
-        products: {
+        brands: {
           relation: Model.HasManyRelation,
-          modelClass: models.BriefProducts,
+          modelClass: models.BriefBrand,
           join: {
             from: 'briefs.id',
-            to: 'brief_products.brief_id',
+            to: 'brief_brands.brief_id',
           }
         },
         attachments: {
