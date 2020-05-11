@@ -14,7 +14,7 @@ router.get(
 
 /* GET - Get new client products */
 router.get(
-    '/:client_id', 
+    '/client-products', 
     VerifyToken, 
     VerifyRole(['AGENCY'], ['OWNER', 'MANAGER']),
     productsController.getClientProducts

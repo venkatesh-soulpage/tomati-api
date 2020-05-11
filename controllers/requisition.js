@@ -42,11 +42,18 @@ const getRequisitions = async (req, res, next) => {
                 .withGraphFetched(
                     `[
                         orders.[
-                            product.[ingredients]
+                            product.[
+                                ingredients.[
+                                    brand
+                                ],
+                                brand
+                            ]
                         ],
                         brief.[
                             brief_events.[venue], 
-                            products.[product]
+                            brands.[
+                                brand
+                            ]
                         ],
                         deliveries.[
                             warehouse,

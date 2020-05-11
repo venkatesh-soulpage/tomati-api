@@ -24,7 +24,18 @@ export default class ProductIngredients extends Model {
               to: 'products.id'
             }
         },
-
+        brand: {
+          relation: Model.HasOneThroughRelation,
+          modelClass: models.Brand,
+          join: {
+            from: 'product_ingredients.product_id',
+            through: {
+              from: 'products.id',
+              to: 'products.brand_id'
+            },
+            to: 'brands.id'
+          }
+        }
       }
     }
   }

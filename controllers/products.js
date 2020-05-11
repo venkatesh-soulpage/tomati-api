@@ -40,7 +40,7 @@ const getProducts = async (req, res, next) => {
 const getClientProducts = async (req, res, next) => {
     try {
         const {account_id} = req;
-        const {client_id} = req.params;
+        // const {client_id} = req.params;
 
         const agency_collaborators =
              await models.AgencyCollaborator.query()
@@ -52,12 +52,12 @@ const getClientProducts = async (req, res, next) => {
         const collaborator = agency_collaborators[0]; 
 
         // Validate client
-        if (`${collaborator.client.id}` !== client_id) return res.status(400).json("You don't have access to this client").send();
+        // if (`${collaborator.client.id}` !== client_id) return res.status(400).json("You don't have access to this client").send();
 
         const products = 
             await models.Product.query()
-                .withGraphFetched('[ingredients]')
-                .where('client_id', client_id);
+                .withGraphFetched('[ingredients.[product], brand]')
+                .where('client_id', collaborator.client.id);
 
         return res.status(200).send(products);
 
