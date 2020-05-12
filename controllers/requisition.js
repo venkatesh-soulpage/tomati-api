@@ -405,12 +405,14 @@ const createRequisitionDelivery = async (req, res, next) => {
             if (Number(units) > Number(stock.quantity)) return res.status(400).json(`Stock unavailable for product with id ${product_id} at warehouse ${warehouse_id}`);
         }
 
+        const requisition = await models.Requisition.query().findById(requisition_id);
+
         // Create a new delivery
         const delivery = 
             await models.RequisitionDelivery.query()
                     .insert({
                         requisition_id: Number(requisition_id),
-                        waybill: Math.random().toString(36).substring(7).toUpperCase(),
+                        waybill: `${requisition.serial_number}_${Math.random().toString(36).substring(7).toUpperCase()}`,
                         status: 'PROCESSING DELIVERY',
                         warehouse_id
                     });
