@@ -28,6 +28,14 @@ router.put(
     requisitionController.updateRequisitionStatus
 );
 
+// PUT - Reject Requisition
+router.put(
+    '/:requisition_id/reject', 
+    VerifyToken, 
+    VerifyRole(['BRAND','AGENCY'], ['OWNER', 'MANAGER']),
+    requisitionController.rejectRequisition
+);
+
 // POST - Add a requisition order
 router.post(
     '/:requisition_id/add-order', 

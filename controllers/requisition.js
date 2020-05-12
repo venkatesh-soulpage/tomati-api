@@ -166,6 +166,7 @@ const updateRequisitionStatus = async (req, res, next) => {
             .patch({status})
             .where('id', requisition_id);
 
+        // If approved
         if (status === 'APPROVED' ) {
             await models.Brief.query()
                 .patch({status: 'APPROVED'})
@@ -186,8 +187,10 @@ const updateRequisitionStatus = async (req, res, next) => {
                             ended_at: brief_event.end_time,
                         })
             }
-
-        } else {
+        }
+        
+        // IF SUBMITTED
+        if ( status === 'SUBMITTED') {
             await models.Brief.query()
             .patch({status: 'WAITING APPROVAL'})
             .where('id', requisition.brief_id);
@@ -198,9 +201,59 @@ const updateRequisitionStatus = async (req, res, next) => {
             }
         }
 
+        // IF REQUEST MODIFICATIONS
+        if (status == 'DRAFT') {
+            await models.Brief.query()
+                .update({status: 'ON PROGRESS'})
+                .where('id', requisition.brief_id);
+            
+            // MAIL notifications
+            for (const collaborator of requisition.client.client_collaborators) {
+                await sendRequisitionToEmail(requisition, collaborator.account, status);
+            }
+        }
+
 
         return res.status(200).json('Requisition updated!').send();
         
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
+const rejectRequisition = async (req, res, next) => {
+    try {
+        const {account_id} = req;
+        const {requisition_id} = req.params;
+
+        // Validate the collaborators
+        const client_collaborators = 
+                        await models.ClientCollaborator.query()
+                            .withGraphFetched('[client]')
+                            .where('account_id', account_id)
+                
+        const collaborator = client_collaborators[0];
+
+        if (!collaborator) return res.status(400).json('Invalid collaborator').send();
+
+        // Validate Requisition permission
+        const requisition = await models.Requisition.query()
+                                .withGraphFetched('[brief]')       
+                                .findById(requisition_id);
+
+        if (requisition.brief.client_id !== collaborator.client_id) return res.status(400).json('Invalid client').send();
+
+        await models.Requisition.query()
+                .update({status: 'REJECTED'})
+                .where('id', requisition_id);
+
+        await models.Brief.query()
+                .update({status: 'REQUISITION REJECTED'})
+                .where('id', requisition.brief_id)
+        
+        return res.status(200).json('Status updated').send();
+
     } catch (e) {
         console.log(e);
         return res.status(500).json(JSON.stringify(e)).send();
@@ -316,8 +369,8 @@ const deliverRequisitionOrders = async (req, res, next) => {
         // Update brief to READY
         const requisition = await models.Requisition.query().findById(requisition_id);
         await models.Brief.query()
-                                .update({status: 'READY'})
-                                .where('id', requisition.brief_id);
+                .update({status: 'READY'})
+                .where('id', requisition.brief_id);
         
         return res.status(200).json('Order delivered')
 
@@ -493,6 +546,7 @@ const requisitionController = {
     getRequisitions,
     createRequisition,
     updateRequisitionStatus,
+    rejectRequisition,
     createRequisitionOrder,
     deleteRequisitionOrder,
     deliverRequisitionOrders,
