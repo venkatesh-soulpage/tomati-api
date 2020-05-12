@@ -39,17 +39,31 @@ const getProducts = async (req, res, next) => {
 
 const getClientProducts = async (req, res, next) => {
     try {
-        const {account_id} = req;
+        const {account_id, scope} = req;
         // const {client_id} = req.params;
 
-        const agency_collaborators =
-             await models.AgencyCollaborator.query()
-                .withGraphFetched('[client]')
-                .where('account_id', account_id)
+        let collaborator;
+        if (scope === 'AGENCY') {
+            const agency_collaborators =
+            await models.AgencyCollaborator.query()
+               .withGraphFetched('[client]')
+               .where('account_id', account_id)
 
-        // Validate collaborator
-        if (!agency_collaborators || agency_collaborators.length < 1) return res.status(400).json('Invalid collaborator').send();
-        const collaborator = agency_collaborators[0]; 
+            // Validate collaborator
+            if (!agency_collaborators || agency_collaborators.length < 1) return res.status(400).json('Invalid collaborator').send();
+            collaborator = agency_collaborators[0]; 
+        }
+
+        if (scope == 'BRAND') {
+            const client_collaborators =
+            await models.ClientCollaborator.query()
+                .withGraphFetched('[client]')
+               .where('account_id', account_id)
+
+            // Validate collaborator
+            if (!client_collaborators || client_collaborators.length < 1) return res.status(400).json('Invalid collaborator').send();
+            collaborator = client_collaborators[0]; 
+        }
 
         // Validate client
         // if (`${collaborator.client.id}` !== client_id) return res.status(400).json("You don't have access to this client").send();

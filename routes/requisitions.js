@@ -73,7 +73,7 @@ router.post(
 router.put(
     '/:requisition_id/update-delivery/:requisition_delivery_id', 
     VerifyToken, 
-    VerifyRole(['BRAND'], ['OWNER', 'WAREHOUSE_MANAGER']),
+    VerifyRole(['BRAND', 'AGENCY'], ['OWNER', 'MANAGER', 'WAREHOUSE_MANAGER']),
     requisitionController.updateRequisitionDelivery
 )
 

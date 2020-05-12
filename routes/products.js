@@ -16,7 +16,7 @@ router.get(
 router.get(
     '/client-products', 
     VerifyToken, 
-    VerifyRole(['AGENCY'], ['OWNER', 'MANAGER']),
+    VerifyRole(['BRAND', 'AGENCY'], ['OWNER', 'MANAGER', 'WAREHOUSE_MANAGER']),
     productsController.getClientProducts
 );
 

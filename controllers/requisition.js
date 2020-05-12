@@ -293,6 +293,7 @@ const deleteRequisitionOrder = async (req, res, next) => {
     }
 }
 
+/* DEPRECATED */
 const deliverRequisitionOrders = async (req, res, next) => {
     try {
         const {account_id} = req;
@@ -391,13 +392,13 @@ const createRequisitionDelivery = async (req, res, next) => {
         for (const deliveryProduct of deliveryProducts) {
 
             // Destruct order
-            const {order, units} = deliveryProduct;
+            const {product, units} = deliveryProduct;
 
             // Iteraye trough all stocks
             const stock = 
                 await models.WarehouseStock.query()
                     .findOne({
-                        product_id: order.product_id,
+                        product_id: product.id,
                         warehouse_id,
                     })
 
@@ -409,8 +410,8 @@ const createRequisitionDelivery = async (req, res, next) => {
             await models.RequisitionDelivery.query()
                     .insert({
                         requisition_id: Number(requisition_id),
-                        waybill,
-                        status,
+                        waybill: Math.random().toString(36).substring(7).toUpperCase(),
+                        status: 'PROCESSING DELIVERY',
                         warehouse_id
                     });
 
@@ -418,13 +419,13 @@ const createRequisitionDelivery = async (req, res, next) => {
         for (const deliveryProduct of deliveryProducts) {
 
             // Destruct order
-            const {order, units} = deliveryProduct;
+            const {product, units} = deliveryProduct;
 
             // Used as an accountability table
             
             const stocks = 
                 await models.WarehouseStock.query()
-                    .where('product_id', order.product_id)
+                    .where('product_id', product.id)
                     .where('warehouse_id', warehouse_id)
 
             const stock = stocks[0];
@@ -433,14 +434,14 @@ const createRequisitionDelivery = async (req, res, next) => {
             await models.RequisitionDeliveryProduct.query()
                     .insert({
                         requisition_delivery_id: delivery.id,
-                        requisition_order_id: order.id,
+                        product_id: product.id,
                         units
                     })
 
             // Record the transaction
             await models.WarehouseTransaction.query()
                     .insert({
-                        product_id: order.product_id,
+                        product_id: product.id,
                         warehouse_id, 
                         account_id,
                         requisition_id,
@@ -451,7 +452,7 @@ const createRequisitionDelivery = async (req, res, next) => {
             // Update the current amount
             await models.WarehouseStock.query()
                     .update({quantity: Number(stock.quantity) - Number(units)})
-                    .where('product_id', order.product_id)
+                    .where('product_id', product.id)
                     .where('warehouse_id', warehouse_id);
             
         }
@@ -482,7 +483,7 @@ const createRequisitionDelivery = async (req, res, next) => {
                 .findById(delivery.id)
 
         for (const collaborator of new_delivery.requisition.brief.agency.agency_collaborators) {
-            await sendDeliveryEmail(new_delivery, collaborator.account, status);
+            await sendDeliveryEmail(new_delivery, collaborator.account, 'PROCESSING DELIVERY');
         } 
 
         return res.status(200).json('Delivery successfull created').send();
@@ -497,10 +498,10 @@ const updateRequisitionDelivery = async (req, res, next) => {
     try {
         const {account_id} = req;
         const {requisition_id, requisition_delivery_id} = req.params;
-        const {waybill, status} = req.body;
+        const {waybill, status, comments} = req.body;
 
         await models.RequisitionDelivery.query()
-                .update({waybill, status, updated_at: new Date()})
+                .update({waybill, status, comments, updated_at: new Date()})
                 .where('requisition_id', requisition_id)
                 .where('id', requisition_delivery_id);
 

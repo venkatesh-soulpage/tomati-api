@@ -25,14 +25,10 @@ export default class RequisitionDeliveryProduct extends Model {
             }
         },
         product: {
-            relation: Model.HasOneThroughRelation,
+            relation: Model.HasOneRelation,
             modelClass: models.Product,
             join: {
-              from: 'requisition_delivery_products.requisition_order_id',
-              through: {
-                from: 'requisition_orders.id',
-                to: 'requisition_orders.product_id'
-              },
+              from: 'requisition_delivery_products.product_id',
               to: 'products.id'
             }
         }
