@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import async from 'async'
 import fetch from 'node-fetch';
 import queryString from 'query-string';
+import moment from 'moment';
 
 import { sendConfirmationEmail, sendFotgotPasswordEmail } from './mailling';
 
@@ -608,6 +609,107 @@ const reset = async (req, res, next) => {
     }
 }
 
+const authWithFacebook = async (req, res, next) => {
+    try {
+
+        // Get facebook parameters
+        const {
+            email,
+            name, 
+            age_range,
+            facebook_access_token,
+            facebook_data_access_expiration_time,
+            facebook_user_id,
+            facebook_signed_request
+        } = req.body;
+
+        console.log(req.body);
+        if (!email || !name || !facebook_access_token || !facebook_data_access_expiration_time || !facebook_user_id || !facebook_signed_request) return res.status(400).json('Invalid auth').send();
+        if (age_range && age_range.min < 18) return res.status(403).json('You need to be +18 to use Booze Boss').send();
+
+
+        // Check if login or signup 
+        const accounts = 
+            await models.Account.query()
+                    .where('email', email).where('facebook_user_id', facebook_user_id);
+
+        const account = accounts[0];
+        if (account) {
+            // If it exists an account is a login attempt
+            // Update account
+            const updated_account = 
+                await models.Account.query()
+                    .update({
+                        facebook_access_token,
+                        facebook_data_access_expiration_time,
+                        facebook_user_id,
+                        facebook_signed_request
+                    })
+                    .where('id', account.id);
+
+                // Sign token
+                const token = await jwt.sign(
+                    {
+                        id: updated_account.id, 
+                        email: updated_account.email, 
+                        scope: 'GUEST',
+                        role: 'REGULAR',
+                    }, 
+                    process.env.SECRET_KEY, 
+                    { expiresIn: '365d' }
+                );
+
+                return res.status(200).json(token).send();
+
+        } else {
+            // If no account exist is a signup
+            // Autogenerate password
+            const password = Math.random().toString(36).substring(7).toUpperCase();
+            const salt = await bcrypt.genSalt(10);
+            const password_hash = await bcrypt.hash(password, salt);
+
+            const first_name = name.split(' ')[0];
+            const last_name = name.split(' ')[1] || '';
+    
+            let temporal_age_verification_limit = new Date();
+            temporal_age_verification_limit.setHours(temporal_age_verification_limit.getHours() + 48);
+
+            // Add new account
+            const new_account = 
+                await models.Account.query()
+                    .insert({
+                        email, first_name, last_name, password_hash,
+                        is_admin: false,
+                        is_email_verified: true,
+                        is_age_verified: false,
+                        facebook_access_token,
+                        facebook_data_access_expiration_time,
+                        facebook_user_id,
+                        facebook_signed_request,
+                        temporal_age_verification_limit: moment(temporal_age_verification_limit).utc().format(), 
+                    });
+
+                // Sign token
+                const token = await jwt.sign(
+                    {
+                        id: new_account.id, 
+                        email: new_account.email, 
+                        scope: 'GUEST',
+                        role: 'REGULAR',
+                    }, 
+                    process.env.SECRET_KEY, 
+                    { expiresIn: '365d' }
+                );
+
+                return res.status(200).json(token).send();
+            }
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 const userController = {
     // Auth
     signup,
@@ -619,6 +721,8 @@ const userController = {
     resendToken,
     forgot,
     reset,
+    // OAuth
+    authWithFacebook,
 }
 
 export default userController;

@@ -29,5 +29,8 @@ router.post('/forgot', accountController.forgot);
 /* POST Reset Password */
 router.post('/reset', accountController.reset);
 
+/* POST Facebook OAuth */
+router.post('/facebook-oauth', accountController.authWithFacebook);
+
 
 module.exports = router;
