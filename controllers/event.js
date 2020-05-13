@@ -138,6 +138,7 @@ const resendEmail = async (req, res, next) => {
         if (!guest) return res.status(400).json('Invalid guest').send();
 
         await sendInviteCode(guest);
+        return res.status(200).json('Success').send();
 
     } catch(e) {
         console.log(e);

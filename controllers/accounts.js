@@ -157,6 +157,7 @@ const agencySignup = async (req, res, next) => {
     try { 
 
         const {email, password, first_name, last_name, phone_number, token } = req.body;
+        console.log(req);
 
         // Check if the account doesn't exist
         const account = 
@@ -243,6 +244,126 @@ const agencySignup = async (req, res, next) => {
 
         // Return the account
         return res.status(201).json(jwt_token).send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
+// Signup for event guests
+const guestSignup = async (req, res, next) => {
+    try { 
+
+        const {email, first_name, last_name, phone_number, code, password} = req.body;
+
+        if (!email || !first_name || !last_name || !phone_number || !code || !password ) return res.status(400).json('Missing fields').send();
+
+        // Check if the account doesn't exist
+        const account = 
+            await models.Account.query()
+                .where('email', email);
+            
+
+        // If the account exist, return message        
+        if (account && account.length > 0) return res.status(400).json('This email already exists');
+
+        // If the code doesn't exist return an error
+        if (!code) return res.status(400).json('Invalid invite code'); 
+
+        // Search for the token and email 
+        const event_guest = 
+            await models.EventGuest.query()
+                .withGraphFetched('[role]')
+                .where('code', code);
+        
+        if (!event_guest || event_guest.length < 1) return res.status(400).json('Invalid invite code');
+
+        const guest = event_guest[0];
+
+        // Validate email
+        if (guest.email && guest.email !== email) return res.status(400).json("The code doesn't match with the provided email"); 
+
+        // If the guest doesn't have a email verification send an email but if the guest already has been validated by the platform
+        // log him in inmediatly
+        if (guest.email === email) {
+
+            // Hash password
+            const salt = await bcrypt.genSalt(10);
+            const password_hash = await bcrypt.hash(password, salt);
+ 
+            // Add new account
+            const new_account = 
+                await models.Account.query()
+                    .insert({
+                        email, first_name, last_name, password_hash, phone_number,
+                        is_admin: false,
+                        is_email_verified: true,
+                        is_age_verified: false,
+                    });
+
+            // Generate the login token
+            const jwt_token = await jwt.sign(
+                {
+                    id: new_account.id, 
+                    email: new_account.email, 
+                    scope: 'GUEST',
+                    role: guest.role.name,
+                }, 
+                process.env.SECRET_KEY, 
+                { expiresIn: '31d' }
+            );
+
+            await models.EventGuest.query()
+                    .update({
+                        account_id: new_account.id,
+                    })
+                    .where('id', guest.id);
+
+            return res.status(200).json({login: true, jwt_token}).send();
+
+        } else {
+
+            // If its only a code signup
+             // Hash password
+            const salt = await bcrypt.genSalt(10);
+            const password_hash = await bcrypt.hash(password, salt);
+    
+            // Add new account
+            const new_account = 
+                await models.Account.query()
+                    .insert({
+                        email, first_name, last_name, password_hash, phone_number,
+                        is_admin: false,
+                        is_email_verified: false,
+                        is_age_verified: false,
+                    });
+
+            // Create new token
+            const new_token = 
+                await models.Token.query().insert({
+                    email: new_account.email,
+                    token: crypto.randomBytes(16).toString('hex')
+                })
+            
+            // Update event guest
+            await models.EventGuest.query()
+                    .update({
+                        account_id: new_account.id,
+                        first_name,
+                        last_name,
+                        email,
+                        phone_number,
+                    })
+                    .where('id', guest.id);
+
+            // Send signup email
+            await sendConfirmationEmail(new_account, new_token);
+
+            // Return the account
+            return res.status(201).json({login: false, message: `We sent you an email to ${email} to confirm your account`}).send();
+
+        }
 
     } catch (e) {
         console.log(e);
@@ -352,7 +473,7 @@ const confirmation = async (req, res, next) => {
         await models.Token.query().deleteById(tokens[0].id);
 
         // Return updated account
-        return res.status(201).json(updated_account).send();
+        return res.redirect(`${process.env.SCHEMA}://${process.env.APP_HOST}${process.env.APP_PORT && `:${process.env.APP_PORT}`}/login?verified=true`);
 
     } catch (e) {
         return res.status(500).json(JSON.stringify(e)).send();
@@ -477,6 +598,7 @@ const userController = {
     signup,
     clientSignup,
     agencySignup,
+    guestSignup,
     login,
     confirmation, 
     resendToken,

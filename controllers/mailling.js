@@ -206,7 +206,7 @@ const sendInviteCode = (guest) => {
             event: guest.event[0].brief_event,
             venue: guest.event[0].brief_event.venue,
             moment,
-            signupUrl: `${process.env.SCHEMA}://${process.env.FRONT_HOST}${process.env.FRONT_PORT  && `:${process.env.FRONT_PORT}`}/client-signup?code=${guest.code}`,
+            signupUrl: `${process.env.SCHEMA}://${process.env.APP_HOST}${process.env.APP_PORT  && `:${process.env.APP_PORT}`}/signup?code=${guest.code}${guest.email && `&email=${guest.email}`}${guest.first_name && `&first_name=${guest.first_name}`}${guest.last_name && `&last_name=${guest.last_name}`}`,
         }
     })
     .then(/* console.log */)
