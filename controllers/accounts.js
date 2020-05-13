@@ -425,6 +425,20 @@ const login = async (req, res, next) => {
                     role = agencyCollaborators[0].role.name;
                 }
         }
+
+        // Validate by Guests if it isn't brand
+        if (!scope || !role) {
+
+            const event_guests = 
+                await models.EventGuest.query()
+                    .where('account_id', accounts[0].id)
+                    .withGraphFetched('role');
+
+                if (event_guests.length > 0) {
+                    scope = event_guests[0].role.scope;
+                    role = event_guests[0].role.name;
+                }
+        }
         
         if (!scope || !role ) return res.status(401).json('Invalid account').send();
 
@@ -476,6 +490,7 @@ const confirmation = async (req, res, next) => {
         return res.redirect(`${process.env.SCHEMA}://${process.env.APP_HOST}${process.env.APP_PORT && `:${process.env.APP_PORT}`}/login?verified=true`);
 
     } catch (e) {
+        console.log(e);
         return res.status(500).json(JSON.stringify(e)).send();
     }
 }
