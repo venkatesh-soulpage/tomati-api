@@ -25,6 +25,7 @@ import RequisitionDelivery from './requisition_delivery';
 import RequisitionDeliveryProduct from './requisition_delivery_product';
 import Event from './event';
 import EventGuest from './event_guest';
+import VerificationAttachment from './verification_attachment';
 
 export default {
     Location,
@@ -53,5 +54,6 @@ export default {
     RequisitionDelivery,
     RequisitionDeliveryProduct,
     Event,
-    EventGuest
+    EventGuest,
+    VerificationAttachment
 };

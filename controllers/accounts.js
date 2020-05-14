@@ -85,7 +85,6 @@ const clientSignup = async (req, res, next) => {
         // If there aren't tokens return error
         if (!tokens || tokens.length < 1) return res.status(400).json({msg: 'The email or token are invalid'});
 
-
         // Hash password
         const salt = await bcrypt.genSalt(10);
         const password_hash = await bcrypt.hash(password, salt);
@@ -623,7 +622,6 @@ const authWithFacebook = async (req, res, next) => {
             facebook_signed_request
         } = req.body;
 
-        console.log(req.body);
         if (!email || !name || !facebook_access_token || !facebook_data_access_expiration_time || !facebook_user_id || !facebook_signed_request) return res.status(400).json('Invalid auth').send();
         if (age_range && age_range.min < 18) return res.status(403).json('You need to be +18 to use Booze Boss').send();
 
@@ -650,10 +648,11 @@ const authWithFacebook = async (req, res, next) => {
                 // Sign token
                 const token = await jwt.sign(
                     {
-                        id: updated_account.id, 
-                        email: updated_account.email, 
+                        id: account.id, 
+                        email: account.email, 
                         scope: 'GUEST',
                         role: 'REGULAR',
+                        is_age_verified: false
                     }, 
                     process.env.SECRET_KEY, 
                     { expiresIn: '365d' }
@@ -696,6 +695,7 @@ const authWithFacebook = async (req, res, next) => {
                         email: new_account.email, 
                         scope: 'GUEST',
                         role: 'REGULAR',
+                        is_age_verified: false,
                     }, 
                     process.env.SECRET_KEY, 
                     { expiresIn: '365d' }
