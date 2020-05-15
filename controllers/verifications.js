@@ -163,6 +163,10 @@ const updateVerificationStatus = async (req, res, next) => {
                         .where('id', verification.id);
                 })
             }
+
+            // Create Wallet
+            await models.Wallet.query()
+                .insert({account_id: verification_account_id})
                     
             return res.status(200).json('Profile successfully approved').send();
 
