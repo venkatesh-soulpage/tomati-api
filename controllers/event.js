@@ -69,11 +69,12 @@ const inviteGuest = async (req, res, next)  => {
         let guest_account;
         if (email) {
             const guests = 
-            await models.Account.query()
-                    .where('email', email);
-        
-                    guest_account = guests[0];
+                await models.Account.query()
+                        .where('email', email);
+            
+                        guest_account = guests[0];
         }
+        
         
 
         // If the user has a boozeboss account assign the account
@@ -160,9 +161,35 @@ const revokeEventGuest = async (req, res, next) => {
         return res.status(500).json(JSON.stringify(e)).send();  
     }
 }
+
+// Guest
+const getGuestEvents = async (req, res, next) => {
+    try {
+        const {account_id} = req;
+        
+        // Get the events where the user is a guest
+        const guest_of_events = 
+                await models.EventGuest.query()
+                    .withGraphFetched('[event.[brief_event]]')
+                    .where('account_id', account_id);        
+
+        // Bring only the events with brief_events
+        
+        const events = guest_of_events.map(goe => { 
+            return goe.event
+        });
+
+        return res.status(200).send(events); 
+              
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();  
+    }
+}
  
 const eventsController = {
     getEvents,
+    getGuestEvents,
     inviteGuest,
     revokeEventGuest,
     resendEmail

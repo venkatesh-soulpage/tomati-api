@@ -9,7 +9,7 @@ export default class EventGuest extends Model {
     static get relationMappings () {
       return {
         event: {
-          relation: Model.HasManyRelation,
+          relation: Model.HasOneRelation,
           modelClass: models.Event,
           join: {
             from: 'event_guests.event_id',

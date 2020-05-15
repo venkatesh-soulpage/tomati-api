@@ -12,6 +12,14 @@ router.get(
     eventsController.getEvents
 );
 
+/* GET - Get a list of client organizations */
+router.get(
+    '/my-events', 
+    VerifyToken, 
+    VerifyRole(['GUEST'], ['REGULAR', 'VIP', 'VVIP']),
+    eventsController.getGuestEvents
+);
+
 /* POST - Invite a new user*/
 router.post(
     '/invite-guest', 
