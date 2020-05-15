@@ -652,7 +652,7 @@ const authWithFacebook = async (req, res, next) => {
                         email: account.email, 
                         scope: 'GUEST',
                         role: 'REGULAR',
-                        is_age_verified: false
+                        is_age_verified: account.is_age_verified
                     }, 
                     process.env.SECRET_KEY, 
                     { expiresIn: '365d' }

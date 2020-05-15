@@ -32,6 +32,14 @@ export default class Account extends Model {
             to: 'warehouse_transactions.account_id'
           }
         },
+        verifications: {
+          relation: Model.HasManyRelation,
+          modelClass: models.VerificationAttachment,
+          join: {
+            from: 'accounts.id',
+            to: 'verification_attachments.account_id'
+          }
+        }
 
       }
     }
