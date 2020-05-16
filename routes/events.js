@@ -28,6 +28,24 @@ router.post(
     eventsController.inviteGuest
 );
 
+/* GET - Get token for an event*/
+router.get(
+    '/:event_id/get-token', 
+    VerifyToken, 
+    VerifyRole(['GUEST'], ['REGULAR', 'VIP', 'VVIP']),
+    eventsController.getCheckinToken
+);
+
+/* GET - Get token for an event*/
+router.post(
+    '/check-in/:token', 
+    VerifyToken, 
+    VerifyRole(['AGENCY'], ['OWNER', 'MANAGER', 'STAFF']),
+    eventsController.checkInGuest
+);
+
+// EVENT GUESTS
+
 /* POST - Invite a new user*/
 router.post(
     '/:event_guest_id/resend-email', 

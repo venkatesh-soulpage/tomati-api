@@ -8,6 +8,14 @@ export default class EventGuest extends Model {
   
     static get relationMappings () {
       return {
+        account: {
+          relation: Model.HasOneRelation,
+          modelClass: models.Account,
+          join: {
+            from: 'event_guests.account_id',
+            to: 'accounts.id'
+          }
+        },
         event: {
           relation: Model.HasOneRelation,
           modelClass: models.Event,
