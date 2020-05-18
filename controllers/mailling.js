@@ -203,8 +203,8 @@ const sendInviteCode = (guest) => {
         },
         locals: {
             guest,
-            event: guest.event[0].brief_event,
-            venue: guest.event[0].brief_event.venue,
+            event: guest.event.brief_event,
+            venue: guest.event.brief_event.venue,
             moment,
             signupUrl: `${process.env.SCHEMA}://${process.env.APP_HOST}${process.env.APP_PORT  && `:${process.env.APP_PORT}`}/signup?code=${guest.code}${guest.email && `&email=${guest.email}`}${guest.first_name && `&first_name=${guest.first_name}`}${guest.last_name && `&last_name=${guest.last_name}`}`,
         }
