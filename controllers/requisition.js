@@ -7,6 +7,8 @@ import queryString from 'query-string';
 
 import { sendRequisitionToEmail, sendDeliveryEmail } from './mailling'
 
+const revision_indexes = 'A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,Y,X,Z,AA,AB,AC,AD,AE,AF,AG,AH,AI,AJ,AK,AL'.split(',');
+
 // GET - Get briefs
 const getRequisitions = async (req, res, next) => {
     try {    
@@ -385,7 +387,7 @@ const createRequisitionDelivery = async (req, res, next) => {
     try {
         const {account_id} = req;
         const {requisition_id} = req.params;
-        const {waybill, warehouse_id, status, deliveryProducts} = req.body;
+        const {warehouse_id, deliveryProducts, requisition_delivery_parent_id} = req.body;
 
 
         // Validate stock
@@ -405,14 +407,44 @@ const createRequisitionDelivery = async (req, res, next) => {
             if (Number(units) > Number(stock.quantity)) return res.status(400).json(`Stock unavailable for product with id ${product_id} at warehouse ${warehouse_id}`);
         }
 
-        const requisition = await models.Requisition.query().findById(requisition_id);
+        // Get the number of deliveries that aren't disputes
+        let revision_indicator;
+        if (requisition_delivery_parent_id) {
+            const parent_requisition_delivery = 
+                await models.RequisitionDelivery.query()
+                        .findById(requisition_delivery_parent_id);
+            
+            // Get the third parameter of the waybill 
+            const revision_index = parent_requisition_delivery.waybill.split('_')[2];
+            revision_indicator = revision_indexes[revision_indexes.indexOf(revision_index) + 1];
+
+            // Disable last delivery
+            await models.RequisitionDelivery.query()
+                    .update({ enabled: false })
+                    .where('id', requisition_delivery_parent_id);
+
+        } else {    
+            revision_indicator = revision_indexes[0];
+        }
+
+        // Get the current requisition
+        const requisition = 
+            await models.Requisition.query()
+                    .findById(requisition_id)
+                    .withGraphFetched(`
+                        [   
+                            deliveries,
+                        ]
+                    `);
+
+        const delivery_number = requisition.deliveries.filter(delivery => delivery.enabled).length + 1;
 
         // Create a new delivery
         const delivery = 
             await models.RequisitionDelivery.query()
                     .insert({
                         requisition_id: Number(requisition_id),
-                        waybill: `${requisition.serial_number}_${Math.random().toString(36).substring(7).toUpperCase()}`,
+                        waybill: `${requisition.serial_number}_${delivery_number}_${revision_indicator}`,
                         status: 'PROCESSING DELIVERY',
                         warehouse_id
                     });
@@ -456,7 +488,6 @@ const createRequisitionDelivery = async (req, res, next) => {
                     .update({quantity: Number(stock.quantity) - Number(units)})
                     .where('product_id', product.id)
                     .where('warehouse_id', warehouse_id);
-            
         }
 
         // Populate new delivery model to send emails
@@ -536,6 +567,43 @@ const updateRequisitionDelivery = async (req, res, next) => {
                     ]
                 ]`)
                 .findById(requisition_delivery_id)
+        
+        // Return objects in transaction if there is a dispute
+        if (status === 'DISPUTED') {
+
+            const deliveryProducts = new_delivery.products;
+    
+            for (const deliveryProduct of deliveryProducts) {
+
+                // Destruct order
+                const {product, units} = deliveryProduct;
+
+                // Used as an accountability table
+                const stocks = 
+                    await models.WarehouseStock.query()
+                        .where('product_id', product.id)
+                        .where('warehouse_id', new_delivery.warehouse_id)
+
+                const stock = stocks[0];
+
+                // Record the transaction
+                await models.WarehouseTransaction.query()
+                        .insert({
+                            product_id: product.id,
+                            warehouse_id: new_delivery.warehouse_id, 
+                            account_id,
+                            requisition_id: new_delivery.requisition_id,
+                            quantity: units,
+                            action: 'DISPUTED'
+                        })
+                
+                // Update the current amount
+                await models.WarehouseStock.query()
+                        .update({quantity: Number(stock.quantity) + Number(units)})
+                        .where('product_id', product.id)
+                        .where('warehouse_id', new_delivery.warehouse_id);
+            }
+        }
 
         // Send email to all client collaborators
         for (const collaborator of new_delivery.requisition.brief.client.client_collaborators) {
