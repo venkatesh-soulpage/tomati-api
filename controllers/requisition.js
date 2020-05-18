@@ -513,6 +513,11 @@ const updateRequisitionDelivery = async (req, res, next) => {
                 .withGraphFetched(`[
                     requisition.[
                         brief.[
+                            client.[
+                                client_collaborators.[
+                                    account
+                                ]
+                            ],
                             agency.[
                                 agency_collaborators.[
                                     account
@@ -532,6 +537,12 @@ const updateRequisitionDelivery = async (req, res, next) => {
                 ]`)
                 .findById(requisition_delivery_id)
 
+        // Send email to all client collaborators
+        for (const collaborator of new_delivery.requisition.brief.client.client_collaborators) {
+            await sendDeliveryEmail(new_delivery, collaborator.account, status);
+        }
+        
+        // Send email to all agency collaborators
         for (const collaborator of new_delivery.requisition.brief.agency.agency_collaborators) {
             await sendDeliveryEmail(new_delivery, collaborator.account, status);
         } 
