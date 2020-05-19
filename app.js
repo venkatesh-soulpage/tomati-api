@@ -21,6 +21,7 @@ var warehousesRoute = require('./routes/warehouses');
 var requisitionsRoute = require('./routes/requisitions');
 var eventsRoute = require('./routes/events');
 var verificationsRoute = require('./routes/verifications');
+var pdfRoute = require('./routes/pdf');
 
 var app = express();
 
@@ -57,6 +58,7 @@ app.use('/api/warehouses', warehousesRoute);
 app.use('/api/requisitions', requisitionsRoute);
 app.use('/api/events', eventsRoute);
 app.use('/api/verifications', verificationsRoute);
+// app.use('/api/pdf', pdfRoute);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

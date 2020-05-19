@@ -309,6 +309,7 @@ const guestSignup = async (req, res, next) => {
                     email: new_account.email, 
                     scope: 'GUEST',
                     role: guest.role.name,
+                    is_age_verified: false,
                 }, 
                 process.env.SECRET_KEY, 
                 { expiresIn: '31d' }
@@ -449,6 +450,7 @@ const login = async (req, res, next) => {
                 email: accounts[0].email, 
                 scope,
                 role,
+                is_age_verified: accounts[0].is_age_verified
             }, 
             process.env.SECRET_KEY, 
             { expiresIn: '31d' }
