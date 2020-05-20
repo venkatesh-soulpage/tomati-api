@@ -7,7 +7,7 @@ import queryString from 'query-string';
 
 import { sendRequisitionToEmail, sendDeliveryEmail } from './mailling'
 import pdfController from './pdf';
-import { submitPDF } from './hellosign'
+import { getPDF, submitPDF } from './hellosign'
 
 const revision_indexes = 'A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,Y,X,Z,AA,AB,AC,AD,AE,AF,AG,AH,AI,AJ,AK,AL'.split(',');
 
@@ -625,19 +625,48 @@ const updateRequisitionDelivery = async (req, res, next) => {
     }
 }
 
-// POST - Create a document, upload it to hellosign and return the signature url.
-const requestHelloSignSignature = async (req, res, next) => {
+
+// GET - Get a copy of the signed document
+const getHellosignSignature = async (req, res, next) => {
     try {
-        const {requisition_id} = req.params;
-        const requisition = await pdfController.helloSignPDF(requisition_id);
-        const url  = await submitPDF(requisition, res);
-        return res.status(200).json(url).send();
+
+        const {requisition_id} = req.params; 
+
+        
+        // Get the requisition and validate that it has a signature id
+        const requisition  = await models.Requisition.query().findById(requisition_id);
+
+        if (!requisition) return res.status(400).json('Invalid requisition').send();
+        if (!requisition.hellosign_signature_id) return res.status(400).json('Invalid signature').send();
+
+        res.setHeader('Content-disposition', 'attachment; filename="' + requisition.hellosign_signature_id + '"')
+        res.setHeader('Content-type', 'application/pdf')
+
+        await getPDF(requisition.hellosign_signature_request_id, res);
+
     } catch (e) {
         console.log(e);
         return res.status(500).json(JSON.stringify(e)).send();
     }
 }
 
+// POST - Create a document, upload it to hellosign and return the signature url.
+const requestHelloSignSignature = async (req, res, next) => {
+    try {
+        const {requisition_id} = req.params;
+        const requisition = await pdfController.helloSignPDF(requisition_id);
+        const signature  = await submitPDF(requisition, res);
+
+        await models.Requisition.query()
+                .update({ hellosign_signature_request_id: signature.signature_request_id })
+                .where('id', requisition_id );
+
+        return res.status(200).json(signature.url).send();
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
 
 const requisitionController = {
     getRequisitions,
@@ -649,6 +678,8 @@ const requisitionController = {
     deliverRequisitionOrders,
     createRequisitionDelivery,
     updateRequisitionDelivery,
+    // Hellosign
+    getHellosignSignature,
     requestHelloSignSignature
 }
 
