@@ -6,6 +6,7 @@ import fetch from 'node-fetch';
 import queryString from 'query-string';
 import PDFDocument from 'pdfkit';
 import moment from 'moment';
+import fs from 'fs';
 
 
 
@@ -374,11 +375,64 @@ const getRequisitionApprovalPdf = async (req, res, next) => {
     }
 }
 
+const helloSignPDF = async (requisition_id) => {
+    try {
+        const requisition = 
+            await models.Requisition.query()
+                    .findById(requisition_id)
+                    .withGraphFetched(`
+                        [
+                            client.[
+                                client_collaborators.[
+                                    account,
+                                    role
+                                ]
+                            ],
+                            brief.[
+                                agency.[
+                                    agency_collaborators.[
+                                        account
+                                    ]
+                                ],
+                                brief_events.[
+                                    orders.[
+                                        product
+                                    ],
+                                    venue
+                                ]
+                            ],
+                            orders.[
+                                product.[
+                                    ingredients
+                                ]
+                            ]
+                        ]
+                    `)
+        
+        const products = await models.Product.query().where('client_id', requisition.client.id);
+        
+        let doc = new PDFDocument({ margin: 50 });
 
+        let top;
+
+        await generateHeader(doc, requisition);
+        await generateCustomerInformation(doc, requisition);
+        top = await generateEvents(doc, requisition);
+        top = await generateProductHeader(doc, top);
+        await generateProductsTable(doc, requisition, products, top);
+
+        doc.pipe(fs.createWriteStream(`temporal/${requisition.client.id}_${requisition.serial_number}.pdf`));
+        doc.end();
+        return requisition; 
+    } catch (e) {
+        console.log(e)
+    }
+}
 
 
 const pdfController = {
-    getRequisitionApprovalPdf
+    getRequisitionApprovalPdf,
+    helloSignPDF
 }
 
 export default pdfController;

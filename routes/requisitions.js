@@ -77,4 +77,12 @@ router.put(
     requisitionController.updateRequisitionDelivery
 )
 
+// POST - Request HelloSign document
+router.post(
+    '/:requisition_id/request-signature', 
+    VerifyToken, 
+    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    requisitionController.requestHelloSignSignature
+)
+
 module.exports = router;
