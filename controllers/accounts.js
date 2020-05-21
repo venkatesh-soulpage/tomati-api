@@ -9,6 +9,25 @@ import moment from 'moment';
 
 import { sendConfirmationEmail, sendFotgotPasswordEmail } from './mailling';
 
+// GET - Get user profile
+const getUser = async (req, res, next) => {
+    try {
+        const {account_id} = req;
+
+        const account = 
+            await models.Account.query()
+                    .findById(account_id);
+
+        if (!account) return res.status(400).json('Invalid account').send();
+
+        return res.status(200).send(account);
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 
 // POST - Signup
 const signup = async (req, res, next) => {
@@ -713,6 +732,8 @@ const authWithFacebook = async (req, res, next) => {
 }
 
 const userController = {
+    // User
+    getUser,
     // Auth
     signup,
     clientSignup,
