@@ -44,6 +44,14 @@ router.post(
     eventsController.checkInGuest
 );
 
+/* POST - Redeem a code to get event*/
+router.post(
+    '/redeem-code', 
+    VerifyToken, 
+    VerifyRole(['GUEST'], ['REGULAR', 'VIP', 'VVIP']),
+    eventsController.redeemCode
+);
+
 // EVENT GUESTS
 
 /* POST - Invite a new user*/

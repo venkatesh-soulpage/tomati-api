@@ -374,6 +374,7 @@ const guestSignup = async (req, res, next) => {
                         last_name,
                         email,
                         phone_number,
+                        code_redeemed: true
                     })
                     .where('id', guest.id);
 

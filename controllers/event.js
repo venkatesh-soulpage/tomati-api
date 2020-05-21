@@ -170,7 +170,7 @@ const getGuestEvents = async (req, res, next) => {
         // Get the events where the user is a guest
         const guest_of_events = 
                 await models.EventGuest.query()
-                    .withGraphFetched('[event.[brief_event]]')
+                    .withGraphFetched('[event.[brief_event.[venue]]]')
                     .where('account_id', account_id);        
 
         // Bring only the events with brief_events
@@ -250,6 +250,49 @@ const checkInGuest = async (req, res, next) => {
     }
 }
 
+// Redeem code
+const redeemCode = async (req, res, next) => {
+    try {
+
+        const {account_id} = req;
+        const {code} = req.body;
+
+        // Validate token
+        if (!code) return res.status(400).json('Invalid Code').send();
+
+        const event_guests = 
+            await models.EventGuest.query()
+                .withGraphFetched('[account, role]')
+                .where('code', code);
+
+        const guest = event_guests[0];
+
+        // Validate that the account doesn't have a registered code for this event
+        const account_guests = 
+            await models.EventGuest.query()
+                .where('account_id', account_id)
+                .where('event_id', guest.event_id);
+            
+        if (account_guests.length > 0) return res.status(400).json('This account is already invited to this event.').send();
+
+        // Validate that the code wasn't redeemed
+        if (!guest) return res.status(400).json('Invalid Code').send();
+        if (guest.code_redeemed) return res.status(400).json('This code has already been redeemed.').send();
+        
+        // Update guest Check-In
+        await models.EventGuest.query()
+                .update({code_redeemed: true, account_id})
+                .where('id', guest.id)
+
+        // Return the gues with account
+        return res.status(200).json('Successfully redemeed').send();
+        
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();  
+    }
+}
+
 const eventsController = {
     getEvents,
     getGuestEvents,
@@ -257,7 +300,8 @@ const eventsController = {
     revokeEventGuest,
     resendEmail,
     getCheckinToken,
-    checkInGuest
+    checkInGuest,
+    redeemCode
 }
 
 export default eventsController;
