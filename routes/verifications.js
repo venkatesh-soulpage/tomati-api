@@ -51,12 +51,14 @@ router.put(
 /* POST - Submit a verification sms */
 router.post(
     '/sms/get-code',
+    VerifyToken,
     verificationController.getVerificationSMS
 );
 
 /* POST - Submit a verification sms */
 router.post(
     '/sms/check-code',
+    VerifyToken,
     verificationController.checkVerificationSMS
 );
 

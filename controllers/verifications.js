@@ -241,6 +241,7 @@ const getVerificationSMS =  async (req, res, next) => {
 
 const checkVerificationSMS =  async (req, res, next) => {
     try {
+        const {account_id} = req;
         const {code, phone_number} = req.body;
 
         const verification = 
@@ -250,6 +251,11 @@ const checkVerificationSMS =  async (req, res, next) => {
             .then(verification_check => verification_check);
             
         if (verification && verification.status === 'approved') {
+
+            await models.Account.query()
+                    .update({is_phone_number_verified: true})
+                    .where('id', account_id);
+                    
             return res.status(200).json('Success!').send();
         } else { 
             return res.status(400).json('Invalid code').send();
