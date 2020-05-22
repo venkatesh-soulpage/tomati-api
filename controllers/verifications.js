@@ -6,6 +6,9 @@ import async from 'async'
 import fetch from 'node-fetch';
 import queryString from 'query-string';
 import AWS from 'aws-sdk';
+import twilio from 'twilio';
+
+const twilio_client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 // Inititialize AWS 
 const s3 = new AWS.S3({
@@ -214,6 +217,51 @@ const updateVerificationStatus = async (req, res, next) => {
     }
 }
 
+// SMS Verifications
+const getVerificationSMS =  async (req, res, next) => {
+    try {
+        const {phone_number} = req.body;
+        const verification = 
+            await twilio_client.verify.services(process.env.TWILIO_VERIFY_SERVICE_SID)
+                    .verifications
+                    .create({to: `+${phone_number}`, channel: 'sms'})
+                    .then(verification => verification);
+            
+        if (verification.status === 'pending') {
+            return res.status(200).json('SMS successful').send();
+        } else {
+            return res.status(400).json('Error sending to this number').send();
+        }
+    
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
+const checkVerificationSMS =  async (req, res, next) => {
+    try {
+        const {code, phone_number} = req.body;
+
+        const verification = 
+            await twilio_client.verify.services(process.env.TWILIO_VERIFY_SERVICE_SID)
+            .verificationChecks
+            .create({to: `+${phone_number}`, code })
+            .then(verification_check => verification_check);
+            
+        if (verification && verification.status === 'approved') {
+            return res.status(200).json('Success!').send();
+        } else { 
+            return res.status(400).json('Invalid code').send();
+        }
+        
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 
 
 const verificationController = {
@@ -222,7 +270,10 @@ const verificationController = {
     checkVerificationStatus,
     uploadVerificationProcess,
     submitVerification,
-    updateVerificationStatus
+    updateVerificationStatus,
+    // SMS verifications
+    getVerificationSMS,
+    checkVerificationSMS,
 }
 
 export default verificationController;

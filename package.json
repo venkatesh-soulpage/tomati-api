@@ -43,7 +43,8 @@
     "pg": "^8.0.0",
     "postgres-date": "^1.0.5",
     "pug": "^2.0.0-beta11",
-    "query-string": "^6.10.1"
+    "query-string": "^6.10.1",
+    "twilio": "^3.43.1"
   },
   "devDependencies": {
     "env-cmd": "^10.0.1"

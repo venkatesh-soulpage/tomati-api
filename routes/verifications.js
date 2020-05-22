@@ -46,4 +46,19 @@ router.put(
     verificationController.updateVerificationStatus
 );
 
+/* SMS */
+
+/* POST - Submit a verification sms */
+router.post(
+    '/sms/get-code',
+    verificationController.getVerificationSMS
+);
+
+/* POST - Submit a verification sms */
+router.post(
+    '/sms/check-code',
+    verificationController.checkVerificationSMS
+);
+
+
 module.exports = router;
