@@ -13,18 +13,37 @@ const getProducts = async (req, res, next) => {
         const {account_id, scope} = req;
     
         // Validate the account is a client collaborator
-        const client_collaborators = 
-            await models.ClientCollaborator.query()
-                .where('account_id', account_id)
-            
-        const collaborator = client_collaborators[0];
-        if (!collaborator) return res.status(400).send('Invalid account');
+        let client;
+        if (scope === 'BRAND') {
+            const client_collaborators = 
+                await models.ClientCollaborator.query()
+                    .where('account_id', account_id)
+                
+            const collaborator = client_collaborators[0];
+            if (!collaborator) return res.status(400).send('Invalid account');
 
-        // Search venues by client_id if its a collaborator just return the client_id venues
-        const client =  
-            await models.Client.query()
-                    .findById(collaborator.client_id)
-                    .withGraphFetched('[products.[brand, stocks]]')                
+            // Search venues by client_id if its a collaborator just return the client_id venues
+            client =  
+                await models.Client.query()
+                        .findById(collaborator.client_id)
+                        .withGraphFetched('[products.[brand, stocks]]')       
+        }
+            
+        if (scope === 'AGENCY') {
+            const agency_collaborators = 
+                await models.AgencyCollaborator.query()
+                    .withGraphFetched('client')
+                    .where('account_id', account_id); 
+
+            const collaborator = agency_collaborators[0];
+            if (!collaborator) return res.status(400).send('Invalid account');
+        
+        
+            client = 
+                await models.Client.query()
+                    .findById(collaborator.client.id)
+                    .withGraphFetched('[products.[brand, stocks]]')   
+        }
             
 
         // Send the clientss
@@ -91,18 +110,32 @@ const createProduct = async (req, res, next) => {
         const {name, brand_id, description, metric, metric_amount, sku, base_price, is_cocktail, cocktail_ingredients} = req.body;
     
         // Validate the account is a client collaborator
-        const client_collaborators = 
+        let collaborator;
+
+        if (scope === 'BRAND') {
+            const client_collaborators = 
             await models.ClientCollaborator.query()
                 .where('account_id', account_id)
             
-        const collaborator = client_collaborators[0];
+            collaborator = client_collaborators[0];
+        }
+        
+        if (scope === 'AGENCY') {
+            const agency_collaborators = 
+                await models.AgencyCollaborator.query()
+                    .withGraphFetched('client')
+                    .where('account_id', account_id);
+
+            collaborator = agency_collaborators[0];
+        }
+
         if (!collaborator) return res.status(400).send('Invalid account');
 
         // Search venues by client_id if its a collaborator just return the client_id venues
         const new_product = 
             await models.Product.query()
                 .insert({
-                    client_id: collaborator.client_id,
+                    client_id: collaborator.client ? collaborator.client.id : collaborator.client_id,
                     name, brand_id, description, metric, metric_amount, sku, base_price, is_cocktail
                 })              
 
@@ -139,13 +172,27 @@ const updateProduct = async (req, res, next) => {
         const {name, description, metric, metric_amount, sku, base_price } = req.body;
     
         // Validate the account is a client collaborator
-        const client_collaborators = 
+        let collaborator;
+
+        if (scope === 'BRAND') {
+            const client_collaborators = 
             await models.ClientCollaborator.query()
                 .where('account_id', account_id)
             
-        const collaborator = client_collaborators[0];
-        if (!collaborator) return res.status(400).send('Invalid account');
+            collaborator = client_collaborators[0];
+        }
+        
+        if (scope === 'AGENCY') {
+            const agency_collaborators = 
+                await models.AgencyCollaborator.query()
+                    .withGraphFetched('client')
+                    .where('account_id', account_id);
 
+            collaborator = agency_collaborators[0];
+        }
+
+        if (!collaborator) return res.status(400).send('Invalid account');
+            
 
         const product =
             await models.Product.query().findById(product_id);
@@ -153,7 +200,7 @@ const updateProduct = async (req, res, next) => {
         // alidate product
         if (!product) return res.status(400).json('Invalid product').send();
 
-        if (product.client_id !== collaborator.client_id) return res.status(400).json("You don't have permission to do that").send();
+        if ((product.client_id !== collaborator.client_id) && (product.client_id !== collaborator.client.id )) return res.status(400).json("You don't have permission to do that").send();
 
 
         // Query builder for product update

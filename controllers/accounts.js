@@ -16,6 +16,7 @@ const getUser = async (req, res, next) => {
 
         const account = 
             await models.Account.query()
+                    .withGraphFetched('[wallet]')
                     .findById(account_id);
 
         if (!account) return res.status(400).json('Invalid account').send();
@@ -731,6 +732,7 @@ const authWithFacebook = async (req, res, next) => {
         return res.status(500).json(JSON.stringify(e)).send();
     }
 }
+
 
 const userController = {
     // User

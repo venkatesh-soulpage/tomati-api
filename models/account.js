@@ -39,8 +39,15 @@ export default class Account extends Model {
             from: 'accounts.id',
             to: 'verification_attachments.account_id'
           }
+        },
+        wallet: {
+          relation: Model.HasOneRelation,
+          modelClass: models.Wallet,
+          join: {
+            from: 'accounts.id',
+            to: 'wallets.account_id'
+          }
         }
-
       }
     }
   }

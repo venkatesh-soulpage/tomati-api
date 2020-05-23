@@ -8,7 +8,7 @@ import VerifyRole from '../utils/verification_role'
 router.get(
     '/', 
     VerifyToken, 
-    VerifyRole(['BRAND'], ['OWNER', 'MANAGER', 'WAREHOUSE_MANAGER']),
+    VerifyRole(['BRAND', 'AGENCY'], ['OWNER', 'MANAGER', 'WAREHOUSE_MANAGER']),
     productsController.getProducts
 );
 
@@ -24,7 +24,7 @@ router.get(
 router.post(
     '/', 
     VerifyToken, 
-    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    VerifyRole(['BRAND', 'AGENCY'], ['OWNER', 'MANAGER', 'WAREHOUSE_MANAGER']),
     productsController.createProduct
 );
 
@@ -32,7 +32,7 @@ router.post(
 router.put(
     '/:product_id', 
     VerifyToken, 
-    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    VerifyRole(['BRAND', 'AGENCY'], ['OWNER', 'MANAGER', 'WAREHOUSE_MANAGER']),
     productsController.updateProduct
 );
 

@@ -11,23 +11,46 @@ const getBrands = async (req, res, next) => {
     try {    
 
         const {account_id, scope} = req;
-    
-        // Validate the account is a client collaborator
-        const client_collaborators = 
+
+        let brands;
+        if (scope === 'BRAND') {
+            // Validate the account is a client collaborator
+            const client_collaborators = 
             await models.ClientCollaborator.query()
                 .where('account_id', account_id)
             
-        const collaborator = client_collaborators[0];
-        if (!collaborator) return res.status(400).send('Invalid account');
+            const collaborator = client_collaborators[0];
+            if (!collaborator) return res.status(400).send('Invalid account');
 
-        // Search venues by client_id if its a collaborator just return the client_id venues
-        const brands =  
-            await models.Brand.query()
-                .modify((queryBuilder) => {
-                    if (scope === 'BRAND') {
-                        queryBuilder.where('client_id', collaborator.client_id); 
-                    }
-                }) 
+            // Search venues by client_id if its a collaborator just return the client_id venues
+            brands =  
+                await models.Brand.query()
+                    .modify((queryBuilder) => {
+                        if (scope === 'BRAND') {
+                            queryBuilder.where('client_id', collaborator.client_id); 
+                        }
+                    }) 
+        }
+
+        if (scope === 'AGENCY') {
+            // Validate the account is a client collaborator
+            const agency_collaborators = 
+            await models.AgencyCollaborator.query()
+                .withGraphFetched('client')
+                .where('account_id', account_id)
+            
+            const collaborator = agency_collaborators[0];
+            if (!collaborator) return res.status(400).send('Invalid account');
+
+            // Search venues by client_id if its a collaborator just return the client_id venues
+            brands =  
+                await models.Brand.query()
+                    .modify((queryBuilder) => {
+                        if (scope === 'AGENCY') {
+                            queryBuilder.where('client_id', collaborator.client.id); 
+                        }
+                    }) 
+        }
 
         // Send the clients
         return res.status(200).send(brands);
