@@ -115,7 +115,8 @@ const createRequisition = async (req, res, next) => {
                 brief_id, 
                 brief_parent_id, 
                 status: 'DRAFT', 
-                serial_number: collaborator.client.requisition_current_serial + 1
+                serial_number: collaborator.client.requisition_current_serial + 1,
+                created_by: collaborator.id
             });
 
         // Update current client

@@ -205,7 +205,7 @@ function generateCustomerInformation(doc, requisition) {
         .text(moment(requisition.created_at).format('DD/MM/YYYY LT'), 150, customerInformationTop + 15)
         .text("Requested by:", 50, customerInformationTop + 30)
         .text(
-            requisition.brief.agency.name,
+            `${requisition.brief.agency.name} (${requisition.created_by_account.first_name} ${requisition.created_by_account.last_name})`,
             150,
             customerInformationTop + 30
         )
@@ -372,7 +372,8 @@ const getRequisitionApprovalPdf = async (req, res, next) => {
                                 product.[
                                     ingredients
                                 ]
-                            ]
+                            ],
+                            created_by_account
                         ]
                     `)
 
@@ -430,7 +431,8 @@ const helloSignPDF = async (requisition_id) => {
                                 product.[
                                     ingredients
                                 ]
-                            ]
+                            ],
+                            created_by_account,
                         ]
                     `)
         

@@ -63,6 +63,18 @@ export default class Requisition extends Model {
             from: 'requisitions.id',
             to: 'requisition_deliveries.requisition_id',
           }
+        },
+        created_by_account: {
+          relation: Model.HasOneThroughRelation,
+          modelClass: models.Account,
+          join: {
+            from: 'requisitions.created_by',
+            through: {
+              from: 'agency_collaborators.id',
+              to: 'agency_collaborators.account_id'
+            },
+            to: 'accounts.id'
+          }
         }
       }
     }

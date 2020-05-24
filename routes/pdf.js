@@ -8,8 +8,8 @@ import VerifyRole from '../utils/verification_role'
 /* GET - Get a list of client organizations */
 router.get(
     '/:requisition_id', 
-    VerifyToken,
-    VerifyRole(['BRAND'], ['OWNER','MANAGER']),
+    /* VerifyToken,
+    VerifyRole(['BRAND'], ['OWNER','MANAGER']), */
     pdfController.getRequisitionApprovalPdf
 );
 
