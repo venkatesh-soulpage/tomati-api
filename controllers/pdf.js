@@ -131,17 +131,43 @@ function generateHr(doc, y) {
       .stroke();
   }
 
-function generateSignature(doc, y) {
+function generateSignature(doc, top) {
+
+    let y = top + 60;
+
     doc
         .strokeColor("#aaaaaa")
         .lineWidth(1)
         .moveTo(200, y)
         .lineTo(400, y)
+        .stroke()
+        .font("Helvetica-Bold");
+
+    doc
+        .fontSize(10)
+        .text("Received by", 265, y + 10)
+        .font("Helvetica-Bold")
+    doc
+        .strokeColor("#aaaaaa")
+        .lineWidth(1)
+        .moveTo(200, y + 50)
+        .lineTo(400, y + 50)
         .stroke();
 
     doc
         .fontSize(10)
-        .text("Caesario De-Medeiros", 250, y + 15)
+        .text("Date", 285, y + 60)
+        .font("Helvetica-Bold")
+    doc
+        .strokeColor("#aaaaaa")
+        .lineWidth(1)
+        .moveTo(200, y + 100)
+        .lineTo(400, y + 100)
+        .stroke();
+
+    doc
+        .fontSize(10)
+        .text("Signature", 275, y + 110)
         .font("Helvetica-Bold")
 }
 
@@ -208,9 +234,6 @@ const getEvent = async (doc, top, brief_event) => {
         .font("Helvetica-Bold")
         .text(moment(brief_event.start_time).format('DD/MM/YYYY LT'), 280, top)
         .font("Helvetica")
-        .text("End Time:", 390, top)
-        .font("Helvetica-Bold")
-        .text(moment(brief_event.end_time).format('DD/MM/YYYY LT'), 450, top)
         
         // Second row
         .fontSize(10)
@@ -309,8 +332,9 @@ function generateTableRow(doc, y, c1, c2, c3, c4) {
     
         generateHr(doc, position + 20);
         i++;
-
     }
+
+    return top + (i + 1) * 30;
   } 
   
 
@@ -365,7 +389,8 @@ const getRequisitionApprovalPdf = async (req, res, next) => {
         await generateCustomerInformation(doc, requisition);
         top = await generateEvents(doc, requisition);
         top = await generateProductHeader(doc, top);
-        await generateProductsTable(doc, requisition, products, top);
+        top = await generateProductsTable(doc, requisition, products, top);
+        top = await generateSignature(doc, top);
 
         doc.pipe(res)
         doc.end();
@@ -419,7 +444,9 @@ const helloSignPDF = async (requisition_id) => {
         await generateCustomerInformation(doc, requisition);
         top = await generateEvents(doc, requisition);
         top = await generateProductHeader(doc, top);
-        await generateProductsTable(doc, requisition, products, top);
+        top = await generateProductsTable(doc, requisition, products, top);
+        await generateSignature(doc, top);
+
 
         doc.pipe(fs.createWriteStream(`temporal/${requisition.client.id}_${requisition.serial_number}.pdf`));
         doc.end();
