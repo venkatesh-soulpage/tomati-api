@@ -175,6 +175,13 @@ const inviteCollaborator = async (req, res, next) => {
 
         if (!email || !role_id || !agency_id) return res.status(400).json('Missing fields').send();
 
+        // Validate email 
+        const accounts = 
+            await models.Account.query()
+                .where('email', email);
+    
+        if (accounts.length > 0) return res.status(400).json('An account already exists with this email address').send();
+
         // Get Client id by ClientCollaborator relation
         const agency = 
             await models.Agency.query()

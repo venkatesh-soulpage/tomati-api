@@ -17,7 +17,20 @@ const getClients = async (req, res, next) => {
         // Get the clients depending on admin or client
         let clients; 
 
-        const query = '[locations.[location], venues, brands, warehouses.[location], client_collaborators.[account, role]]';
+        const query = `[
+            locations.[
+                location
+            ], 
+            venues, 
+            brands, 
+            warehouses.[
+                location
+            ], 
+            client_collaborators.[
+                account, 
+                role
+            ]
+        ]`;
         
         if (req.scope === 'ADMIN') {
             clients = 
@@ -149,6 +162,13 @@ const inviteCollaborator = async (req, res, next) => {
         const { email, role_id, client_id } = req.body;
 
         if (!email || !role_id || !client_id) return res.status(400).json('Missing fields').send();
+
+        // Validate email 
+        const accounts = 
+            await models.Account.query()
+                .where('email', email);
+
+        if (accounts.length > 0) return res.status(400).json('An account already exists with this email address').send();
 
         // Get Client id by ClientCollaborator relation
         const client = 
