@@ -28,7 +28,7 @@ router.post(
 router.post(
     '/:client_id/add-location',
     VerifyToken,
-    VerifyRole(['ADMIN', 'BRAND'], ['ADMIN', 'OWNER']),
+    VerifyRole(['ADMIN'], ['ADMIN']),
     clientController.addLocation
 );
 

@@ -234,20 +234,7 @@ const addLocation = async (req, res, next) => {
         const { client_id } = req.params;
         const { location_id } = req.body;
 
-        // Validate the account is a client collaborator
-        const client_collaborators = 
-            await models.ClientCollaborator.query()
-                .where('account_id', account_id)
-                .withGraphFetched('[client.[locations]]')
-
-        const collaborator = client_collaborators[0];
-
-        // Validate client
-        if (`${collaborator.client_id}` !== client_id) return res.status(400).json('Invalid client').send();
-
-        // Validate SLA 
-        if (collaborator.client.locations.length >= collaborator.client.locations_limit ) return res.status(400).json('Locations limit reach').send();
-
+        // Add client location
         await models.ClientLocations.query()
             .insert({
                 location_id, client_id,
