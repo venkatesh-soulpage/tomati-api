@@ -534,7 +534,7 @@ const updateRequisitionDelivery = async (req, res, next) => {
     try {
         const {account_id} = req;
         const {requisition_id, requisition_delivery_id} = req.params;
-        const {waybill, status, comments} = req.body;
+        const {waybill, status, comments, is_refund, refunds} = req.body;
 
         await models.RequisitionDelivery.query()
                 .update({waybill, status, comments, updated_at: new Date()})
@@ -574,37 +574,35 @@ const updateRequisitionDelivery = async (req, res, next) => {
         // Return objects in transaction if there is a dispute
         if (status === 'DISPUTED') {
 
-            const deliveryProducts = new_delivery.products;
+            // If refund send the items to the warehouse 
+            if (is_refund && refunds && refunds.length > 0) {
+                for (const refund of refunds) {
+
+                    // Used as an accountability table
+                    const stocks = 
+                        await models.WarehouseStock.query()
+                            .where('product_id', refund.product.id)
+                            .where('warehouse_id', new_delivery.warehouse_id)
     
-            for (const deliveryProduct of deliveryProducts) {
-
-                // Destruct order
-                const {product, units} = deliveryProduct;
-
-                // Used as an accountability table
-                const stocks = 
+                    const stock = stocks[0];
+    
+                    // Record the transaction
+                    await models.WarehouseTransaction.query()
+                            .insert({
+                                product_id: refund.product.id,
+                                warehouse_id: new_delivery.warehouse_id, 
+                                account_id,
+                                requisition_id: new_delivery.requisition_id,
+                                quantity: refund.refund_amount,
+                                action: 'DISPUTED'
+                            })
+                    
+                    // Update the current amount
                     await models.WarehouseStock.query()
-                        .where('product_id', product.id)
-                        .where('warehouse_id', new_delivery.warehouse_id)
-
-                const stock = stocks[0];
-
-                // Record the transaction
-                await models.WarehouseTransaction.query()
-                        .insert({
-                            product_id: product.id,
-                            warehouse_id: new_delivery.warehouse_id, 
-                            account_id,
-                            requisition_id: new_delivery.requisition_id,
-                            quantity: units,
-                            action: 'DISPUTED'
-                        })
-                
-                // Update the current amount
-                await models.WarehouseStock.query()
-                        .update({quantity: Number(stock.quantity) + Number(units)})
-                        .where('product_id', product.id)
-                        .where('warehouse_id', new_delivery.warehouse_id);
+                            .update({quantity: Number(stock.quantity) + Number(refund.refund_amount)})
+                            .where('product_id', refund.product.id)
+                            .where('warehouse_id', new_delivery.warehouse_id);
+                }
             }
         }
 
