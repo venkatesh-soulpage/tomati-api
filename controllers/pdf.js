@@ -210,6 +210,21 @@ function generateCustomerInformation(doc, requisition) {
             customerInformationTop + 30
         )
     
+    doc
+        .fontSize(10)
+        .text("Received by:", 350, customerInformationTop)
+        .font("Helvetica-Bold")
+        .text(`____________________`, 420, customerInformationTop)
+        .font("Helvetica")
+        .text("Date:", 350, customerInformationTop + 15)
+        .text('____________________', 420, customerInformationTop + 15)
+        .text("Signature:", 350, customerInformationTop + 30)
+        .text(
+            `____________________`,
+            420,
+            customerInformationTop + 30
+        )
+    
         generateHr(doc, customerInformationTop + 52);
   }
 
@@ -391,7 +406,7 @@ const getRequisitionApprovalPdf = async (req, res, next) => {
         top = await generateEvents(doc, requisition);
         top = await generateProductHeader(doc, top);
         top = await generateProductsTable(doc, requisition, products, top);
-        top = await generateSignature(doc, top);
+        // top = await generateSignature(doc, top);
 
         doc.pipe(res)
         doc.end();
@@ -447,7 +462,7 @@ const helloSignPDF = async (requisition_id) => {
         top = await generateEvents(doc, requisition);
         top = await generateProductHeader(doc, top);
         top = await generateProductsTable(doc, requisition, products, top);
-        await generateSignature(doc, top);
+        // await generateSignature(doc, top);
 
 
         doc.pipe(fs.createWriteStream(`temporal/${requisition.client.id}_${requisition.serial_number}.pdf`));
