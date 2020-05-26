@@ -55,6 +55,14 @@ export default class Brief extends Model {
             from: 'briefs.id',
             to: 'brief_attachments.brief_id',
           }
+        }, 
+        requisition: {
+          relation: Model.HasOneRelation,
+          modelClass: models.Requisition,
+          join: {
+            from: 'briefs.id',
+            to: 'requisitions.brief_id'
+          }
         }
       }
     }

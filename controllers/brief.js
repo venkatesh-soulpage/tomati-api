@@ -64,7 +64,8 @@ const getBriefs = async (req, res, next) => {
                             brand
                         ],
                         attachments, 
-                        agency
+                        agency,
+                        requisition
                     ]`
                 )
                 .modify((queryBuilder) => {
