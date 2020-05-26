@@ -260,32 +260,67 @@ const redeemCode = async (req, res, next) => {
         // Validate token
         if (!code) return res.status(400).json('Invalid Code').send();
 
-        const event_guests = 
+        // Check if the code used is master code 
+        const event =
+            await models.Event.query()
+                    .where('master_code', code)
+                    .first();
+        
+        // If there is an event add it to the event guest list, else check by individual guests logic 
+        if (event) {
+
+            // Validate the account 
+            const account = 
+                    await models.Account.query()
+                            .findById(account_id);
+
+            if (!account) return res.status(400).json('Invalid Account').send();
+            
+            // Create the guest 
+            await models.EventGuest.query()
+                    .insert({
+                        event_id: event.id,
+                        account_id: account.id,
+                        first_name: account.first_name,
+                        last_name: account.last_name,
+                        email: account.email,
+                        phone_number: account.phone_number,
+                        code: `${code}_MASTERCODE`,
+                        code_redeemed: true
+                    })
+
+            // Return the gues with account
+            return res.status(200).json('Successfully redemeed').send();
+            
+        } else {
+            const event_guests = 
             await models.EventGuest.query()
                 .withGraphFetched('[account, role]')
                 .where('code', code);
 
-        const guest = event_guests[0];
+            const guest = event_guests[0];
 
-        // Validate that the account doesn't have a registered code for this event
-        const account_guests = 
-            await models.EventGuest.query()
-                .where('account_id', account_id)
-                .where('event_id', guest.event_id);
+            // Validate that the account doesn't have a registered code for this event
+            const account_guests = 
+                await models.EventGuest.query()
+                    .where('account_id', account_id)
+                    .where('event_id', guest.event_id);
+                
+            if (account_guests.length > 0) return res.status(400).json('This account is already invited to this event.').send();
+
+            // Validate that the code wasn't redeemed
+            if (!guest) return res.status(400).json('Invalid Code').send();
+            if (guest.code_redeemed) return res.status(400).json('This code has already been redeemed.').send();
             
-        if (account_guests.length > 0) return res.status(400).json('This account is already invited to this event.').send();
+            // Update guest Check-In
+            await models.EventGuest.query()
+                    .update({code_redeemed: true, account_id})
+                    .where('id', guest.id)
 
-        // Validate that the code wasn't redeemed
-        if (!guest) return res.status(400).json('Invalid Code').send();
-        if (guest.code_redeemed) return res.status(400).json('This code has already been redeemed.').send();
+            // Return the gues with account
+            return res.status(200).json('Successfully redemeed').send();
+        }
         
-        // Update guest Check-In
-        await models.EventGuest.query()
-                .update({code_redeemed: true, account_id})
-                .where('id', guest.id)
-
-        // Return the gues with account
-        return res.status(200).json('Successfully redemeed').send();
         
     } catch (e) {
         console.log(e);

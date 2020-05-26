@@ -218,6 +218,10 @@ const updateProduct = async (req, res, next) => {
     }
 }
 
+const deleteProducts = async (req, res, next) => {
+    
+}
+
 const productsController = {
     getProducts,
     getClientProducts,

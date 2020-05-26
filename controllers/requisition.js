@@ -190,6 +190,8 @@ const updateRequisitionStatus = async (req, res, next) => {
                             setup_at: brief_event.setup_time,
                             started_at: brief_event.start_time,
                             ended_at: brief_event.end_time,
+                            master_code: Math.random().toString(36).substring(7).toUpperCase(),
+                            is_master_code_enabled: true,
                         })
             }
         }
