@@ -107,7 +107,7 @@ const createProduct = async (req, res, next) => {
     try {    
 
         const {account_id, scope} = req;
-        const {name, brand_id, description, metric, metric_amount, sku, base_price, is_cocktail, cocktail_ingredients} = req.body;
+        const {name, brand_id, description, metric, metric_amount, sku, base_price, is_cocktail, cocktail_ingredients, product_type, product_subtype} = req.body;
     
         // Validate the account is a client collaborator
         let collaborator;
@@ -136,7 +136,7 @@ const createProduct = async (req, res, next) => {
             await models.Product.query()
                 .insert({
                     client_id: collaborator.client ? collaborator.client.id : collaborator.client_id,
-                    name, brand_id, description, metric, metric_amount, sku, base_price, is_cocktail
+                    name, brand_id, description, metric, metric_amount, sku, base_price, is_cocktail, product_type, product_subtype
                 })              
 
         // If its cocktail save the cocktail ingredients
