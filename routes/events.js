@@ -12,6 +12,14 @@ router.get(
     eventsController.getEvents
 );
 
+/* PATCH - Update a field of an event */
+router.patch(
+    '/:event_id', 
+    VerifyToken, 
+    VerifyRole(['AGENCY'], ['OWNER','MANAGER']),
+    eventsController.updateEventField
+);
+
 /* GET - Get a list of client organizations */
 router.get(
     '/my-events', 
@@ -19,6 +27,15 @@ router.get(
     VerifyRole(['GUEST'], ['REGULAR', 'VIP', 'VVIP']),
     eventsController.getGuestEvents
 );
+
+/* GET - Get a list of client organizations */
+router.get(
+    '/:event_id', 
+    VerifyToken, 
+    VerifyRole(['AGENCY', 'GUEST'], ['OWNER','MANAGER', 'REGULAR', 'VIP', 'VVIP']),
+    eventsController.getEvent
+);
+
 
 /* POST - Invite a new user*/
 router.post(
@@ -42,6 +59,14 @@ router.post(
     VerifyToken, 
     VerifyRole(['AGENCY'], ['OWNER', 'MANAGER', 'STAFF']),
     eventsController.checkInGuest
+);
+
+/* GET - Get token for an event*/
+router.post(
+    '/check-out/:token', 
+    VerifyToken, 
+    VerifyRole(['AGENCY'], ['OWNER', 'MANAGER', 'STAFF']),
+    eventsController.checkOutGuest
 );
 
 /* POST - Redeem a code to get event*/

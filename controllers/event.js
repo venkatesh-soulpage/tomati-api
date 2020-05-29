@@ -58,6 +58,55 @@ const getEvents = async (req, res, next) => {
     }
 }
 
+// GET - Get an specific event with an id
+const getEvent = async (req, res, next) => {
+
+    try {
+        const {event_id} = req.params;
+
+        const event = 
+            await models.Event.query()
+                .withGraphFetched(`
+                    [
+                        brief,
+                        brief_event,
+                        guests.[
+                            role
+                        ]
+                    ]
+                `)
+                .findById(event_id);
+    
+        if (!event) return res.status(400).json('Invalid ID').send();
+    
+        return res.status(200).send(event);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(JSON.stringify(error)).send();
+    }
+}
+
+// UPDATE - Update an event field mostly used for start an event before and ending it before
+const updateEventField = async (req, res, next) => {
+
+    try {
+        const {event_id} = req.params;
+        const {field, value} = req.body;
+
+        if (!event_id || !field || !value) return res.status(400).json('Missing fields').send();
+
+        await models.Event.query()
+                .update({[field]: value})
+                .where('id', event_id);
+
+        return res.status(200).json('Successfully updated').send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 // POST - Invite a user
 const inviteGuest = async (req, res, next)  => {
     try { 
@@ -250,6 +299,39 @@ const checkInGuest = async (req, res, next) => {
     }
 }
 
+const checkOutGuest = async (req, res, next) => {
+    try {
+
+        const {token} = req.params;
+
+        // Validate token
+        if (!token) return res.status(400).json('Invalid token').send();
+
+        const event_guests = 
+            await models.EventGuest.query()
+                .withGraphFetched('[account, role]')
+                .where('check_in_token', token);
+
+        const guest = event_guests[0];
+
+        if (!guest) return res.status(400).json('Invalid token').send();
+        
+        // Update guest Check-In
+        await models.EventGuest.query()
+                .update({
+                    check_out_time: new Date(),
+                })
+                .where('id', guest.id)
+
+        // Return the gues with account
+        return res.status(200).send(guest);
+        
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();  
+    }
+}
+
 // Redeem code
 const redeemCode = async (req, res, next) => {
     try {
@@ -285,7 +367,7 @@ const redeemCode = async (req, res, next) => {
                         last_name: account.last_name,
                         email: account.email,
                         phone_number: account.phone_number,
-                        code: `${code}_MASTERCODE`,
+                        code: `${code}_${account_id}`,
                         code_redeemed: true
                     })
 
@@ -330,12 +412,15 @@ const redeemCode = async (req, res, next) => {
 
 const eventsController = {
     getEvents,
+    getEvent,
+    updateEventField,
     getGuestEvents,
     inviteGuest,
     revokeEventGuest,
     resendEmail,
     getCheckinToken,
     checkInGuest,
+    checkOutGuest,
     redeemCode
 }
 

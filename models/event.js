@@ -8,6 +8,18 @@ export default class Event extends Model {
   
     static get relationMappings () {
       return {
+        brief: {
+          relation: Model.HasOneThroughRelation,
+          modelClass: models.Brief,
+          join: {
+            from: 'events.brief_event_id',
+            through: {
+              from: 'brief_events.id',
+              to: 'brief_events.brief_id'
+            }, 
+            to: 'briefs.id'
+          }
+        },
         brief_event: {
           relation: Model.HasOneRelation,
           modelClass: models.BriefEvent,

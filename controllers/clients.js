@@ -262,7 +262,7 @@ const editSla = async (req, res, next) => {
                 .update({[field]: value})
                 .where('id', client_id);
             
-        return res.status(200).json('Client SLA successfully updated')
+        return res.status(200).json('Client successfully updated')
         
     } catch (e) {
         console.log(e);
