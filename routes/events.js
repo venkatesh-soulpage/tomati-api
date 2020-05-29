@@ -87,6 +87,14 @@ router.post(
     eventsController.addEventProduct
 )
 
+// POST - Add a new product to the menu
+router.delete(
+    '/:event_id/delete-product/:event_product_id',
+    VerifyToken,
+    VerifyRole(['AGENCY'], ['OWNER', 'MANAGER']),
+    eventsController.removeEventProduct
+)
+
 // EVENT GUESTS
 
 /* POST - Invite a new user*/
