@@ -35,7 +35,16 @@ export default class Event extends Model {
                 from: 'events.id',
                 to: 'event_guests.event_id'
             }
-        }
+        },
+        products: {
+            relation: Model.HasManyRelation,
+            modelClass: models.EventProduct,
+            join: {
+                from: 'events.id',
+                to: 'event_products.event_id'
+            }
+        },
+      
       }
     }
   }

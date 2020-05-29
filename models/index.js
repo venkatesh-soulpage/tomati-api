@@ -27,6 +27,7 @@ import Event from './event';
 import EventGuest from './event_guest';
 import VerificationAttachment from './verification_attachment';
 import Wallet from './wallet';
+import EventProduct from './event_product';
 
 export default {
     Location,
@@ -57,5 +58,6 @@ export default {
     Event,
     EventGuest,
     VerificationAttachment,
-    Wallet
+    Wallet,
+    EventProduct
 };

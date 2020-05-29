@@ -29,9 +29,15 @@ const getEvents = async (req, res, next) => {
                 .withGraphFetched(`
                     [
                         brief_events.[
+                            brief.[
+                                brands
+                            ],
                             event.[
                                 guests.[
                                     role
+                                ],
+                                products.[
+                                    product
                                 ]
                             ], 
                             venue
@@ -410,6 +416,42 @@ const redeemCode = async (req, res, next) => {
     }
 }
 
+const addEventProduct = async (req, res, next) => {
+    try {
+        const {account_id} = req;
+        const {event_id} = req.params;
+        const {product_id, price} = req.body;
+
+        // Validate valid agency collaborator
+        const collaborator = 
+            await models.AgencyCollaborator.query()
+                    .withGraphFetched(`[client]`)
+                    .where('account_id', account_id)
+                    .first();
+
+        if (!collaborator) return res.status(400).json('Invalid collaborator').send();
+        
+        // Validate that the collaborator has the correct access  
+        const event = await models.Event.query()
+                        .withGraphFetched('[brief]')
+                        .findById(event_id);
+
+        if (!event) return res.status(400).json('Invalid event id').send();
+        if (event.brief.agency_id !== collaborator.agency_id) return res.status(400).json('Invalid agency').send();
+        
+        await models.EventProduct.query()
+                .insert({
+                    event_id, product_id, price,
+                })
+
+        return res.status(200).json('Product successfully added to menu').send();        
+        
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();  
+    }
+}
+
 const eventsController = {
     getEvents,
     getEvent,
@@ -421,7 +463,8 @@ const eventsController = {
     getCheckinToken,
     checkInGuest,
     checkOutGuest,
-    redeemCode
+    redeemCode, 
+    addEventProduct
 }
 
 export default eventsController;

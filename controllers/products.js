@@ -42,7 +42,15 @@ const getProducts = async (req, res, next) => {
             client = 
                 await models.Client.query()
                     .findById(collaborator.client.id)
-                    .withGraphFetched('[products.[brand, stocks]]')   
+                    .withGraphFetched(`[
+                        products.[
+                            brand, 
+                            stocks, 
+                            ingredients.[
+                                product
+                            ]
+                        ]
+                    ]`);   
         }
             
 

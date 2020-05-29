@@ -77,6 +77,16 @@ router.post(
     eventsController.redeemCode
 );
 
+// EVENT PRODUCTS
+
+// POST - Add a new product to the menu
+router.post(
+    '/:event_id/add-product',
+    VerifyToken,
+    VerifyRole(['AGENCY'], ['OWNER', 'MANAGER']),
+    eventsController.addEventProduct
+)
+
 // EVENT GUESTS
 
 /* POST - Invite a new user*/
@@ -94,5 +104,6 @@ router.delete(
     VerifyRole(['AGENCY'], ['OWNER','MANAGER']),
     eventsController.revokeEventGuest
 );
+
 
 module.exports = router;
