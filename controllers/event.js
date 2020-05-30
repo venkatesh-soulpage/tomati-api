@@ -78,6 +78,9 @@ const getEvent = async (req, res, next) => {
                         brief_event,
                         guests.[
                             role
+                        ],
+                        products.[
+                            product
                         ]
                     ]
                 `)
