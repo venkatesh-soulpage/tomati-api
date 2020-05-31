@@ -15,7 +15,8 @@ const createOrder = async (req, res, next) => {
     
     try {    
         const {account_id, scope} = req;
-        const {wallet_id, transactions} = req.body;
+        const {wallet_id} = req.params;
+        const {transactions} = req.body;
 
         // Transactions should be an array of event products ids,
         // Get the actual values for the event products and avoid calculating the total price for each item and the order on the front-end
@@ -53,7 +54,7 @@ const createOrder = async (req, res, next) => {
                         type: 'BUY'
                     })
 
-        if (wallet_order) return res.status(400).json('Error creating the wallet order').send();
+        if (!wallet_order) return res.status(400).json('Error creating the wallet order').send();
 
         // Create the wallet order transactions
         for (const tx of transactions) {

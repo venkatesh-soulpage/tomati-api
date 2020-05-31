@@ -3,7 +3,7 @@ import models from '.'
 
 export default class WalletOrder extends Model {
     static get tableName () {
-      return 'wallet_order'
+      return 'wallet_orders'
     }
   
     static get relationMappings () {

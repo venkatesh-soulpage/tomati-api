@@ -6,7 +6,7 @@ import VerifyRole from '../utils/verification_role'
 
 /* POST - Create a new order with products */
 router.post(
-    '/add-order', 
+    '/:wallet_id/add-order', 
     VerifyToken, 
     VerifyRole(['GUEST'], ['REGULAR', 'VIP', 'VVIP']),
     walletController.createOrder
