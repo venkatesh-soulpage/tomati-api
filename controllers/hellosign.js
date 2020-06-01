@@ -11,6 +11,8 @@ import path from 'path';
 // Hellosign 
 const hellosign = require('hellosign-sdk')({ key: process.env.HELLOSIGN_API_KEY });
 
+console.log(process.env);
+
 // Retrieve the requested pdf
 const getPDF = async (hellosign_signature_request_id, parent_res) => {
     try {
