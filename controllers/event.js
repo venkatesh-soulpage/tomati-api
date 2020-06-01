@@ -384,12 +384,13 @@ const redeemCode = async (req, res, next) => {
             return res.status(200).json('Successfully redemeed').send();
             
         } else {
-            const event_guests = 
-            await models.EventGuest.query()
-                .withGraphFetched('[account, role]')
-                .where('code', code);
+            const guest = 
+                await models.EventGuest.query()
+                    .withGraphFetched('[account, role]')
+                    .where('code', code)
+                    .first();
 
-            const guest = event_guests[0];
+            if (!guest) return res.status(400).json('Invalid code').send();
 
             // Validate that the account doesn't have a registered code for this event
             const account_guests = 
