@@ -6,8 +6,14 @@ import fetch from 'node-fetch';
 import queryString from 'query-string';
 import PDFDocument from 'pdfkit';
 import moment from 'moment';
+import path from 'path';
 import fs from 'fs';
 
+// Create the temporal directory on heroku
+const temp_dir = path.join(process.cwd(), 'temporal/');
+if (!fs.existsSync(temp_dir)) {
+    fs.mkdirSync(temp_dir);
+}
 
 
 /* HELPER FUNCTIONS */
