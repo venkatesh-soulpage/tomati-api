@@ -264,6 +264,11 @@ const agencySignup = async (req, res, next) => {
             { expiresIn: '31d' }
         );
 
+        // Update the collaborator status
+        await models.CollaboratorInvitation.query()
+                .patch({status: 'SIGNED'})
+                .where('email', email);
+
         // Send signup email
         // await sendConfirmationEmail(new_account, new_token);
 

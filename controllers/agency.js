@@ -13,6 +13,19 @@ const getAgencies = async (req, res, next) => {
 
     try {
 
+        const query = `
+            [
+                owner,
+                client,
+                agency_collaborators.[
+                    account, 
+                    role
+                ],
+                collaborator_invitations.[
+                    role
+                ]
+            ]
+        `
     
         // Get Agencies according to scope;
         // ADMIN - All agencies
@@ -23,7 +36,7 @@ const getAgencies = async (req, res, next) => {
 
             agencies = 
                 await models.Agency.query()
-                    .withGraphFetched('[owner, client, agency_collaborators.[account, role]]')
+                    .withGraphFetched(query)
                     .modifyGraph('agency_collaborators', builder => {
                         builder.select('id');
                     });
@@ -37,7 +50,7 @@ const getAgencies = async (req, res, next) => {
             agencies = 
                 await models.Agency.query()
                     .where('invited_by', client_collaborator[0].client_id)
-                    .withGraphFetched('[owner, client, agency_collaborators.[account, role]]')
+                    .withGraphFetched(query)
                     .modifyGraph('agency_collaborators', builder => {
                         builder.select('id');
                     });
@@ -51,7 +64,7 @@ const getAgencies = async (req, res, next) => {
             agencies = 
                 await models.Agency.query()
                     .where('id', agency_collaborator[0].agency_id)
-                    .withGraphFetched('[owner, client, agency_collaborators.[account, role]]')
+                    .withGraphFetched(query)
                     .modifyGraph('agency_collaborators', builder => {
                         builder.select('id');
                     });
@@ -109,7 +122,6 @@ const inviteAgency = async (req, res, next) => {
         // Validate client
         if (!collaborator) return res.status(400).json('Invalid client').send();
 
-        console.log(collaborator);
         // Validate limits
         if (collaborator.client.agencies_limit <= collaborator.client.agencies.length) {
             return res.status(400).json(
@@ -156,6 +168,14 @@ const inviteAgency = async (req, res, next) => {
                 email: owner_email,
                 token,
             })
+
+        // Create agency collaborator invitation
+        await models.CollaboratorInvitation.query()
+                .insert({ 
+                    agency_id: agency.id,
+                    role_id: role[0].id,
+                    email: owner_email
+                })
 
         // TODO send invite email
         await agencyInviteEmail(owner_email, new_token, {scope: 'AGENCY', name: 'OWNER'});
@@ -226,6 +246,11 @@ const inviteCollaborator = async (req, res, next) => {
                 email: email,
                 token
             })
+
+        await models.CollaboratorInvitation.query()
+                .insert({
+                    email, role_id, agency_id
+                })
 
         // Send invite email
         await agencyInviteEmail(email, new_token, role[0]);

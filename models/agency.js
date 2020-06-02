@@ -40,6 +40,14 @@ export default class Agency extends Model {
             to: 'agency_collaborators.agency_id'
           }
         },
+        collaborator_invitations: {
+          relation: Model.HasManyRelation,
+          modelClass: models.CollaboratorInvitation,
+          join: {
+            from: 'agencies.id',
+            to: 'collaborator_invitations.agency_id'
+          }
+        },
         briefs: {
           relation: Model.HasManyRelation,
           modelClass: models.Brief,
