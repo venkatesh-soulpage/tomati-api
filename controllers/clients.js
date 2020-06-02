@@ -29,6 +29,9 @@ const getClients = async (req, res, next) => {
             client_collaborators.[
                 account, 
                 role
+            ],
+            collaborator_invitations.[
+                role
             ]
         ]`;
         
@@ -139,7 +142,7 @@ const inviteClient = async (req, res, next) => {
 
         const query = '[locations.[location], venues, brands, warehouses.[location], client_collaborators.[account, role]]';
         
-
+        // Create client
         const new_client = 
             await models.Client.query()
                 .findById(client.id)
@@ -147,6 +150,14 @@ const inviteClient = async (req, res, next) => {
                 .modifyGraph('client_collaborators', builder => {
                     builder.select('id');
                 }) 
+    
+        // Add collaborator invitation
+        await models.CollaboratorInvitation.query()
+                .insert({ 
+                    client_id: new_client.id, 
+                    role_id: role[0].id,
+                    email: owner_email,
+                })
 
         return res.status(201).json(new_client).send();
     } catch (e) {
@@ -215,6 +226,12 @@ const inviteCollaborator = async (req, res, next) => {
             .insert({
                 email: email,
                 token
+            })
+
+        // Add collaborator invitation
+        await models.CollaboratorInvitation.query()
+            .insert({ 
+                email, role_id, client_id
             })
 
         // Send invite email

@@ -146,6 +146,11 @@ const clientSignup = async (req, res, next) => {
                     account_id: new_account.id,
                     client_id: decoded.client_id,
                 })
+
+        // Update the collaborator invites table
+        await models.CollaboratorInvitation.query()
+                .patch({status: 'SIGNED'})
+                .where('email', email)
         
         // Generate the login token
         const jwt_token = await jwt.sign(

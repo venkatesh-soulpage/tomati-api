@@ -48,6 +48,7 @@ const getRequisitions = async (req, res, next) => {
                         orders.[
                             product.[
                                 ingredients.[
+                                    product,
                                     brand
                                 ],
                                 brand
@@ -65,19 +66,19 @@ const getRequisitions = async (req, res, next) => {
                         ]
                     ]`
                 )
-                .modifyGraph('brief', builder => {
-                    if (scope === 'AGENCY') {
-                        builder.where('agency_id', collaborator.agency_id);
-                    }
-                    if (scope === 'BRAND') {
-                        builder.where('client_id', collaborator.client_id)
-                    }                
-                })
                 .modify((queryBuilder) => {
                     if (scope === 'BRAND') {
                         queryBuilder
                             .whereIn('status', ['SUBMITTED', 'APPROVED', 'DELIVERED']);
                     }
+                })
+                .modify((queryBuilder) => {
+                    if (scope === 'AGENCY') {
+                        queryBuilder.where('created_by', collaborator.client.id);
+                    }
+                    if (scope === 'BRAND') {
+                        queryBuilder.where('created_by', collaborator.client_id)
+                    }   
                 })
                 .orderBy('created_at', 'desc')
                 

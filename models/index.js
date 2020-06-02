@@ -30,6 +30,7 @@ import Wallet from './wallet';
 import EventProduct from './event_product';
 import WalletOrder from './wallet_order';
 import WalletOrderTransaction from './wallet_order_transaction';
+import CollaboratorInvitation from './collaborator_invitations';
 
 export default {
     Location,
@@ -63,5 +64,6 @@ export default {
     Wallet,
     EventProduct, 
     WalletOrder, 
-    WalletOrderTransaction
+    WalletOrderTransaction,
+    CollaboratorInvitation
 };
