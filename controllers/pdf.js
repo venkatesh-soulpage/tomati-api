@@ -76,7 +76,6 @@ const getCurrentUnits = (requisition, product_id) => {
 
 
 const getUniqueProducts = (requisition) => {
-    
     const {orders} = requisition;
 
     // Filter the products for the brand

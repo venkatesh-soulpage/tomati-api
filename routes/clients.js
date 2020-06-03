@@ -24,6 +24,15 @@ router.post(
     clientController.inviteCollaborator
 );
 
+
+/* POST - Invite new collaborator */
+router.put(
+    '/:client_id/upload-logo',
+    VerifyToken,
+    VerifyRole(['ADMIN', 'BRAND'], ['ADMIN', 'OWNER']),
+    clientController.uploadLogo
+);
+
 /* POST - Invite new collaborator */
 router.post(
     '/:client_id/add-location',

@@ -5,8 +5,16 @@ import jwt from 'jsonwebtoken';
 import async from 'async'
 import fetch from 'node-fetch';
 import queryString from 'query-string';
+import AWS from 'aws-sdk';
 
 import { sendConfirmationEmail, sendFotgotPasswordEmail, clientInviteEmail } from './mailling';
+
+// Inititialize AWS 
+const s3 = new AWS.S3({
+    accessKeyId: process.env.BUCKETEER_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.BUCKETEER_AWS_SECRET_ACCESS_KEY,
+    region: process.env.BUCKETEER_AWS_REGION,
+  });
 
 // GET - Get a list of clients
 const getClients = async (req, res, next) => {
@@ -290,6 +298,53 @@ const editSla = async (req, res, next) => {
     }
 }
 
+// PUT - Upload a logo to the client profile
+const uploadLogo = async (req, res, next) => {
+    try {    
+        const {account_id} = req;
+        const {client_id} = req.params;
+        const {file} = req.files;
+
+        const key = `public/brand_images/${client_id}/${file.name}`
+
+        let params = {
+            Key: key,
+            Bucket: process.env.BUCKETEER_BUCKET_NAME,
+            Body: file.data,
+        }
+
+        // Verify client with collaborator
+        const collaborator = 
+            await models.ClientCollaborator.query()
+                        .where('account_id', account_id)
+                        .first();
+
+        if (!collaborator) return res.status(400).json('Invalid account').send();
+        if (`${collaborator.client_id}` !== client_id) return res.status(400).json('Invalid client').send(); // Parse int to string
+
+        // Upload the image 
+        await s3.putObject(params, async (err, data) => {
+            if (err) {
+                console.log(err, err.stack).send();
+                return res.status(400).json('Upload failed').send();
+            } else {
+                
+                await models.Client.query()
+                    .update({
+                        logo_url: `https://s3.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
+                    })
+                    .where('id', client_id);
+
+                return res.status(200).json('Logo successfully uploaded').send();
+            }
+        })
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+} 
+
 
 const clientController = {
     // Client
@@ -297,7 +352,8 @@ const clientController = {
     inviteClient,
     inviteCollaborator,
     addLocation,
-    editSla
+    editSla, 
+    uploadLogo,
 }
 
 export default clientController;
