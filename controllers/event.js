@@ -45,7 +45,8 @@ const getEvents = async (req, res, next) => {
                     ]
                 `)
                 .where('client_id', collaborator.client.id)
-                .where('status', 'APPROVED');
+                .where('status', 'APPROVED')
+                .orderBy('created_at', 'DESC');
         
         // Get brief
         const events = []; 
@@ -229,7 +230,8 @@ const getGuestEvents = async (req, res, next) => {
         const guest_of_events = 
                 await models.EventGuest.query()
                     .withGraphFetched('[event.[brief_event.[venue]]]')
-                    .where('account_id', account_id);        
+                    .where('account_id', account_id)
+                    .orderBy('created_at', 'DESC');        
 
         // Bring only the events with brief_events
 
@@ -282,15 +284,21 @@ const checkInGuest = async (req, res, next) => {
         // Validate token
         if (!token) return res.status(400).json('Invalid token').send();
 
-        const event_guests = 
+        const guest = 
             await models.EventGuest.query()
-                .withGraphFetched('[account, role]')
-                .where('check_in_token', token);
-
-        const guest = event_guests[0];
+                .withGraphFetched(`[
+                    account, 
+                    role, 
+                    event.[
+                        brief_event
+                    ]
+                ]`)
+                .where('check_in_token', token)
+                .first();
+            
 
         if (!guest) return res.status(400).json('Invalid token').send();
-        
+    
         // Update guest Check-In
         await models.EventGuest.query()
                 .update({
@@ -298,6 +306,18 @@ const checkInGuest = async (req, res, next) => {
                     check_in_time: new Date(),
                 })
                 .where('id', guest.id)
+
+        // Update users wallet with free credits defined on brief event
+        const wallet = await models.Wallet.query().where('account_id', guest.account_id).first();
+        
+        if (wallet) {
+            console.log(wallet)
+            await models.Wallet.query()
+                    .update({
+                        balance: Number(wallet.balance) + Number(guest.event.brief_event.free_drinks_per_guest),
+                    })
+                    .where('id', wallet.id);
+        }
 
         // Return the gues with account
         return res.status(200).send(guest);
