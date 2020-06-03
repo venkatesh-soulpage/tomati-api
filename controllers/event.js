@@ -299,25 +299,33 @@ const checkInGuest = async (req, res, next) => {
 
         if (!guest) return res.status(400).json('Invalid token').send();
     
-        // Update guest Check-In
-        await models.EventGuest.query()
+        // Update guest Check-In but validate if the user has already checked out from the event.
+        // If the user had already checked in and checked out from the event remove the checkout time
+        // If is the first time check in gift the free credits and set the check in time.
+        if (guest.checked_in) {
+            await models.EventGuest.query()
+                    .update({ check_out_time: null })
+                    .where('id', guest.id);
+        } else {
+            await models.EventGuest.query()
                 .update({
                     checked_in: true, 
                     check_in_time: new Date(),
                 })
                 .where('id', guest.id)
 
-        // Update users wallet with free credits defined on brief event
-        const wallet = await models.Wallet.query().where('account_id', guest.account_id).first();
+            // Update users wallet with free credits defined on brief event
+            const wallet = await models.Wallet.query().where('account_id', guest.account_id).first();
         
-        if (wallet) {
-            await models.Wallet.query()
-                    .update({
-                        balance: Number(wallet.balance) + Number(guest.event.brief_event.free_drinks_per_guest),
-                    })
-                    .where('id', wallet.id);
+            if (wallet) {
+                await models.Wallet.query()
+                        .update({
+                            balance: Number(wallet.balance) + Number(guest.event.brief_event.free_drinks_per_guest),
+                        })
+                        .where('id', wallet.id);
+            }
         }
-
+        
         // Return the gues with account
         return res.status(200).send(guest);
         
