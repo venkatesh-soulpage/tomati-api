@@ -169,8 +169,8 @@ const inviteClient = async (req, res, next) => {
 // POST - Invite a new client collaborator
 const inviteCollaborator = async (req, res, next) => {
     try {
-        
-        const { email, role_id, client_id } = req.body;
+        const {account_id} = req;
+        const { email, role_id, client_id, name, custom_message } = req.body;
 
         if (!email || !role_id || !client_id) return res.status(400).json('Missing fields').send();
 
@@ -234,8 +234,11 @@ const inviteCollaborator = async (req, res, next) => {
                 email, role_id, client_id
             })
 
+        // Find the host
+        const host = await models.Account.query().findById(account_id);
+
         // Send invite email
-        await clientInviteEmail(email, new_token, role[0]);
+        await clientInviteEmail(email, new_token, role[0], {name, custom_message, host});
 
         return res.status(201).json(`We sent an invite email to ${email}`).send();
     } catch (e) {

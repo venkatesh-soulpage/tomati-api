@@ -8,7 +8,7 @@ import VerifyRole from '../utils/verification_role'
 router.get(
     '/me', 
     VerifyToken, 
-    VerifyRole(['GUEST', 'AGENCY'], ['OWNER', 'MANAGER', 'STAFF','REGULAR', 'VIP', 'VVIP']),
+    VerifyRole(['GUEST', 'AGENCY', 'BRAND'], ['OWNER', 'MANAGER', 'STAFF','REGULAR', 'VIP', 'VVIP']),
     accountsController.getUser
 );
 

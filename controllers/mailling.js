@@ -40,7 +40,7 @@ const sendConfirmationEmail = (user, token) => {
     .catch(console.error);
 }
 
-const clientInviteEmail = (account_email, token, role) => {
+const clientInviteEmail = (account_email, token, role, options) => {
 
     const email = new Email({
         message: {
@@ -62,16 +62,19 @@ const clientInviteEmail = (account_email, token, role) => {
             to: account_email,
         },
         locals: {
-            email: account_email,
+            email: options.name || account_email,
             role: `${capitalizeFirstLetter(role.scope)} ${capitalizeFirstLetter(role.name)}`,
-            signupUrl: `${process.env.SCHEMA}://${process.env.FRONT_HOST}:${process.env.FRONT_PORT}/client-signup?email=${account_email}&token=${token.token}`
+            signupUrl: `${process.env.SCHEMA}://${process.env.FRONT_HOST}:${process.env.FRONT_PORT}/client-signup?email=${account_email}&token=${token.token}`,
+            custom_message: options && options.custom_message, 
+            host_name: options.host && `${options.host.first_name} ${options.host.last_name}`,
+            host_sign: options.host && `- ${options.host.first_name} ${options.host.last_name}`,
         }
     })
     .then(/* console.log */)
     .catch(console.error);
 }
 
-const agencyInviteEmail = (account_email, token, role) => {
+const agencyInviteEmail = (account_email, token, role, options) => {
 
     const email = new Email({
         message: {
@@ -93,9 +96,12 @@ const agencyInviteEmail = (account_email, token, role) => {
             to: account_email,
         },
         locals: {
-            email: account_email,
+            email: options.name || account_email,
             role: `${capitalizeFirstLetter(role.scope)} ${capitalizeFirstLetter(role.name)}`, 
-            signupUrl: `${process.env.SCHEMA}://${process.env.FRONT_HOST}:${process.env.FRONT_PORT}/agency-signup?email=${account_email}&token=${token.token}`
+            signupUrl: `${process.env.SCHEMA}://${process.env.FRONT_HOST}:${process.env.FRONT_PORT}/agency-signup?email=${account_email}&token=${token.token}`,
+            custom_message: options && options.custom_message, 
+            host_name: options.host && `${options.host.first_name} ${options.host.last_name}`,
+            host_sign: options.host && `- ${options.host.first_name} ${options.host.last_name}`,
         }
     })
     .then(/* console.log */)
