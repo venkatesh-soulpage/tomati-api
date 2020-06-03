@@ -311,7 +311,6 @@ const checkInGuest = async (req, res, next) => {
         const wallet = await models.Wallet.query().where('account_id', guest.account_id).first();
         
         if (wallet) {
-            console.log(wallet)
             await models.Wallet.query()
                     .update({
                         balance: Number(wallet.balance) + Number(guest.event.brief_event.free_drinks_per_guest),
