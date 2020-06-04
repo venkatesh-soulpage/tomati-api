@@ -12,7 +12,7 @@ export default class WalletOrderTransaction extends Model {
           relation: Model.HasOneRelation,
           modelClass: models.WalletOrder,
           join: {
-            from: 'wallet_orders.wallet_id',
+            from: 'wallet_order_transactions.wallet_id',
             to: 'wallets.id'
           }
         },
@@ -20,7 +20,7 @@ export default class WalletOrderTransaction extends Model {
             relation: Model.HasOneRelation,
             modelClass: models.EventProduct,
             join: {
-                from: 'wallet_orders.event_product_id',
+                from: 'wallet_order_transactions.event_product_id',
                 to: 'event_products.id'
             }
         }

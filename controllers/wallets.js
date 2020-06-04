@@ -75,18 +75,141 @@ const createOrder = async (req, res, next) => {
         
 
         // Send the clients
-        return res.status(200).json(`Successfully created order with identifier: ${order_identifier}`).send();
+        return res.status(200).json(order_identifier).send();
 
     } catch (e) {
         console.log(e);
         return res.status(500).json(JSON.stringify(e)).send();
     }
+}
+
+const getOrder = async (req, res, next) => {
+    try {
+        const {account_id} = req;
+        const {order_identifier} = req.params;
+
+        const order =
+                await models.WalletOrder.query()
+                        .withGraphFetched(`[
+                            wallet,
+                            transactions.[
+                                event_product.[
+                                    product
+                                ]
+                            ],
+                            agency_collaborator
+                        ]`)
+                        .where('order_identifier', order_identifier)
+                        .first();
+                
+        if (!order) return res.status(400).json('Invalid order identifier');
+        
+        return res.status(200).send(order);
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
+const cancelOrder = async (req, res, next) => {
+    try {
+        const {account_id} = req;
+        const {order_id} = req.params;
+
+        const order = 
+                await models.WalletOrder.query()
+                        .withGraphFetched(`[
+                            wallet
+                        ]`)
+                        .findById(order_id);
+        
+        if (!order) return res.status(400).json('Invalid order').send();
+        if (order.wallet.account_id !== account_id) return res.status(400).json('Invalid account').send();
+        if (order.status !== 'CREATED') return res.status(400).json("Order can't be cancelled").send();
+
+        // Update order status 
+        await models.WalletOrder.query()
+            .update({ status: 'CANCELLED'})
+            .where('id', order_id);
+        
+        const updated_order = 
+                await models.WalletOrder.query()
+                    .withGraphFetched(`[
+                        wallet,
+                        transactions.[
+                            event_product.[
+                                product
+                            ]
+                        ],
+                        agency_collaborator
+                    ]`)
+                    .findById(order_id);
+
+        // Refund credits
+        await models.Wallet.query()
+                .update({
+                    balance: Number(order.total_amount) + Number(order.wallet.balance),
+                })
+                .where('id', order.wallet.id);
+
+        return res.status(200).json({order: updated_order, success: 'Order successfully canceled'});
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
+const scanOrder = async (req, res, next) => {
+    try {
+        const {account_id} = req;
+        const {order_identifier} = req.params;
+
+        const order = 
+                await models.WalletOrder.query()
+                        .withGraphFetched(`[
+                            wallet
+                        ]`)
+                        .where('order_identifier', order_identifier)
+                        .first();
+        
+        if (!order) return res.status(400).json('Invalid order').send();
+        if (order.status !== 'CREATED') return res.status(400).json("Order can't be accepted").send();
+
+        // Update order status 
+        await models.WalletOrder.query()
+            .update({ status: 'RECEIVED', scanned_by: account_id})
+            .where('order_identifier', order_identifier);
+        
+        const updated_order = 
+                await models.WalletOrder.query()
+                    .withGraphFetched(`[
+                        wallet,
+                        transactions.[
+                            event_product.[
+                                product
+                            ]
+                        ],
+                        agency_collaborator
+                    ]`)
+                    .where('order_identifier', order_identifier)
+                    .first();
 
 
+        return res.status(200).json({order: updated_order, success: 'Order successfully scanned'});
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
 }
 
 const walletController = {
     createOrder,
+    getOrder,
+    cancelOrder,
+    scanOrder,
 }
 
 export default walletController;

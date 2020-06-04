@@ -23,6 +23,14 @@ export default class WalletOrder extends Model {
                 from: 'wallet_orders.id',
                 to: 'wallet_order_transactions.wallet_order_id'
             }
+        },
+        agency_collaborator: {
+          relation: Model.HasOneRelation, 
+          modelClass: models.Account,
+          join: {
+            from: 'wallet_orders.scanned_by',
+            to: 'accounts.id'
+          }
         }
       }
     }
