@@ -242,12 +242,82 @@ const addCreditsWithPaypal = async (req, res, next) => {
     }
 }
 
+// Handle Paypal purchase
+const addCreditsWithQR = async (req, res, next) => {
+    try {
+        const { wallet_id } = req.params;
+        const { amount, payment_type } = req.body;
+
+        if (!wallet_id || !amount || !payment_type)  return res.status(400).json('Invalid payment. Please contact support@boozeboss.co .').send();
+
+        const wallet = await models.Wallet.query().findById(wallet_id);
+        if (!wallet) return res.status(400).json('Invalid wallet id').send();
+
+        const code = await crypto.randomBytes(16).toString('hex');
+
+        // Create the wallet purchase 
+        const wallet_purchase = 
+                await models.WalletPurchase.query()
+                        .insert({
+                            wallet_id,
+                            payment_type,
+                            amount,
+                            status: 'PENDING', 
+                            code 
+                        })   
+        
+        return res.status(200).json({success: `Please scan this at the venue front desk to redeem your credits to your Wallet`, code}).send();
+        
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
+const approveCreditsWithQR = async (req, res, next) => {
+    try {
+        const {account_id} = req;
+        const {event_id, code} = req.body;
+
+        if (!account_id || !event_id || !code) return res.status(400).json('Missing fields').send();
+
+        const wallet_purchase = 
+            await models.WalletPurchase.query()
+                    .withGraphFetched('[wallet]')
+                    .where('code', code)
+                    .first();
+
+        if (wallet_purchase.status === 'PENDING') return res.status(400).json('This code has already been scanned').send();
+
+        await models.WalletPurchase.query()
+                .update({
+                    status: 'APPROVED',
+                    scanned_by: account_id,
+                    event_id,
+                })
+
+        await models.Wallet.query()
+                .update({
+                    balance: Number(wallet_purchase.wallet.balance) + Number(wallet_purchase.amount), 
+                 })
+                 .where('id', wallet_purchase.wallet.id)
+
+        return res.status(200).json('Balance added succesfully').send();
+        
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 const walletController = {
     createOrder,
     getOrder,
     cancelOrder,
     scanOrder,
-    addCreditsWithPaypal
+    addCreditsWithPaypal,
+    addCreditsWithQR, 
+    approveCreditsWithQR
 }
 
 export default walletController;

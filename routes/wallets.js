@@ -23,6 +23,22 @@ router.post(
     walletController.addCreditsWithPaypal
 )
 
+/* POST - Add credits if the paypal payment was successfull */
+router.post(
+    '/:wallet_id/add-credits/qr',
+    VerifyToken, 
+    VerifyRole(['GUEST'], ['REGULAR', 'VIP', 'VVIP']),
+    walletController.addCreditsWithQR
+)
+
+/* PUT - Approve order  */
+router.post(
+    '/approve/:code',
+    VerifyToken, 
+    VerifyRole(['AGENCY'], ['OWNER', 'MANAGER', 'STAFF']),
+    walletController.approveCreditsWithQR
+)
+
 /* POST - Create a new order with products */
 router.get(
     '/orders/:order_identifier', // Not the same as order_id

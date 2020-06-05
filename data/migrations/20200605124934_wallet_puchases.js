@@ -12,6 +12,7 @@ exports.up = async (knex) => {
         // Only used for scanned payments
         table.integer('scanned_by').references('accounts.id')
         table.integer('event_id').references('events.id')
+        table.string('qr_code')
         table.timestamp('created_at').defaultTo(knex.fn.now()).notNullable()
         table.timestamp('updated_at').defaultTo(knex.fn.now()).notNullable()
     })
