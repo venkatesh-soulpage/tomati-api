@@ -113,5 +113,13 @@ router.delete(
     eventsController.revokeEventGuest
 );
 
+// Stats
+router.get(
+    '/:event_id/stats',
+    VerifyToken,
+    VerifyRole(['AGENCY'], ['OWNER','MANAGER']),
+    eventsController.getEventStats
+)
+
 
 module.exports = router;

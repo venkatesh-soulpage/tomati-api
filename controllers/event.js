@@ -516,6 +516,44 @@ const removeEventProduct = async (req, res, next) => {
     }
 }
 
+const getEventStats = async (req, res, next) => {
+    try {
+        const {event_id} = req.params;
+
+        console.log(event_id)
+
+        const event_products = 
+            await models.EventProduct.query()
+                    .withGraphFetched(`[
+                        product.[
+                            ingredients.[
+                                product
+                            ]
+                        ],
+                        transactions.[
+                            wallet_order
+                        ]
+                    ]`)
+                    .where('event_id', event_id);
+
+        const event = 
+                await models.Event.query()
+                        .withGraphFetched(`[
+                            guests.[
+                                role
+                            ]
+                        ]`)
+                        .findById(event_id);
+
+
+        return res.status(200).send({event_products, event});
+                
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();  
+    }
+}
+
 const eventsController = {
     getEvents,
     getEvent,
@@ -529,7 +567,8 @@ const eventsController = {
     checkOutGuest,
     redeemCode, 
     addEventProduct, 
-    removeEventProduct
+    removeEventProduct,
+    getEventStats
 }
 
 export default eventsController;

@@ -12,8 +12,8 @@ export default class WalletOrderTransaction extends Model {
           relation: Model.HasOneRelation,
           modelClass: models.WalletOrder,
           join: {
-            from: 'wallet_order_transactions.wallet_id',
-            to: 'wallets.id'
+            from: 'wallet_order_transactions.wallet_order_id',
+            to: 'wallet_orders.id'
           }
         },
         event_product: {

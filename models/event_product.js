@@ -24,6 +24,14 @@ export default class EventProduct extends Model {
             to: 'products.id'
           }
         },
+        transactions: {
+          relation: Model.HasManyRelation, 
+          modelClass: models.WalletOrderTransaction,
+          join: {
+            from: 'event_products.id',
+            to: 'wallet_order_transactions.event_product_id'
+          }
+        }
       }
     }
   }
