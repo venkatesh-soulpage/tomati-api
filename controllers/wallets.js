@@ -205,11 +205,49 @@ const scanOrder = async (req, res, next) => {
     }
 }
 
+// Handle Paypal purchase
+const addCreditsWithPaypal = async (req, res, next) => {
+    try {
+        const { wallet_id } = req.params;
+        const { amount, payment_type, paypal_order_id } = req.body;
+
+        if (!wallet_id || !amount || !payment_type || !paypal_order_id)  return res.status(400).json('Invalid payment. Please contact support@boozeboss.co .').send();
+
+        const wallet = await models.Wallet.query().findById(wallet_id);
+        if (!wallet) return res.status(400).json('Invalid wallet id').send();
+
+        // Create the wallet purchase 
+        const wallet_purchase = 
+                await models.WalletPurchase.query()
+                        .insert({
+                            wallet_id,
+                            payment_type,
+                            amount,
+                            status: 'APPROVED', 
+                            paypal_order_id
+                        })
+
+        // Add credits to account wallet 
+        await models.Wallet.query()
+                .update({
+                    balance: Number(wallet.balance) + Number(amount)
+                })
+                .where('id', wallet.id);
+        
+        return res.status(200).json(`Successfully added ${wallet_purchase.amount} to your Wallet`).send();
+        
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 const walletController = {
     createOrder,
     getOrder,
     cancelOrder,
     scanOrder,
+    addCreditsWithPaypal
 }
 
 export default walletController;

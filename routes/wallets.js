@@ -12,6 +12,17 @@ router.post(
     walletController.createOrder
 );
 
+
+// Handle Purchases
+
+/* POST - Add credits if the paypal payment was successfull */
+router.post(
+    '/:wallet_id/add-credits/paypal',
+    VerifyToken, 
+    VerifyRole(['GUEST'], ['REGULAR', 'VIP', 'VVIP']),
+    walletController.addCreditsWithPaypal
+)
+
 /* POST - Create a new order with products */
 router.get(
     '/orders/:order_identifier', // Not the same as order_id
@@ -35,5 +46,6 @@ router.put(
     VerifyRole(['AGENCY'], ['OWNER', 'MANAGER', 'STAFF']),
     walletController.scanOrder
 );
+
 
 module.exports = router;
