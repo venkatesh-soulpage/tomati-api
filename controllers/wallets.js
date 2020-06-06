@@ -234,7 +234,7 @@ const addCreditsWithPaypal = async (req, res, next) => {
                 })
                 .where('id', wallet.id);
         
-        return res.status(200).json(`Successfully added ${wallet_purchase.amount} to your Wallet`).send();
+        return res.status(200).json(`Thanks for your purchase! We added ${wallet_purchase.amount} to your wallet.`).send();
         
     } catch (e) {
         console.log(e);
@@ -253,7 +253,7 @@ const addCreditsWithQR = async (req, res, next) => {
         const wallet = await models.Wallet.query().findById(wallet_id);
         if (!wallet) return res.status(400).json('Invalid wallet id').send();
 
-        const code = await crypto.randomBytes(16).toString('hex');
+        const qr_code = await crypto.randomBytes(16).toString('hex');
 
         // Create the wallet purchase 
         const wallet_purchase = 
@@ -263,10 +263,10 @@ const addCreditsWithQR = async (req, res, next) => {
                             payment_type,
                             amount,
                             status: 'PENDING', 
-                            code 
+                            qr_code 
                         })   
         
-        return res.status(200).json({success: `Please scan this at the venue front desk to redeem your credits to your Wallet`, code}).send();
+        return res.status(200).json({success: `Please scan and pay this code at the venue front desk to redeem your credits to your Wallet`, code: qr_code}).send();
         
     } catch (e) {
         console.log(e);
@@ -287,6 +287,14 @@ const approveCreditsWithQR = async (req, res, next) => {
                     .where('code', code)
                     .first();
 
+        const event = 
+            await models.Event.query().findById(event_id);
+
+        // Validate the credits left with the current amount 
+        if (wallet_purchase.amount > event.credits_left) return res.status(400).json('No credits left. Please use another method').send();
+        // Validate the date
+        if (new Date(date).getTime() >= new Date().getTime()) return res.status(400).json('Credits not available for this event').send();
+
         if (wallet_purchase.status === 'PENDING') return res.status(400).json('This code has already been scanned').send();
 
         await models.WalletPurchase.query()
@@ -301,6 +309,11 @@ const approveCreditsWithQR = async (req, res, next) => {
                     balance: Number(wallet_purchase.wallet.balance) + Number(wallet_purchase.amount), 
                  })
                  .where('id', wallet_purchase.wallet.id)
+
+        // Update Event fund
+        await models.Event.query()
+                 .update('credits_left', Number(event.credits_left) - Number(wallet_purchase.amount))
+                 .where('id', event_id);
 
         return res.status(200).json('Balance added succesfully').send();
         
