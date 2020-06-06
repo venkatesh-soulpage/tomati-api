@@ -32,11 +32,19 @@ router.post(
 )
 
 /* PUT - Approve order  */
-router.post(
-    '/approve/:code',
+router.put(
+    '/wallet-purchase/approve/:code',
     VerifyToken, 
     VerifyRole(['AGENCY'], ['OWNER', 'MANAGER', 'STAFF']),
     walletController.approveCreditsWithQR
+)
+
+/* PUT - Approve order  */
+router.get(
+    '/wallet-purchase/:code',
+    VerifyToken, 
+    VerifyRole(['AGENCY'], ['OWNER', 'MANAGER', 'STAFF']),
+    walletController.getWalletPurchase
 )
 
 /* POST - Create a new order with products */

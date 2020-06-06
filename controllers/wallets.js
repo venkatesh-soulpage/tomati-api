@@ -277,14 +277,15 @@ const addCreditsWithQR = async (req, res, next) => {
 const approveCreditsWithQR = async (req, res, next) => {
     try {
         const {account_id} = req;
-        const {event_id, code} = req.body;
+        const {code} = req.params;
+        const {event_id} = req.body;
 
         if (!account_id || !event_id || !code) return res.status(400).json('Missing fields').send();
 
         const wallet_purchase = 
             await models.WalletPurchase.query()
                     .withGraphFetched('[wallet]')
-                    .where('code', code)
+                    .where('qr_code', code)
                     .first();
 
         const event = 
@@ -293,9 +294,9 @@ const approveCreditsWithQR = async (req, res, next) => {
         // Validate the credits left with the current amount 
         if (wallet_purchase.amount > event.credits_left) return res.status(400).json('No credits left. Please use another method').send();
         // Validate the date
-        if (new Date(date).getTime() >= new Date().getTime()) return res.status(400).json('Credits not available for this event').send();
+        if (new Date(event.ended_at).getTime() < new Date().getTime()) return res.status(400).json('Credits not available for this event').send();
 
-        if (wallet_purchase.status === 'PENDING') return res.status(400).json('This code has already been scanned').send();
+        if (wallet_purchase.status !== 'PENDING') return res.status(400).json('This code has already been scanned').send();
 
         await models.WalletPurchase.query()
                 .update({
@@ -303,20 +304,43 @@ const approveCreditsWithQR = async (req, res, next) => {
                     scanned_by: account_id,
                     event_id,
                 })
+                .where('qr_code', code)
 
         await models.Wallet.query()
                 .update({
-                    balance: Number(wallet_purchase.wallet.balance) + Number(wallet_purchase.amount), 
+                    balance: wallet_purchase.wallet.balance + wallet_purchase.amount, 
                  })
                  .where('id', wallet_purchase.wallet.id)
 
         // Update Event fund
         await models.Event.query()
-                 .update('credits_left', Number(event.credits_left) - Number(wallet_purchase.amount))
-                 .where('id', event_id);
+                .update({
+                    credits_left:  Number(event.credits_left) - Number(wallet_purchase.amount)
+                })
+                .where('id', event_id);
 
         return res.status(200).json('Balance added succesfully').send();
         
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
+const getWalletPurchase = async (req, res, next) => {
+    try {
+        const {code} = req.params;
+        
+        const wallet_purchase =
+                await models.WalletPurchase.query()
+                        .where('qr_code', code)
+                        .first();
+
+        if (!wallet_purchase) return res.status(400).json('Invalid code').send();
+
+        return res.status(200).send(wallet_purchase);
+    
+
     } catch (e) {
         console.log(e);
         return res.status(500).json(JSON.stringify(e)).send();
@@ -330,7 +354,8 @@ const walletController = {
     scanOrder,
     addCreditsWithPaypal,
     addCreditsWithQR, 
-    approveCreditsWithQR
+    approveCreditsWithQR,
+    getWalletPurchase
 }
 
 export default walletController;
