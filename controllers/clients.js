@@ -262,6 +262,18 @@ const addLocation = async (req, res, next) => {
         const { client_id } = req.params;
         const { location_id } = req.body;
 
+        // Validate locations
+        const collaborator =
+            await models.ClientCollaborator.query()
+                .withGraphFetched(`[
+                    client.[
+                        locations
+                    ]
+                ]`)
+                .first();
+
+        if (collaborator.client.locations_limit >= collaborator.client.locations.length ) return res.status(400).json('Limit reached. Please contact support@boozeboss.co to increase your limit').send();
+
         // Add client location
         await models.ClientLocations.query()
             .insert({
