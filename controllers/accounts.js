@@ -91,6 +91,15 @@ const clientSignup = async (req, res, next) => {
         // If the account exist, return message        
         if (account && account.length > 0) return res.status(400).json({msg: 'This email already exists'});
 
+        // Validate expiration time on cient invitation
+        const invitation = 
+                    await models.CollaboratorInvitation.query()
+                            .where('email', email)
+                            .orderBy('created_at', 'DESC')
+                            .first();
+            
+        if (new Date(invitation.expiration_date).getTime() <= new Date().getTime()) return res.status(400).json('Invitation already expired').send();
+
 
         // Validate the token signature
         const decoded = await jwt.verify(token, process.env.SECRET_KEY);

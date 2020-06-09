@@ -50,6 +50,9 @@ const getClients = async (req, res, next) => {
                     .modifyGraph('client_collaborators', builder => {
                         builder.select('id');
                     })
+                    .modifyGraph('collaborator_invitations', builder => {
+                        builder.where('collaborator_invitations.expiration_date', '>', new Date())
+                    }) 
                     .orderBy('name', 'ASC');
         } else {
             // Get Client id by ClientCollaborator relation
@@ -68,9 +71,12 @@ const getClients = async (req, res, next) => {
                     .modifyGraph('client_collaborators', builder => {
                         builder.select('id');
                     }) 
+                    .modifyGraph('collaborator_invitations', builder => {
+                        builder.where('collaborator_invitations.expiration_date', '>', new Date())
+                    }) 
                     .orderBy('name', 'ASC');
-        }            
-
+        }   
+        
         // Send the clients
         return res.status(201).json(clients).send();
 
@@ -200,6 +206,7 @@ const inviteCollaborator = async (req, res, next) => {
         const invitation = 
             await models.CollaboratorInvitation.query()
                     .where('email', email)
+                    .where('collaborator_invitations.expiration_date', '>', new Date())
                     .first();
 
         if (invitation) return res.status(400).json('A pending invitation already exists with this email').send();
@@ -211,6 +218,9 @@ const inviteCollaborator = async (req, res, next) => {
                     client_collaborators,
                     collaborator_invitations
                 ]`)
+                .modifyGraph('collaborator_invitations', builder => {
+                    builder.where('collaborator_invitations.expiration_date', '>', new Date())
+                }) 
                 .findById(client_id);
         
 
@@ -255,10 +265,14 @@ const inviteCollaborator = async (req, res, next) => {
                 token
             })
 
+        let expiration_date = new Date();
+        expiration_date.setHours(expiration_date.getHours() + 1); // Default expiration time to 1 hour.
+
         // Add collaborator invitation
         await models.CollaboratorInvitation.query()
             .insert({ 
-                email, role_id, client_id
+                email, role_id, client_id,
+                expiration_date,
             })
 
         // Find the host
