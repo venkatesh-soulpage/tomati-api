@@ -206,7 +206,7 @@ const inviteCollaborator = async (req, res, next) => {
         const invitation = 
             await models.CollaboratorInvitation.query()
                     .where('email', email)
-                    .where('collaborator_invitations.expiration_date', '>', new Date())
+                    .where('expiration_date', '>', new Date())
                     .first();
 
         if (invitation) return res.status(400).json('A pending invitation already exists with this email').send();

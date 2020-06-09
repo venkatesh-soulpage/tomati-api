@@ -40,6 +40,9 @@ const getAgencies = async (req, res, next) => {
                     .modifyGraph('agency_collaborators', builder => {
                         builder.select('id');
                     })
+                    .modifyGraph('collaborator_invitations', builder => {
+                        builder.where('collaborator_invitations.expiration_date', '>', new Date())
+                    }) 
                     .orderBy('name', 'ASC');;
 
         } else if (req.scope === 'BRAND') {
@@ -55,6 +58,9 @@ const getAgencies = async (req, res, next) => {
                     .modifyGraph('agency_collaborators', builder => {
                         builder.select('id');
                     })
+                    .modifyGraph('collaborator_invitations', builder => {
+                        builder.where('collaborator_invitations.expiration_date', '>', new Date())
+                    }) 
                     .orderBy('name', 'ASC');;
 
         } else if (req.scope === 'AGENCY') {
@@ -70,6 +76,9 @@ const getAgencies = async (req, res, next) => {
                     .modifyGraph('agency_collaborators', builder => {
                         builder.select('id');
                     })
+                    .modifyGraph('collaborator_invitations', builder => {
+                        builder.where('collaborator_invitations.expiration_date', '>', new Date())
+                    }) 
                     .orderBy('name', 'ASC');
         }
 
@@ -205,21 +214,43 @@ const inviteCollaborator = async (req, res, next) => {
     
         if (accounts.length > 0) return res.status(400).json('An account already exists with this email address').send();
 
+        // Validate that there isn't an existing invitation.
+        const invitation = 
+            await models.CollaboratorInvitation.query()
+                    .where('email', email)
+                    .where('expiration_date', '>', new Date())
+                    .first();
+
+        if (invitation) return res.status(400).json('A pending invitation already exists with this email').send();
+
+
         // Get Client id by ClientCollaborator relation
         const agency = 
             await models.Agency.query()
+                .withGraphFetched(`[
+                    collaborator_invitations, 
+                    agency_collaborators,
+                ]`)
+                .modifyGraph('collaborator_invitations', builder => {
+                    builder.where('collaborator_invitations.expiration_date', '>', new Date())
+                }) 
                 .findById(agency_id);
 
         if (!agency) return res.status(400).json('Invalid agency_id').send(); 
 
-        const agency_collaborators =
+        const agency_collaborator =
             await models.AgencyCollaborator
                 .query()
                 .withGraphFetched('[client, agency.[agency_collaborators]]')
-                .where('agency_id', agency.id);
-            
+                .where('agency_id', agency.id)
+                .first();
+
+        // Spaces left condition
+        const invites_left = agency.collaborator_invitations.filter(invite => invite.status === 'PENDING');
+        const space_occupied = agency.agency_collaborators.length + invites_left.length;
+
         // Validate that the Agency has remaining collaborators
-        if (agency_collaborators[0].client.agency_collaborators_limit <= agency_collaborators[0].agency.agency_collaborators.length) return res.status(401).json(
+        if (agency_collaborator.client.agency_collaborators_limit <= space_occupied) return res.status(401).json(
             `
                 Maximum number of collaborators have been added. Contact ; support@boozeboss.co  to upgrade your account.
             `
@@ -249,10 +280,13 @@ const inviteCollaborator = async (req, res, next) => {
                 email: email,
                 token
             })
+        
+        let expiration_date = new Date();
+        expiration_date.setHours(expiration_date.getHours() + 1); // Default expiration time to 1 hour.
 
         await models.CollaboratorInvitation.query()
                 .insert({
-                    email, role_id, agency_id
+                    email, role_id, agency_id, expiration_date
                 })
 
         const host = await models.Account.query().findById(account_id);
@@ -267,13 +301,47 @@ const inviteCollaborator = async (req, res, next) => {
     }
 }
 
+// PUT - Revoke collaborator invitations 
+const revokeCollaboratorInvite = async (req, res, next) => {
+    try {
+        const {account_id} = req;
+        const {collaborator_invitation_id} = req.params;
+
+        // Validate collaborator id 
+        const agency_collaborator = 
+                await models.AgencyCollaborator.query()
+                        .where('account_id', account_id)
+                        .first();
+            
+        if (!agency_collaborator) return res.status(400).json('Invalid collaborator id').send();
+        
+        const collaborator_invitation =
+                await models.CollaboratorInvitation.query()
+                        .findById(collaborator_invitation_id);
+
+        if (!collaborator_invitation) return res.status(400).json('Invalid invitation id').send();
+
+        if (collaborator_invitation.agency_id !== agency_collaborator.agency_id) return res.status(400).json("You're not allowed to do this").send();
+        
+        await models.CollaboratorInvitation.query()
+                .deleteById(collaborator_invitation_id);
+
+        return res.status(201).json('Invitation correctly revoked').send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 
 const agencyController = {
     // Client
     getAgencies,
     getAgencySla,
     inviteAgency,
-    inviteCollaborator
+    inviteCollaborator, 
+    revokeCollaboratorInvite
 }
 
 export default agencyController;

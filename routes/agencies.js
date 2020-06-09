@@ -34,5 +34,13 @@ router.post(
     agencyController.inviteCollaborator
 );
 
+/* POST - Invite new collaborator */
+router.delete(
+    '/revoke-collaborator/:collaborator_invitation_id',
+    VerifyToken,
+    VerifyRole(['AGENCY'], ['OWNER', 'MANAGER']),
+    agencyController.revokeCollaboratorInvite
+);
+
 
 module.exports = router;
