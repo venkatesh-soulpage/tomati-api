@@ -24,6 +24,14 @@ router.post(
     clientController.inviteCollaborator
 );
 
+/* POST - Invite new collaborator */
+router.delete(
+    '/revoke-collaborator/:collaborator_invitation_id',
+    VerifyToken,
+    VerifyRole(['ADMIN', 'BRAND'], ['ADMIN', 'OWNER']),
+    clientController.revokeCollaboratorInvite
+);
+
 
 /* POST - Invite new collaborator */
 router.put(
