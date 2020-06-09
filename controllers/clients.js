@@ -50,6 +50,7 @@ const getClients = async (req, res, next) => {
                     .modifyGraph('client_collaborators', builder => {
                         builder.select('id');
                     })
+                    .orderBy('name', 'ASC');
         } else {
             // Get Client id by ClientCollaborator relation
             const collaborators = 
@@ -67,6 +68,7 @@ const getClients = async (req, res, next) => {
                     .modifyGraph('client_collaborators', builder => {
                         builder.select('id');
                     }) 
+                    .orderBy('name', 'ASC');
         }            
 
         // Send the clients
@@ -88,6 +90,10 @@ const inviteClient = async (req, res, next) => {
             collaborator_limit, briefs_limit, brands_limit, warehouses_limit, locations_limit,
             identity_verifications_limit, agencies_limit, agency_collaborators_limit, selected_locations,
         } = req.body;
+
+        // Validate that the client hasn't been registered on the platform
+        const client_account = await models.Account.query().where('email', owner_email).first();
+        if (client_account) return res.status(400).json('The owner email is already registered.').send();
 
         // Create client
         const client = 
@@ -167,7 +173,7 @@ const inviteClient = async (req, res, next) => {
                     email: owner_email,
                 })
 
-        return res.status(201).json(new_client).send();
+        return res.status(201).json('Client successfully created and invited. Waiting for signup').send();
     } catch (e) {
         console.log(e);
         return res.status(500).json(JSON.stringify(e)).send();
@@ -183,26 +189,39 @@ const inviteCollaborator = async (req, res, next) => {
         if (!email || !role_id || !client_id) return res.status(400).json('Missing fields').send();
 
         // Validate email 
-        const accounts = 
+        const account = 
             await models.Account.query()
-                .where('email', email);
+                .where('email', email)
+                .first();
 
-        if (accounts.length > 0) return res.status(400).json('An account already exists with this email address').send();
+        if (account) return res.status(400).json('An account already exists with this email address').send();
+
+        // Validate that there isn't an existing invitation.
+        const invitation = 
+            await models.CollaboratorInvitation.query()
+                    .where('email', email)
+                    .first();
+
+        if (invitation) return res.status(400).json('A pending invitation already exists with this email').send();
 
         // Get Client id by ClientCollaborator relation
         const client = 
             await models.Client.query()
+                .withGraphFetched(`[
+                    client_collaborators,
+                    collaborator_invitations
+                ]`)
                 .findById(client_id);
+        
 
         if (!client) return res.status(400).json('Invalid client_id').send(); 
 
-        const client_collaborators =
-            await models.ClientCollaborator
-                .query()
-                .where('client_id', client.id);
-            
+        // Spaces left condition
+        const invites_left = client.collaborator_invitations.filter(invite => invite.status === 'PENDING');
+        const space_occupied = client.client_collaborators.length + invites_left.length;
+        
         // Validate that the Client has remaining collaborators
-        if (client.collaborator_limit <= client_collaborators.length) {
+        if (client.collaborator_limit <= space_occupied) {
             return res.status(401).json(
                 `
                 All seats are currently occupied.  

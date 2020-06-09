@@ -39,7 +39,8 @@ const getAgencies = async (req, res, next) => {
                     .withGraphFetched(query)
                     .modifyGraph('agency_collaborators', builder => {
                         builder.select('id');
-                    });
+                    })
+                    .orderBy('name', 'ASC');;
 
         } else if (req.scope === 'BRAND') {
 
@@ -53,7 +54,8 @@ const getAgencies = async (req, res, next) => {
                     .withGraphFetched(query)
                     .modifyGraph('agency_collaborators', builder => {
                         builder.select('id');
-                    });
+                    })
+                    .orderBy('name', 'ASC');;
 
         } else if (req.scope === 'AGENCY') {
 
@@ -67,7 +69,8 @@ const getAgencies = async (req, res, next) => {
                     .withGraphFetched(query)
                     .modifyGraph('agency_collaborators', builder => {
                         builder.select('id');
-                    });
+                    })
+                    .orderBy('name', 'ASC');
         }
 
         if (!agencies) return res.status(400).json('Invalid').send();
