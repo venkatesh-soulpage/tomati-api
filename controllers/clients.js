@@ -94,7 +94,7 @@ const inviteClient = async (req, res, next) => {
         const {
             name, description, owner_email,
             collaborator_limit, briefs_limit, brands_limit, warehouses_limit, locations_limit,
-            identity_verifications_limit, agencies_limit, agency_collaborators_limit, selected_locations,
+            identity_verifications_limit, agencies_limit, agency_collaborators_limit, selected_locations, expiration_date
         } = req.body;
 
         // Validate that the client hasn't been registered on the platform
@@ -115,7 +115,8 @@ const inviteClient = async (req, res, next) => {
                     locations_limit,
                     identity_verifications_limit, 
                     agencies_limit, 
-                    agency_collaborators_limit
+                    agency_collaborators_limit,
+                    expiration_date
                 })
 
         // Create client locations
@@ -157,7 +158,7 @@ const inviteClient = async (req, res, next) => {
                 token,
             })
 
-        // TODO send invite email
+        // send invite email
         await clientInviteEmail(owner_email, new_token, {scope: 'BRAND', name: 'OWNER'});
 
         const query = '[locations.[location], venues, brands, warehouses.[location], client_collaborators.[account, role]]';
@@ -172,11 +173,14 @@ const inviteClient = async (req, res, next) => {
                 }) 
     
         // Add collaborator invitation
+        let invitation_expiration_date = new Date();
+        invitation_expiration_date.setHours(invitation_expiration_date.getHours() + 1); // Default expiration time to 1 hour.
         await models.CollaboratorInvitation.query()
                 .insert({ 
                     client_id: new_client.id, 
                     role_id: role[0].id,
                     email: owner_email,
+                    expiration_date: invitation_expiration_date
                 })
 
         return res.status(201).json('Client successfully created and invited. Waiting for signup').send();
