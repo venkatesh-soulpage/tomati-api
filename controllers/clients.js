@@ -27,7 +27,11 @@ const getClients = async (req, res, next) => {
 
         const query = `[
             locations.[
-                location
+                location.[
+                    childrens.[
+                        childrens
+                    ]
+                ]
             ], 
             venues, 
             brands, 
@@ -174,7 +178,7 @@ const inviteClient = async (req, res, next) => {
     
         // Add collaborator invitation
         let invitation_expiration_date = new Date();
-        invitation_expiration_date.setHours(invitation_expiration_date.getHours() + 1); // Default expiration time to 1 hour.
+        invitation_expiration_date.setHours(expiration_date.getHours() + 1); // Default expiration time to 1 hour.
         await models.CollaboratorInvitation.query()
                 .insert({ 
                     client_id: new_client.id, 

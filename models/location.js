@@ -24,6 +24,14 @@ export default class Location extends Model {
             to: 'locations.id'
           }
         },
+        childrens: {
+          relation: Model.HasManyRelation,
+          modelClass: models.Location,
+          join: {
+            from: 'locations.id',
+            to: 'locations.parent_location'
+          }
+        },
         client_locations: {
           relation: Model.HasManyRelation,
           modelClass: models.ClientLocations,

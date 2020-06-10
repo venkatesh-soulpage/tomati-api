@@ -12,7 +12,13 @@ const getLocations = async (req, res, next) => {
         const locations = 
             await models.Location
                 .query()
-                .withGraphFetched('[parent]')
+                .withGraphFetched(`[
+                    childrens.[
+                        childrens
+                    ]
+                ]`)
+                .where('is_country', true);
+                
 
         return res.status(201).send(locations);
 
