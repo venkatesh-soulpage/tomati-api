@@ -37,7 +37,7 @@ export default class Agency extends Model {
           modelClass: models.AgencyCollaborator,
           join: {
             from: 'agencies.id',
-            to: 'agency_collaborators.agency_id'
+            to: 'collaborators.agency_id'
           }
         },
         collaborator_invitations: {
