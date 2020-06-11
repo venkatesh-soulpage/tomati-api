@@ -13,7 +13,7 @@ export default class Role extends Model {
           modelClass: models.ClientCollaborator,
           join: {
             from: 'roles.id',
-            to: 'client_collaborators.role_id'
+            to: 'collaborators.role_id'
           }
         }
       }

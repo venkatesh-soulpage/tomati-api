@@ -3,7 +3,7 @@ import models from '../models'
 
 export default class ClientCollaborator extends Model {
     static get tableName () {
-      return 'client_collaborators'
+      return 'collaborators'
     }
   
     static get relationMappings () {
@@ -12,7 +12,7 @@ export default class ClientCollaborator extends Model {
           relation: Model.BelongsToOneRelation,
           modelClass: models.Role,
           join: {
-            from: 'client_collaborators.role_id',
+            from: 'collaborators.role_id',
             to: 'roles.id'
           }
         },
@@ -20,7 +20,7 @@ export default class ClientCollaborator extends Model {
             relation: Model.BelongsToOneRelation,
             modelClass: models.Account, 
             join: {
-              from: 'client_collaborators.account_id',
+              from: 'collaborators.account_id',
               to: 'accounts.id'
             }
         },
@@ -28,7 +28,7 @@ export default class ClientCollaborator extends Model {
             relation: Model.BelongsToOneRelation,
             modelClass: models.Client,
             join: {
-              from: 'client_collaborators.client_id',
+              from: 'collaborators.client_id',
               to: 'clients.id'
             }
         },
@@ -36,7 +36,7 @@ export default class ClientCollaborator extends Model {
           relation: Model.HasManyRelation,
           modelClass: models.Briefs,
           join: {
-            from: 'client_collaborators.id',
+            from: 'collaborators.id',
             to: 'briefs.created_by'
           }
         },

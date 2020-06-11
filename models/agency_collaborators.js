@@ -3,7 +3,7 @@ import models from '.'
 
 export default class AgencyCollaborator extends Model {
     static get tableName () {
-      return 'agency_collaborators'
+      return 'collaborators'
     }
   
     static get relationMappings () {
@@ -12,7 +12,7 @@ export default class AgencyCollaborator extends Model {
           relation: Model.BelongsToOneRelation,
           modelClass: models.Role,
           join: {
-            from: 'agency_collaborators.role_id',
+            from: 'collaborators.role_id',
             to: 'roles.id'
           }
         },
@@ -20,7 +20,7 @@ export default class AgencyCollaborator extends Model {
             relation: Model.BelongsToOneRelation,
             modelClass: models.Account,
             join: {
-              from: 'agency_collaborators.account_id',
+              from: 'collaborators.account_id',
               to: 'accounts.id'
             }
         },
@@ -28,7 +28,7 @@ export default class AgencyCollaborator extends Model {
             relation: Model.BelongsToOneRelation,
             modelClass: models.Agency,
             join: {
-              from: 'agency_collaborators.agency_id',
+              from: 'collaborators.agency_id',
               to: 'agencies.id'
             }
         },
@@ -36,7 +36,7 @@ export default class AgencyCollaborator extends Model {
           relation: Model.HasOneThroughRelation,
           modelClass: models.Client,
           join: {
-            from: 'agency_collaborators.agency_id',
+            from: 'collaborators.agency_id',
             through: {
               from :'agencies.id',
               to: 'agencies.invited_by',

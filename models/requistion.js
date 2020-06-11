@@ -70,8 +70,8 @@ export default class Requisition extends Model {
           join: {
             from: 'requisitions.created_by',
             through: {
-              from: 'agency_collaborators.id',
-              to: 'agency_collaborators.account_id'
+              from: 'collaborators.id',
+              to: 'collaborators.account_id'
             },
             to: 'accounts.id'
           }
