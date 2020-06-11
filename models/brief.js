@@ -21,7 +21,7 @@ export default class Brief extends Model {
             modelClass: models.ClientCollaborator,
             join: {
               from: 'briefs.created_by',
-              to: 'client_collaborators.id'
+              to: 'collaborators.id'
             }
         },
         agency: {

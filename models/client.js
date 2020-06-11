@@ -37,7 +37,7 @@ export default class Client extends Model {
           modelClass: models.ClientCollaborator,
           join: {
             from: 'clients.id',
-            to: 'client_collaborators.client_id'
+            to: 'collaborators.client_id'
           }
         },
         collaborator_invitations: {

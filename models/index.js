@@ -32,6 +32,7 @@ import WalletOrder from './wallet_order';
 import WalletOrderTransaction from './wallet_order_transaction';
 import CollaboratorInvitation from './collaborator_invitations';
 import WalletPurchase from './wallet_purchase';
+import RegionalOrganization from './regional_organization';
 
 export default {
     Location,
@@ -68,4 +69,5 @@ export default {
     WalletOrderTransaction,
     CollaboratorInvitation, 
     WalletPurchase,
+    RegionalOrganization
 };
