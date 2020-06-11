@@ -8,7 +8,12 @@ import VerifyRole from '../utils/verification_role'
 router.get(
     '/', 
     VerifyToken, 
-    VerifyRole(['BRAND', 'AGENCY'], ['OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
     briefController.getBriefs
 );
 
@@ -17,7 +22,10 @@ router.get(
 router.post(
     '/', 
     VerifyToken, 
-    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+    ]),
     briefController.createBrief
 );
 
@@ -25,7 +33,10 @@ router.post(
 router.delete(
     '/:brief_id', 
     VerifyToken, 
-    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+    ]),
     briefController.deleteBrief
 );
 
@@ -33,7 +44,10 @@ router.delete(
 router.post(
     '/:brief_id/add-event', 
     VerifyToken, 
-    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+    ]),
     briefController.addBriefEvent
 );
 
@@ -41,7 +55,10 @@ router.post(
 router.put(
     '/:brief_id/update-event/:brief_event_id', 
     VerifyToken, 
-    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+    ]),
     briefController.updateBriefEvent
 );
 
@@ -49,7 +66,10 @@ router.put(
 router.delete(
     '/:brief_id/delete-event/:brief_event_id', 
     VerifyToken, 
-    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+    ]),
     briefController.deleteBriefEvent
 );
 
@@ -57,7 +77,10 @@ router.delete(
 router.post(
     '/:brief_id/add-brand', 
     VerifyToken, 
-    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+    ]),
     briefController.addBriefBrand
 );
 
@@ -65,7 +88,10 @@ router.post(
 router.delete(
     '/:brief_id/delete-brand/:brief_brand_id', 
     VerifyToken, 
-    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+    ]),
     briefController.deleteBriefBrand
 );
 
@@ -73,7 +99,10 @@ router.delete(
 router.put(
     '/:brief_id/update-status', 
     VerifyToken, 
-    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+    ]),
     briefController.updateBriefStatus
 );
 
@@ -81,7 +110,10 @@ router.put(
 router.post(
     '/:brief_id/upload-attachment', 
     VerifyToken, 
-    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+    ]),
     briefController.uploadBriefAttachment
 );
 
@@ -89,7 +121,10 @@ router.post(
 router.delete(
     '/:brief_id/delete-attachment/:brief_attachment_id', 
     VerifyToken, 
-    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+    ]),
     briefController.deleteBriefAttachment
 );
 

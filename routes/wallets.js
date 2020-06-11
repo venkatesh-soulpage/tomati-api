@@ -8,7 +8,11 @@ import VerifyRole from '../utils/verification_role'
 router.post(
     '/:wallet_id/add-order', 
     VerifyToken, 
-    VerifyRole(['GUEST'], ['REGULAR', 'VIP', 'VVIP']),
+    VerifyRole([
+        {scope: 'GUEST', role: 'REGULAR'},
+        {scope: 'GUEST', role: 'VIP'},
+        {scope: 'GUEST', role: 'VVIP'},
+    ]),
     walletController.createOrder
 );
 
@@ -19,7 +23,11 @@ router.post(
 router.post(
     '/:wallet_id/add-credits/paypal',
     VerifyToken, 
-    VerifyRole(['GUEST'], ['REGULAR', 'VIP', 'VVIP']),
+    VerifyRole([
+        {scope: 'GUEST', role: 'REGULAR'},
+        {scope: 'GUEST', role: 'VIP'},
+        {scope: 'GUEST', role: 'VVIP'},
+    ]),
     walletController.addCreditsWithPaypal
 )
 
@@ -27,7 +35,11 @@ router.post(
 router.post(
     '/:wallet_id/add-credits/qr',
     VerifyToken, 
-    VerifyRole(['GUEST'], ['REGULAR', 'VIP', 'VVIP']),
+    VerifyRole([
+        {scope: 'GUEST', role: 'REGULAR'},
+        {scope: 'GUEST', role: 'VIP'},
+        {scope: 'GUEST', role: 'VVIP'},
+    ]),
     walletController.addCreditsWithQR
 )
 
@@ -35,7 +47,11 @@ router.post(
 router.put(
     '/wallet-purchase/approve/:code',
     VerifyToken, 
-    VerifyRole(['AGENCY'], ['OWNER', 'MANAGER', 'STAFF']),
+    VerifyRole([
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+        {scope: 'AGENCY', role: 'STAFF'},
+    ]),
     walletController.approveCreditsWithQR
 )
 
@@ -43,7 +59,11 @@ router.put(
 router.get(
     '/wallet-purchase/:code',
     VerifyToken, 
-    VerifyRole(['AGENCY'], ['OWNER', 'MANAGER', 'STAFF']),
+    VerifyRole([
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+        {scope: 'AGENCY', role: 'STAFF'},
+    ]),
     walletController.getWalletPurchase
 )
 
@@ -51,7 +71,14 @@ router.get(
 router.get(
     '/orders/:order_identifier', // Not the same as order_id
     VerifyToken, 
-    VerifyRole(['GUEST', 'AGENCY'], ['REGULAR', 'VIP', 'VVIP', 'OWNER', 'MANAGER', 'STAFF']),
+    VerifyRole([
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+        {scope: 'AGENCY', role: 'STAFF'},
+        {scope: 'GUEST', role: 'REGULAR'},
+        {scope: 'GUEST', role: 'VIP'},
+        {scope: 'GUEST', role: 'VVIP'},
+    ]),
     walletController.getOrder
 );
 
@@ -59,7 +86,11 @@ router.get(
 router.put(
     '/orders/:order_id/cancel', 
     VerifyToken, 
-    VerifyRole(['GUEST'], ['REGULAR', 'VIP', 'VVIP']),
+    VerifyRole([
+        {scope: 'GUEST', role: 'REGULAR'},
+        {scope: 'GUEST', role: 'VIP'},
+        {scope: 'GUEST', role: 'VVIP'},
+    ]),
     walletController.cancelOrder
 )
 ;
@@ -67,7 +98,11 @@ router.put(
 router.put(
     '/orders/:order_identifier/scan', 
     VerifyToken, 
-    VerifyRole(['AGENCY'], ['OWNER', 'MANAGER', 'STAFF']),
+    VerifyRole([
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+        {scope: 'AGENCY', role: 'STAFF'},
+    ]),
     walletController.scanOrder
 );
 

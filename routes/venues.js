@@ -8,7 +8,11 @@ import VerifyRole from '../utils/verification_role'
 router.get(
     '/', 
     VerifyToken, 
-    VerifyRole(['ADMIN', 'BRAND'], ['ADMIN','OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+    ]),
     venueController.getVenues
 );
 
@@ -16,7 +20,11 @@ router.get(
 router.get(
     '/:client_id', 
     VerifyToken, 
-    VerifyRole(['ADMIN', 'BRAND'], ['ADMIN','OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+    ]),
     venueController.getVenuesByClient
 );
 
@@ -24,7 +32,11 @@ router.get(
 router.post(
     '/', 
     VerifyToken, 
-    VerifyRole(['ADMIN', 'BRAND'], ['ADMIN','OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+    ]),
     venueController.createVenue
 );
 
@@ -32,7 +44,11 @@ router.post(
 router.delete(
     '/:venue_id', 
     VerifyToken, 
-    VerifyRole(['ADMIN', 'BRAND'], ['ADMIN','OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+    ]),
     venueController.deleteVenue
 );
 

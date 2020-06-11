@@ -10,7 +10,9 @@ import verificationController from '../controllers/verifications';
 router.get(
     '/',
     VerifyToken, 
-    VerifyRole(['ADMIN'], ['ADMIN']),
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+    ]),
     verificationController.getVerifications
 )
 
@@ -18,7 +20,11 @@ router.get(
 router.get(
     '/check-status',
     VerifyToken, 
-    VerifyRole(['GUEST'], ['REGULAR', 'VIP', 'VVIP']),
+    VerifyRole([
+        {scope: 'GUEST', role: 'REGULAR'},
+        {scope: 'GUEST', role: 'VIP'},
+        {scope: 'GUEST', role: 'VVIP'},
+    ]),
     verificationController.checkVerificationStatus
 );
 
@@ -26,7 +32,11 @@ router.get(
 router.post(
     '/upload-verification/:verification_type',
     VerifyToken, 
-    VerifyRole(['GUEST'], ['REGULAR', 'VIP', 'VVIP']),
+    VerifyRole([
+        {scope: 'GUEST', role: 'REGULAR'},
+        {scope: 'GUEST', role: 'VIP'},
+        {scope: 'GUEST', role: 'VVIP'},
+    ]),
     verificationController.uploadVerificationProcess
 );
 
@@ -34,7 +44,11 @@ router.post(
 router.post(
     '/submit',
     VerifyToken, 
-    VerifyRole(['GUEST'], ['REGULAR', 'VIP', 'VVIP']),
+    VerifyRole([
+        {scope: 'GUEST', role: 'REGULAR'},
+        {scope: 'GUEST', role: 'VIP'},
+        {scope: 'GUEST', role: 'VVIP'},
+    ]),
     verificationController.submitVerification
 );
 
@@ -42,7 +56,9 @@ router.post(
 router.put(
     '/:verification_account_id/update-status',
     VerifyToken, 
-    VerifyRole(['ADMIN'], ['ADMIN']),
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+    ]),
     verificationController.updateVerificationStatus
 );
 

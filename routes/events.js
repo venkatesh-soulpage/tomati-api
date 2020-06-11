@@ -8,7 +8,10 @@ import VerifyRole from '../utils/verification_role'
 router.get(
     '/', 
     VerifyToken, 
-    VerifyRole(['AGENCY'], ['OWNER','MANAGER']),
+    VerifyRole([
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
     eventsController.getEvents
 );
 
@@ -16,7 +19,10 @@ router.get(
 router.patch(
     '/:event_id', 
     VerifyToken, 
-    VerifyRole(['AGENCY'], ['OWNER','MANAGER']),
+    VerifyRole([
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
     eventsController.updateEventField
 );
 
@@ -24,7 +30,11 @@ router.patch(
 router.get(
     '/my-events', 
     VerifyToken, 
-    VerifyRole(['GUEST'], ['REGULAR', 'VIP', 'VVIP']),
+    VerifyRole([
+        {scope: 'GUEST', role: 'REGULAR'},
+        {scope: 'GUEST', role: 'VIP'},
+        {scope: 'GUEST', role: 'VVIP'},
+    ]),
     eventsController.getGuestEvents
 );
 
@@ -32,7 +42,14 @@ router.get(
 router.get(
     '/:event_id', 
     VerifyToken, 
-    VerifyRole(['AGENCY', 'GUEST'], ['OWNER','MANAGER', 'REGULAR', 'VIP', 'VVIP']),
+    VerifyRole([
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+        {scope: 'AGENCY', role: 'STAFF'},
+        {scope: 'GUEST', role: 'REGULAR'},
+        {scope: 'GUEST', role: 'VIP'},
+        {scope: 'GUEST', role: 'VVIP'},
+    ]),
     eventsController.getEvent
 );
 
@@ -41,7 +58,10 @@ router.get(
 router.post(
     '/invite-guest', 
     VerifyToken, 
-    VerifyRole(['AGENCY'], ['OWNER','MANAGER']),
+    VerifyRole([
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
     eventsController.inviteGuest
 );
 
@@ -49,7 +69,11 @@ router.post(
 router.get(
     '/:event_id/get-token', 
     VerifyToken, 
-    VerifyRole(['GUEST'], ['REGULAR', 'VIP', 'VVIP']),
+    VerifyRole([
+        {scope: 'GUEST', role: 'REGULAR'},
+        {scope: 'GUEST', role: 'VIP'},
+        {scope: 'GUEST', role: 'VVIP'},
+    ]),
     eventsController.getCheckinToken
 );
 
@@ -57,7 +81,11 @@ router.get(
 router.post(
     '/check-in/:token', 
     VerifyToken, 
-    VerifyRole(['AGENCY'], ['OWNER', 'MANAGER', 'STAFF']),
+    VerifyRole([
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+        {scope: 'AGENCY', role: 'STAFF'},
+    ]),
     eventsController.checkInGuest
 );
 
@@ -65,7 +93,11 @@ router.post(
 router.post(
     '/check-out/:token', 
     VerifyToken, 
-    VerifyRole(['AGENCY'], ['OWNER', 'MANAGER', 'STAFF']),
+    VerifyRole([
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+        {scope: 'AGENCY', role: 'STAFF'},
+    ]),
     eventsController.checkOutGuest
 );
 
@@ -73,7 +105,11 @@ router.post(
 router.post(
     '/redeem-code', 
     VerifyToken, 
-    VerifyRole(['GUEST'], ['REGULAR', 'VIP', 'VVIP']),
+    VerifyRole([
+        {scope: 'GUEST', role: 'REGULAR'},
+        {scope: 'GUEST', role: 'VIP'},
+        {scope: 'GUEST', role: 'VVIP'},
+    ]),
     eventsController.redeemCode
 );
 
@@ -83,7 +119,11 @@ router.post(
 router.post(
     '/:event_id/add-product',
     VerifyToken,
-    VerifyRole(['AGENCY'], ['OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+
+    ]),
     eventsController.addEventProduct
 )
 
@@ -91,7 +131,10 @@ router.post(
 router.delete(
     '/:event_id/delete-product/:event_product_id',
     VerifyToken,
-    VerifyRole(['AGENCY'], ['OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
     eventsController.removeEventProduct
 )
 
@@ -101,7 +144,10 @@ router.delete(
 router.post(
     '/:event_guest_id/resend-email', 
     VerifyToken, 
-    VerifyRole(['AGENCY'], ['OWNER','MANAGER']),
+    VerifyRole([
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
     eventsController.resendEmail
 );
 
@@ -109,7 +155,10 @@ router.post(
 router.delete(
     '/:event_guest_id', 
     VerifyToken, 
-    VerifyRole(['AGENCY'], ['OWNER','MANAGER']),
+    VerifyRole([
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
     eventsController.revokeEventGuest
 );
 
@@ -117,7 +166,10 @@ router.delete(
 router.get(
     '/:event_id/stats',
     VerifyToken,
-    VerifyRole(['AGENCY'], ['OWNER','MANAGER']),
+    VerifyRole([
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
     eventsController.getEventStats
 )
 

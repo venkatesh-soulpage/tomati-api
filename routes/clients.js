@@ -9,7 +9,11 @@ import VerifyRole from '../utils/verification_role'
 router.get(
     '/', 
     VerifyToken, 
-    VerifyRole(['ADMIN', 'BRAND'], ['ADMIN', 'OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+    ]),
     clientController.getClients
 );
 
@@ -20,7 +24,10 @@ router.post('/invite', VerifyToken, VerifyAdmin, clientController.inviteClient);
 router.post(
     '/invite-collaborator',
     VerifyToken,
-    VerifyRole(['ADMIN', 'BRAND'], ['ADMIN', 'OWNER']),
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'BRAND', role: 'OWNER'}
+    ]),
     clientController.inviteCollaborator
 );
 
@@ -28,7 +35,10 @@ router.post(
 router.delete(
     '/revoke-collaborator/:collaborator_invitation_id',
     VerifyToken,
-    VerifyRole(['ADMIN', 'BRAND'], ['ADMIN', 'OWNER']),
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'BRAND', role: 'OWNER'}
+    ]),
     clientController.revokeCollaboratorInvite
 );
 
@@ -37,7 +47,10 @@ router.delete(
 router.put(
     '/:client_id/upload-logo',
     VerifyToken,
-    VerifyRole(['ADMIN', 'BRAND'], ['ADMIN', 'OWNER']),
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'BRAND', role: 'OWNER'}
+    ]),
     clientController.uploadLogo
 );
 
@@ -45,7 +58,9 @@ router.put(
 router.post(
     '/:client_id/add-location',
     VerifyToken,
-    VerifyRole(['ADMIN'], ['ADMIN']),
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+    ]),
     clientController.addLocation
 );
 
@@ -53,7 +68,9 @@ router.post(
 router.put(
     '/:client_id/update-sla',
     VerifyToken,
-    VerifyRole(['ADMIN'], ['ADMIN']),
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+    ]),
     clientController.editSla
 );
 
