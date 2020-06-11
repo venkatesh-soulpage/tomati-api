@@ -18,7 +18,7 @@ export default class ClientCollaborator extends Model {
         },
         account: {
             relation: Model.BelongsToOneRelation,
-            modelClass: models.Account,
+            modelClass: models.Account, 
             join: {
               from: 'client_collaborators.account_id',
               to: 'accounts.id'
