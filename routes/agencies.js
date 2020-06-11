@@ -8,7 +8,13 @@ import VerifyRole from '../utils/verification_role'
 router.get(
     '/', 
     VerifyToken, 
-    VerifyRole(['ADMIN', 'BRAND', 'AGENCY'], ['ADMIN','OWNER','MANAGER']),
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
     agencyController.getAgencies
 );
 
@@ -22,7 +28,9 @@ router.get(
 router.post(
     '/invite',
     VerifyToken,
-    VerifyRole('BRAND', ['OWNER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+    ]),
     agencyController.inviteAgency
 );
 
@@ -30,7 +38,11 @@ router.post(
 router.post(
     '/invite-collaborator',
     VerifyToken,
-    VerifyRole(['ADMIN', 'AGENCY'], ['ADMIN', 'OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
     agencyController.inviteCollaborator
 );
 
@@ -38,7 +50,10 @@ router.post(
 router.delete(
     '/revoke-collaborator/:collaborator_invitation_id',
     VerifyToken,
-    VerifyRole(['AGENCY'], ['OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
     agencyController.revokeCollaboratorInvite
 );
 

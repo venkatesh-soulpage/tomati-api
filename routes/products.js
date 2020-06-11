@@ -8,7 +8,13 @@ import VerifyRole from '../utils/verification_role'
 router.get(
     '/', 
     VerifyToken, 
-    VerifyRole(['BRAND', 'AGENCY'], ['OWNER', 'MANAGER', 'WAREHOUSE_MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+        {scope: 'BRAND', role: 'WAREHOUSE_MANAGER'},
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
     productsController.getProducts
 );
 
@@ -16,7 +22,13 @@ router.get(
 router.get(
     '/client-products', 
     VerifyToken, 
-    VerifyRole(['BRAND', 'AGENCY'], ['OWNER', 'MANAGER', 'WAREHOUSE_MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+        {scope: 'BRAND', role: 'WAREHOUSE_MANAGER'},
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
     productsController.getClientProducts
 );
 
@@ -24,7 +36,13 @@ router.get(
 router.post(
     '/', 
     VerifyToken, 
-    VerifyRole(['BRAND', 'AGENCY'], ['OWNER', 'MANAGER', 'WAREHOUSE_MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+        {scope: 'BRAND', role: 'WAREHOUSE_MANAGER'},
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
     productsController.createProduct
 );
 
@@ -32,7 +50,13 @@ router.post(
 router.put(
     '/:product_id', 
     VerifyToken, 
-    VerifyRole(['BRAND', 'AGENCY'], ['OWNER', 'MANAGER', 'WAREHOUSE_MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+        {scope: 'BRAND', role: 'WAREHOUSE_MANAGER'},
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
     productsController.updateProduct
 );
 

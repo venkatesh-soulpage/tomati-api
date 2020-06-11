@@ -8,7 +8,11 @@ import VerifyRole from '../utils/verification_role'
 router.get(
     '/', 
     VerifyToken, 
-    VerifyRole(['ADMIN', 'BRAND'], ['ADMIN', 'OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+    ]),
     locationsController.getLocations
 );
 
@@ -16,7 +20,9 @@ router.get(
 router.post(
     '/', 
     VerifyToken, 
-    VerifyRole(['ADMIN'], ['ADMIN']),
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+    ]),
     locationsController.createLocation
 );
 

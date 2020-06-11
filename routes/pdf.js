@@ -9,7 +9,10 @@ import VerifyRole from '../utils/verification_role'
 router.get(
     '/:requisition_id', 
     VerifyToken,
-    VerifyRole(['BRAND'], ['OWNER','MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+    ]),
     pdfController.getRequisitionApprovalPdf
 );
 

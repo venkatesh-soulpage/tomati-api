@@ -8,7 +8,13 @@ import VerifyRole from '../utils/verification_role'
 router.get(
     '/', 
     VerifyToken, 
-    VerifyRole(['BRAND', 'AGENCY'], ['OWNER', 'MANAGER', 'WAREHOUSE_MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+        {scope: 'BRAND', role: 'WAREHOUSE_MANAGER'},
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
     requisitionController.getRequisitions
 );
 
@@ -16,7 +22,10 @@ router.get(
 router.post(
     '/', 
     VerifyToken, 
-    VerifyRole(['AGENCY'], ['OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
     requisitionController.createRequisition
 );
 
@@ -24,7 +33,12 @@ router.post(
 router.put(
     '/:requisition_id/update-status', 
     VerifyToken, 
-    VerifyRole(['BRAND','AGENCY'], ['OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
     requisitionController.updateRequisitionStatus
 );
 
@@ -32,7 +46,12 @@ router.put(
 router.put(
     '/:requisition_id/reject', 
     VerifyToken, 
-    VerifyRole(['BRAND','AGENCY'], ['OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
     requisitionController.rejectRequisition
 );
 
@@ -40,7 +59,10 @@ router.put(
 router.post(
     '/:requisition_id/add-order', 
     VerifyToken, 
-    VerifyRole(['AGENCY'], ['OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
     requisitionController.createRequisitionOrder
 );
 
@@ -49,7 +71,10 @@ router.post(
 router.delete(
     '/:requisition_id/delete-order/:requisition_order_id', 
     VerifyToken, 
-    VerifyRole(['AGENCY'], ['OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
     requisitionController.deleteRequisitionOrder
 );
 
@@ -57,7 +82,11 @@ router.delete(
 router.post(
     '/:requisition_id/deliver-orders', 
     VerifyToken, 
-    VerifyRole(['BRAND'], ['OWNER', 'MANAGER', 'WAREHOUSE_MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+        {scope: 'BRAND', role: 'WAREHOUSE_MANAGER'},
+    ]),
     requisitionController.deliverRequisitionOrders
 )
 
@@ -65,7 +94,10 @@ router.post(
 router.post(
     '/:requisition_id/add-delivery', 
     VerifyToken, 
-    VerifyRole(['BRAND'], ['OWNER', 'WAREHOUSE_MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'WAREHOUSE_MANAGER'},
+    ]),
     requisitionController.createRequisitionDelivery
 )
 
@@ -73,7 +105,13 @@ router.post(
 router.put(
     '/:requisition_id/update-delivery/:requisition_delivery_id', 
     VerifyToken, 
-    VerifyRole(['BRAND', 'AGENCY'], ['OWNER', 'MANAGER', 'WAREHOUSE_MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+        {scope: 'BRAND', role: 'WAREHOUSE_MANAGER'},
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
     requisitionController.updateRequisitionDelivery
 )
 
@@ -81,7 +119,10 @@ router.put(
 router.get(
     '/:requisition_id/get-signature', 
     VerifyToken, 
-    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+    ]),
     requisitionController.getHellosignSignature
 )
 
@@ -89,7 +130,10 @@ router.get(
 router.post(
     '/:requisition_id/request-signature', 
     VerifyToken, 
-    VerifyRole(['BRAND'], ['OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+    ]),
     requisitionController.requestHelloSignSignature
 )
 

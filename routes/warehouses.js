@@ -8,7 +8,12 @@ import VerifyRole from '../utils/verification_role'
 router.get(
     '/', 
     VerifyToken, 
-    VerifyRole(['ADMIN', 'BRAND'], ['ADMIN','OWNER', 'MANAGER', 'WAREHOUSE_MANAGER']),
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+        {scope: 'BRAND', role: 'WAREHOUSE_MANAGER'},
+    ]),
     warehousesController.getWarehouses
 );
 
@@ -16,7 +21,11 @@ router.get(
 router.post(
     '/', 
     VerifyToken, 
-    VerifyRole(['ADMIN', 'BRAND'], ['ADMIN','OWNER', 'MANAGER']),
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+    ]),
     warehousesController.createWarehouse
 );
 
@@ -24,7 +33,10 @@ router.post(
 router.post(
     '/:warehouse_id/add-stock', 
     VerifyToken, 
-    VerifyRole(['BRAND'], ['OWNER', 'WAREHOUSE_MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'WAREHOUSE_MANAGER'},
+    ]),
     warehousesController.createWarehouseStock
 );
 
@@ -32,7 +44,10 @@ router.post(
 router.post(
     '/:warehouse_id/remove-stock', 
     VerifyToken, 
-    VerifyRole(['BRAND'], ['OWNER', 'WAREHOUSE_MANAGER']),
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'WAREHOUSE_MANAGER'},
+    ]),
     warehousesController.removeWarehouseStock
 );
 
