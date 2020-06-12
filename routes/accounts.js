@@ -10,6 +10,7 @@ router.get(
     VerifyToken, 
     VerifyRole([
         {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'REGION', role: 'OWNER'},
         {scope: 'BRAND', role: 'OWNER'},
         {scope: 'BRAND', role: 'MANAGER'},
         {scope: 'BRAND', role: 'WAREHOUSE_MANAGER'},

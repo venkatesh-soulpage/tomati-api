@@ -11,19 +11,19 @@ router.get(
     VerifyToken, 
     VerifyRole([
         {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'REGION', role: 'OWNER'},
     ]),
     organizationsController.getOrganizations,
 );
 
 /* GET - Get a list of regional organizations */
-router.get(
+router.post(
     '/', 
     VerifyToken, 
     VerifyRole([
         {scope: 'ADMIN', role: 'ADMIN'},
-        {scope: 'REGIONAL', role: 'OWNER'},
     ]),
-    organizationsController.getOrganizations,
+    organizationsController.inviteOrganization,
 );
 
 module.exports = router;

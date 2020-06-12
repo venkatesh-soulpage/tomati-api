@@ -7,7 +7,7 @@ import fetch from 'node-fetch';
 import queryString from 'query-string';
 import moment from 'moment';
 
-import { sendConfirmationEmail, sendFotgotPasswordEmail } from './mailling';
+import { sendConfirmationEmail, sendFotgotPasswordEmail, organizationInviteEmail, clientInviteEmail, agencyInviteEmail } from './mailling';
 
 // GET - Get user profile
 const getUser = async (req, res, next) => {
@@ -72,6 +72,107 @@ const signup = async (req, res, next) => {
         return res.status(201).json({new_account, new_token}).send();
 
     } catch (e) {
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
+// POST - Organization Signup
+const organizationSignup = async (req, res, next) => {
+
+    try { 
+
+        const {email, password, first_name, last_name, phone_number, token } = req.body;
+
+        // Check if the account doesn't exist
+        const account = 
+            await models.Account.query()
+                .where('email', email);
+
+        // If the account exist, return message        
+        if (account && account.length > 0) return res.status(400).json({msg: 'This email already exists'});
+
+        // Validate expiration time on cient invitation
+        const invitation = 
+                    await models.CollaboratorInvitation.query()
+                            .where('email', email)
+                            .orderBy('created_at', 'DESC')
+                            .first();
+            
+        if (new Date(invitation.expiration_date).getTime() <= new Date().getTime()) return res.status(400).json('Invitation already expired').send();
+
+        // Validate the token signature
+        const decoded = await jwt.verify(token, process.env.SECRET_KEY);
+        if (!decoded) return res.status(400).json({msg: 'The email or token are invalid'});
+
+        // Check if the token sent is on the database
+        const tokens = 
+            await models.Token.query()
+                .where('token', token)
+                .where('email', email);
+
+        // If there aren't tokens return error
+        if (!tokens || tokens.length < 1) return res.status(400).json({msg: 'The email or token are invalid'});
+
+        // Hash password
+        const salt = await bcrypt.genSalt(10);
+        const password_hash = await bcrypt.hash(password, salt);
+ 
+        // Add new account
+        const new_account = 
+            await models.Account.query()
+                .insert({
+                    email, first_name, last_name, phone_number, password_hash,
+                    is_admin: false,
+                    is_email_verified: true,
+                    is_age_verified: true,
+                });
+
+        // Delete confirmation token
+        await models.Token.query()
+                .delete()
+                .where('token', token)
+                .where('email', email);
+
+        // Search for Region Owner Role
+        const role = 
+                await models.Role.query()
+                    .where('scope', decoded.scope)
+                    .where('name', decoded.name)
+                    .first();
+
+        // Add a client collaborator
+        await models.Collaborator.query()
+                .insert({
+                    role_id: role.id,
+                    account_id: new_account.id,
+                    regional_organization_id:   Number(decoded.regional_organization_id),
+                })
+
+        // Update the collaborator invites table
+        await models.CollaboratorInvitation.query()
+                .patch({status: 'SIGNED'})
+                .where('email', email)
+        
+        // Generate the login token
+        const jwt_token = await jwt.sign(
+            {
+                id: new_account.id, 
+                email: new_account.email, 
+                scope: role.scope,
+                role: role.name,
+            }, 
+            process.env.SECRET_KEY, 
+            { expiresIn: '31d' }
+        );
+
+        // Send signup email
+        // await sendConfirmationEmail(new_account, new_token);
+
+        // Return the account
+        return res.status(201).json(jwt_token).send();
+
+    } catch (e) {
+        console.log(e);
         return res.status(500).json(JSON.stringify(e)).send();
     }
 }
@@ -575,6 +676,72 @@ const resendToken = async (req, res, next) => {
 
 }
 
+// POST - Resend verification email token
+const resendInvitation = async (req, res, next) => {
+
+    try {
+        const {account_id} = req;
+        const {collaborator_invitation_id} = req.body;
+
+        // Validate that the user hasn't logged in
+        const invitation = 
+            await models.CollaboratorInvitation.query()
+            .withGraphFetched(`[
+                organization,
+                client,
+                agency, 
+                role,
+            ]`)
+            .findById(collaborator_invitation_id);
+
+        if (invitation && invitation.status === 'SIGNED') return res.status(400).json('This invitation has already been used').send();
+        
+        // Define email
+        const {email} = invitation;
+
+        // Get the token
+        const token = 
+            await models.Token.query()
+                    .where('email', email)
+                    .orderBy('created_at', 'DESC')
+                    .first();
+                    
+        // Update collaborator invitaion expiration
+        let invitation_expiration_date = new Date();
+        invitation_expiration_date.setHours(invitation_expiration_date.getHours() + 1); // Default expiration time to 1 hour.
+        await models.CollaboratorInvitation.query()
+                .update({expiration_date: invitation_expiration_date})
+                .where('email', email)
+                .orderBy('creation_date', 'DESC')
+                .first();
+            
+        // send invite email
+        const host = await models.Account.query().findById(account_id);
+
+        // Route emails depending of the type of invitation
+        if (invitation.organization) {
+            await organizationInviteEmail(email, token, invitation.role, {host});
+        }
+
+        if (invitation.client){
+            await clientInviteEmail(email, token, invitation.role, {host});
+        } 
+
+        if (invitation.agency) {
+            await agencyInviteEmail(email, token, invitation.role, {host});
+        }
+        
+        // Return the account
+        return res.status(201).json('Successfully resend invitation').send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+
+    }
+
+}
+
 // POST - Set the reset token and send an email with the url
 const forgot = async (req, res, next) => {
 
@@ -758,12 +925,14 @@ const userController = {
     getUser,
     // Auth
     signup,
+    organizationSignup,
     clientSignup,
     agencySignup,
     guestSignup,
     login,
     confirmation, 
     resendToken,
+    resendInvitation,
     forgot,
     reset,
     // OAuth

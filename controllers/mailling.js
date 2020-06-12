@@ -64,7 +64,7 @@ const organizationInviteEmail = (account_email, token, role, options) => {
         locals: {
             email: (options && options.name) ? options.name : account_email,
             role: `${capitalizeFirstLetter(role.scope)} ${capitalizeFirstLetter(role.name)}`,
-            signupUrl: `${process.env.SCHEMA}://${process.env.FRONT_HOST}:${process.env.FRONT_PORT}/client-signup?email=${account_email}&token=${token.token}`,
+            signupUrl: `${process.env.SCHEMA}://${process.env.FRONT_HOST}:${process.env.FRONT_PORT}/organization-signup?email=${account_email}&token=${token.token}`,
             custom_message: options && options.custom_message, 
             host_name: options && options.host && `${options.host.first_name} ${options.host.last_name}`,
             host_sign: options && options.host && `- ${options.host.first_name} ${options.host.last_name}`,
