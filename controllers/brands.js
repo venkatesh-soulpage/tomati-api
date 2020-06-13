@@ -87,20 +87,24 @@ const createBrand = async (req, res, next) => {
         const {account_id, scope} = req;
         const {name, description, client_id, product_type, product_subtype} = req.body;
 
-        // Validate the account is a client collaborator
-        const client_collaborator = 
-            await models.ClientCollaborator.query()
-                .withGraphFetched(`[
-                    client.[
-                        brands
-                    ]
-                ]`)
-                .where('account_id', account_id)
-                .first();
+        // Validate collaborators
+        const collaborator =    
+                await models.Collaborator.query()
+                        .withGraphFetched(`[
+                            client,
+                            organization.[
+                                clients
+                            ]
+                        ]`)
+                        .where('account_id', account_id)
+                        .first();
 
-        const is_same_client = client_collaborator && client_collaborator.client_id === client_id;
-        if (!is_same_client && scope !== 'ADMIN') return res.status(401).json("Do you don't have permission to create this brand").send();
-        if (client_collaborator.client.brands_limit >= client_collaborator.client.brands.length) return res.status(400).json('Limit reached please contact support@boozeboss.co to upgrade your account');
+        if (!collaborator) return res.status(400).json('Invalid collaborator').send();
+        if (collaborator.client && collaborator.client_id !== client_id) return res.status(400).json('Invalid client').send();
+        if (collaborator.organization) {
+            const clients = collaborator.organization.clients.map(client => client.id);
+            if (clients.indexOf(client_id) < 0) return res.status(400).json('Invalid organization').send();
+        }
 
         const new_brand =  
             await models.Brand.query()

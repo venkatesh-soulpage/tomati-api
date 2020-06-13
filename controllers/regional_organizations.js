@@ -33,7 +33,9 @@ const getOrganizations = async (req, res, next) => {
                             role
                         ]
                         locations.[
-                            location
+                            location.[
+                                childrens
+                            ]
                         ]
                     ]`)
                     .modify((queryBuilder) => {

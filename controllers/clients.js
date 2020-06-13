@@ -26,6 +26,7 @@ const getClients = async (req, res, next) => {
         let clients; 
 
         const query = `[
+            location,
             locations.[
                 location.[
                     childrens.[
@@ -59,26 +60,34 @@ const getClients = async (req, res, next) => {
                     }) 
                     .orderBy('name', 'ASC');
         } else {
-            // Get Client id by ClientCollaborator relation
-            const collaborators = 
-                await models.ClientCollaborator
+            // Get Client id by Collaborator
+            const collaborator = 
+                await models.Collaborator
                     .query()
                     .where('account_id', account_id)
-                    .withGraphFetched('client')
-
-            const collaborator = collaborators[0];
-            
-            clients =
-                await models.Client.query()
-                    .where('id', collaborator.client_id)
-                    .withGraphFetched(query)
-                    .modifyGraph('client_collaborators', builder => {
-                        builder.select('id');
-                    }) 
-                    .modifyGraph('collaborator_invitations', builder => {
-                        builder.where('collaborator_invitations.expiration_date', '>', new Date())
-                    }) 
-                    .orderBy('name', 'ASC');
+                    .withGraphFetched('[client, organization]')
+                    .first()
+                        
+                clients =
+                    await models.Client.query()
+                        .withGraphFetched(query)
+                        .modify(builder => {
+                            // Filter for organization teams
+                            if (collaborator.organization) {
+                                builder.where('regional_organization_id', collaborator.organization.id);
+                            }
+                            // Filter for team
+                            if (collaborator.client) {
+                                builder.where('id', collaborator.client.id)
+                            }
+                        })
+                        .modifyGraph('client_collaborators', builder => {
+                            builder.select('id');
+                        }) 
+                        /* .modifyGraph('collaborator_invitations', builder => {
+                            builder.where('collaborator_invitations.expiration_date', '>', new Date())
+                        })  */
+                        .orderBy('name', 'ASC');
         }   
         
         // Send the clients
@@ -95,15 +104,29 @@ const getClients = async (req, res, next) => {
 const inviteClient = async (req, res, next) => {
     try {
         /* Todo add client organization logic */
+        const { account_id, scope} = req;
+
         const {
-            name, description, owner_email,
-            collaborator_limit, briefs_limit, brands_limit, warehouses_limit, locations_limit,
-            identity_verifications_limit, agencies_limit, agency_collaborators_limit, selected_locations, expiration_date
+            name, description, owner_email, display_name, custom_message,
+            collaborator_limit, briefs_limit, brands_limit, warehouses_limit,
+            identity_verifications_limit, agencies_limit, agency_collaborators_limit, location_id, expiration_date
         } = req.body;
 
         // Validate that the client hasn't been registered on the platform
         const client_account = await models.Account.query().where('email', owner_email).first();
         if (client_account) return res.status(400).json('The owner email is already registered.').send();
+
+        // Check if it is a regional organization team
+        const collaborator = 
+                await models.Collaborator
+                    .query()
+                    .where('account_id', account_id)
+                    .withGraphFetched('[organization, account]')
+                    .first();
+
+
+        // If its invited by a regional owner assign the correct id
+        const regional_organization_id = collaborator && collaborator.organization && collaborator.organization.id;
 
         // Create client
         const client = 
@@ -116,42 +139,30 @@ const inviteClient = async (req, res, next) => {
                     briefs_limit, 
                     brands_limit, 
                     warehouses_limit,
-                    locations_limit,
+                    locations_limit: 1,
+                    location_id,
                     identity_verifications_limit, 
                     agencies_limit, 
                     agency_collaborators_limit,
-                    expiration_date
+                    expiration_date,
+                    regional_organization_id, 
                 })
-
-        // Create client locations
-        // Validate that there are locations
-        const locations = selected_locations.map(selected => {
-            return {
-                location_id: selected.id,
-                client_id: client.id,
-            }
-        });
-
-        if (locations.length > 0) {
-            await models.ClientLocations
-                .query()
-                .insert(locations);
-        }
 
         // Create new token to validate owner email
         const role = 
                 await models.Role.query()
                     .where('scope', 'BRAND')
-                    .where('name', 'OWNER');
+                    .where('name', 'OWNER')
+                    .first();
         
 
         // Sign jwt
         const token = await jwt.sign(
             {  
-                role_id: role[0].id,
+                role_id: role.id,
                 client_id: client.id,
-                scope: role[0].scope,
-                name: role[0].name
+                scope: role.scope,
+                name: role.name
             }, 
             process.env.SECRET_KEY,
         );
@@ -163,7 +174,8 @@ const inviteClient = async (req, res, next) => {
             })
 
         // send invite email
-        await clientInviteEmail(owner_email, new_token, {scope: 'BRAND', name: 'OWNER'});
+        const host = collaborator && collaborator.account ? collaborator.account : {first_name: 'Booze Boss', last_name: 'Team'};
+        await clientInviteEmail(owner_email, new_token, {scope: 'BRAND', name: 'OWNER'}, {display_name, custom_message, host});
 
         const query = '[locations.[location], venues, brands, warehouses.[location], client_collaborators.[account, role]]';
         
@@ -182,7 +194,7 @@ const inviteClient = async (req, res, next) => {
         await models.CollaboratorInvitation.query()
                 .insert({ 
                     client_id: new_client.id, 
-                    role_id: role[0].id,
+                    role_id: role.id,
                     email: owner_email,
                     expiration_date: invitation_expiration_date
                 })
@@ -252,15 +264,16 @@ const inviteCollaborator = async (req, res, next) => {
         const role = 
             await models.Role
                 .query()
-                .where('id', role_id);
+                .where('id', role_id)
+                .first();
 
         // Sign jwt
         const token = await jwt.sign(
             {  
                 role_id,
                 client_id: client.id,
-                scope: role[0].scope,
-                name: role[0].name
+                scope: role.scope,
+                name: role.name
             }, 
             process.env.SECRET_KEY,
         );
@@ -287,7 +300,7 @@ const inviteCollaborator = async (req, res, next) => {
         const host = await models.Account.query().findById(account_id);
 
         // Send invite email
-        await clientInviteEmail(email, new_token, role[0], {name, custom_message, host});
+        await clientInviteEmail(email, new_token, role, {name: display_name, custom_message, host});
 
         return res.status(201).json(`We sent an invite email to ${email}`).send();
     } catch (e) {

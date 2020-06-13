@@ -24,6 +24,14 @@ export default class Client extends Model {
               to: 'locations.id'
             }
         },
+        organization: {
+          relation: Model.BelongsToOneRelation,
+          modelClass: models.RegionalOrganization,
+          join: {
+            from: 'clients.regional_organization_id',
+            to: 'regional_organizations.id'
+          }
+        }, 
         agencies: {
           relation: Model.HasManyRelation,
           modelClass: models.Agency,

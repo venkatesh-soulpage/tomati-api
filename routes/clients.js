@@ -11,6 +11,7 @@ router.get(
     VerifyToken, 
     VerifyRole([
         {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'REGION', role: 'OWNER'},
         {scope: 'BRAND', role: 'OWNER'},
         {scope: 'BRAND', role: 'MANAGER'},
     ]),
@@ -18,7 +19,15 @@ router.get(
 );
 
 /* POST - Create a new client organization and invite a new client */
-router.post('/invite', VerifyToken, VerifyAdmin, clientController.inviteClient);
+router.post(
+    '/invite', 
+    VerifyToken, 
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'REGION', role: 'OWNER'},
+    ]),
+    clientController.inviteClient
+);
 
 /* POST - Invite new collaborator */
 router.post(

@@ -16,7 +16,7 @@ router.get(
     venueController.getVenues
 );
 
-/* GET - Get a list of client organizations */
+/* GET - Get a list of venues on a client organization */
 router.get(
     '/:client_id', 
     VerifyToken, 
@@ -28,12 +28,13 @@ router.get(
     venueController.getVenuesByClient
 );
 
-/* GET - Get a list of client organizations */
+/* GET - Create a new venue */
 router.post(
     '/', 
     VerifyToken, 
     VerifyRole([
         {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'REGION', role: 'OWNER'},
         {scope: 'BRAND', role: 'OWNER'},
         {scope: 'BRAND', role: 'MANAGER'},
     ]),
@@ -46,6 +47,7 @@ router.delete(
     VerifyToken, 
     VerifyRole([
         {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'REGION', role: 'OWNER'},
         {scope: 'BRAND', role: 'OWNER'},
         {scope: 'BRAND', role: 'MANAGER'},
     ]),

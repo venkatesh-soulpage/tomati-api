@@ -65,12 +65,25 @@ const createVenue = async (req, res, next) => {
         const {created_by, name, contact_name, contact_email, contact_phone_number, address, latitude, longitude} = req.body;
 
         // Validate the account is a client collaborator
-        const client_collaborators = 
-            await models.ClientCollaborator.query()
-                .where('account_id', account_id)
+        const collaborator = 
+            await models.Collaborator.query()
+                    .withGraphFetched(`[
+                        organization.[
+                            clients
+                        ],
+                        client
+                    ]`)
+                    .where('account_id', account_id)
+                    .first();
 
-        const is_same_client = client_collaborators[0] && client_collaborators[0].client_id === created_by;
-        if (!is_same_client && scope !== 'ADMIN') return res.status(401).json("Do you don't have permission to create this venue").send();
+        // Validate that the user has permission to do this
+        // Valildate if is a client collaborator
+        if (collaborator.client && collaborator.client.id !== created_by) return res.status(400).json('Invalid collaborator').send();
+        // Validate if is a organization collaborator
+        if (collaborator.organization ) {
+            const clients = collaborator.organization.clients.map(client => client.id);
+            if (clients.indexOf(created_by) < 0) return res.status(400).json('Invalid team').send();
+        }
 
         const new_venue =  
             await models.Venue.query()
@@ -94,20 +107,31 @@ const deleteVenue = async (req, res, next) => {
         const {account_id, scope} = req;
         const {venue_id} = req.params;
 
-
-        // Validate the account is a client collaborator
-        const client_collaborators = 
-            await models.ClientCollaborator.query()
-                .where('account_id', account_id)
-
         // Validate that the venue exists
         const venue = await models.Venue.query().findById(venue_id);
-
         if (!venue) return res.status(400).json('Invalid venue').send();
+        
+        // Validate the account is a client collaborator
+        // Validate the account is a client collaborator
+        const collaborator = 
+            await models.Collaborator.query()
+                    .withGraphFetched(`[
+                        organization.[
+                            clients
+                        ],
+                        client
+                    ]`)
+                    .where('account_id', account_id)
+                    .first();
 
-        // Validate that the client had created the venue
-        const is_same_client = client_collaborators[0] && client_collaborators[0].client_id === venue.created_by;
-        if (!is_same_client && scope !== 'ADMIN') return res.status(401).json("Do you don't have permission to create this venue").send();
+        // Validate that the user has permission to do this
+        // Valildate if is a client collaborator
+        if (collaborator.client && collaborator.client.id !== venue.created_by) return res.status(400).json('Invalid collaborator').send();
+        // Validate if is a organization collaborator
+        if (collaborator.organization ) {
+            const clients = collaborator.organization.clients.map(client => client.id);
+            if (clients.indexOf(venue.created_by) < 0) return res.status(400).json('Invalid team').send();
+        }
 
         await models.Venue.query().deleteById(venue_id);
 

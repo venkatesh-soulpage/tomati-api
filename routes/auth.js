@@ -34,6 +34,7 @@ router.post(
     VerifyToken,
     VerifyRole([
         {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'REGION', role: 'OWNER'},
         {scope: 'BRAND', role: 'OWNER'},
         {scope: 'AGENCY', role: 'OWNER'},
     ]),

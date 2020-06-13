@@ -9,6 +9,21 @@ import queryString from 'query-string';
 const getLocations = async (req, res, next) => {
     
     try {    
+
+        const {account_id, scope} = req;
+        
+        const collaborator =
+                await models.Collaborator.query()
+                        .withGraphFetched(`[
+                            organization.[
+                                locations
+                            ]
+                        ]`)
+                        .where('account_id', account_id)
+                        .first();
+
+        if (!collaborator && scope !== 'ADMIN') return res.status(400).json('Invalid account').send();
+
         const locations = 
             await models.Location
                 .query()
@@ -17,7 +32,14 @@ const getLocations = async (req, res, next) => {
                         childrens
                     ]
                 ]`)
-                .where('is_country', true);
+                .where('is_country', true)
+                .modify(builder => { 
+                    // Get the regional organization locations and filter the endpoint to only them
+                    if (collaborator && collaborator.organization) {
+                        const locations = collaborator.organization.locations.map(location => location.location_id);
+                        builder.whereIn('id', locations);
+                    }
+                });
                 
 
         return res.status(201).send(locations);

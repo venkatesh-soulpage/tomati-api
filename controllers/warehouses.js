@@ -44,16 +44,37 @@ const createWarehouse = async (req, res, next) => {
         const {account_id, scope} = req;
         const {location_id, name, address, client_id} = req.body;
 
-        // Validate the account is a client collaborator
-        const client_collaborators = 
-            await models.ClientCollaborator.query()
-                .withGraphFetched('[client.[warehouses]]')
-                .where('account_id', account_id)
+        // Validate collaborators
+        const collaborator = 
+                await models.Collaborator.query()
+                        .withGraphFetched(`[
+                            organization.[
+                                clients
+                            ],
+                            client
+                        ]`)
+                        .where('account_id', account_id)
+                        .first();
 
-        if (client_collaborators[0].client_id !== client_id) return res.status(400).json('Invalrewid client').send();
+        // Validate collaborator permissions
+        if (!collaborator) return res.status(400).json('Invalid collaborator').send();
+        if (collaborator.client && collaborator.client_id !== client_id) return res.status(400).json('Invalid client id').send();
+        if (collaborator.organization) {
+            const clients = collaborator.organization.clients.map(client => client.id);
+            if (clients.indexOf(client_id) < 0) return res.status(400).json('Invalid organization').send();
+        } 
 
-        // Validate warehouses
-        if (client_collaborators[0].client.warehouses_limit <= client_collaborators[0].client.warehouses.length) {
+        // Validate warehouse limits
+        const client = 
+            await models.Client.query()
+                    .withGraphFetched(`[
+                        warehouses
+                    ]`)
+                    .where('id', client_id)
+                    .first();
+
+
+        if (client.warehouses_limit <= client.warehouses.length) {
             return res.status(400).json(
                 `
                     Maximum number of warehouses have been added. Contact ; support@boozeboss.co  to upgrade your account.
@@ -61,11 +82,10 @@ const createWarehouse = async (req, res, next) => {
             ).send()
         }
     
-        const new_warehouse =  
-            await models.Warehouse.query()
+        await models.Warehouse.query()
                 .insert({
                     location_id, name, address,
-                    client_id: client_collaborators[0].client_id,
+                    client_id,
                 }); 
 
         // Send the clients
