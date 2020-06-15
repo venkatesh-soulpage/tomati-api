@@ -1,1 +1,1 @@
-web: knex migrate:latest && npm run start 
+web: knex migrate:latest && knex seed:run --specific=initial_locations.js && npm run start 
