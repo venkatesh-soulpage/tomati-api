@@ -28,9 +28,7 @@ const getLocations = async (req, res, next) => {
             await models.Location
                 .query()
                 .withGraphFetched(`[
-                    childrens.[
-                        childrens
-                    ]
+                    childrens
                 ]`)
                 .where('is_country', true)
                 .modify(builder => { 
