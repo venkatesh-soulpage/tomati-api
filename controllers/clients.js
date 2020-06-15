@@ -26,12 +26,9 @@ const getClients = async (req, res, next) => {
         let clients; 
 
         const query = `[
-            location,
-            locations.[
-                location.[
-                    childrens.[
-                        childrens
-                    ]
+            location.[
+                childrens.[
+                    childrens
                 ]
             ], 
             venues, 
