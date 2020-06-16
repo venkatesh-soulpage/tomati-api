@@ -152,7 +152,7 @@ const changePrimaryLocation = async (req, res, next) => {
                     .first();
 
         if (!collaborator && scope !== 'ADMIN') return res.status(400).json('Invalid Role').send();
-        if (collaborator && collaborator.organization && collaborator.organization.id !== regional_organization_id) return res.status(400).json('Invalid Organization').send();
+        if (collaborator && collaborator.organization && collaborator.organization.id !== Number(regional_organization_id)) return res.status(400).json('Invalid Organization').send();
 
         // Set all locations to false
         await models.RegionalOrganizationLocation.query()
