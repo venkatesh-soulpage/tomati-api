@@ -8,6 +8,26 @@ export default class Account extends Model {
   
     static get relationMappings () {
       return {
+        role: {
+          relation: Model.HasOneThroughRelation,
+          modelClass: models.Role,
+          join: {
+            from: 'accounts.id',
+            through: {
+              from: 'collaborators.account_id',
+              to: 'collaborators.role_id'
+            },
+            to: 'roles.id'
+          }
+        }, 
+        collaborator: {
+          relation: Model.HasOneRelation,
+          modelClass: models.Collaborator,
+          join: {
+            from: 'accounts.id',
+            to: 'collaborators.account_id',
+          }
+        },
         location: {
           relation: Model.BelongsToOneRelation,
           modelClass: models.Location,

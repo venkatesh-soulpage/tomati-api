@@ -76,6 +76,9 @@ const signup = async (req, res, next) => {
     }
 }
 
+// Invite Manager 
+
+
 // POST - Organization Signup
 const organizationSignup = async (req, res, next) => {
 
@@ -116,6 +119,9 @@ const organizationSignup = async (req, res, next) => {
         // Hash password
         const salt = await bcrypt.genSalt(10);
         const password_hash = await bcrypt.hash(password, salt);
+
+        // Generate a refresh token
+        const refresh_token = await crypto.randomBytes(16).toString('hex');
  
         // Add new account
         const new_account = 
@@ -125,6 +131,7 @@ const organizationSignup = async (req, res, next) => {
                     is_admin: false,
                     is_email_verified: true,
                     is_age_verified: true,
+                    refresh_token
                 });
 
         // Delete confirmation token
@@ -162,14 +169,14 @@ const organizationSignup = async (req, res, next) => {
                 role: role.name,
             }, 
             process.env.SECRET_KEY, 
-            { expiresIn: '31d' }
+            { expiresIn: '3h' }
         );
 
         // Send signup email
         // await sendConfirmationEmail(new_account, new_token);
 
         // Return the account
-        return res.status(201).json(jwt_token).send();
+        return res.status(201).json({token: jwt_token, refresh_token}).send();
 
     } catch (e) {
         console.log(e);
@@ -218,6 +225,9 @@ const clientSignup = async (req, res, next) => {
         // Hash password
         const salt = await bcrypt.genSalt(10);
         const password_hash = await bcrypt.hash(password, salt);
+
+        // Generate a refresh token
+        const refresh_token = await crypto.randomBytes(16).toString('hex');
  
         // Add new account
         const new_account = 
@@ -227,6 +237,7 @@ const clientSignup = async (req, res, next) => {
                     is_admin: false,
                     is_email_verified: true,
                     is_age_verified: true,
+                    refresh_token
                 });
 
         // Update the Client organization owner_id
@@ -271,14 +282,14 @@ const clientSignup = async (req, res, next) => {
                 role: role[0].name,
             }, 
             process.env.SECRET_KEY, 
-            { expiresIn: '31d' }
+            { expiresIn: '3h' }
         );
 
         // Send signup email
         // await sendConfirmationEmail(new_account, new_token);
 
         // Return the account
-        return res.status(201).json(jwt_token).send();
+        return res.status(201).json({token: jwt_token, refresh_token}).send();
 
     } catch (e) {
         console.log(e);
@@ -320,6 +331,9 @@ const agencySignup = async (req, res, next) => {
         // Hash password
         const salt = await bcrypt.genSalt(10);
         const password_hash = await bcrypt.hash(password, salt);
+
+        // Generate a refresh token
+        const refresh_token = await crypto.randomBytes(16).toString('hex');
  
         // Add new account
         const new_account = 
@@ -329,6 +343,7 @@ const agencySignup = async (req, res, next) => {
                     is_admin: false,
                     is_email_verified: true,
                     is_age_verified: true,
+                    refresh_token
                 });
 
         // Update the Client organization owner_id
@@ -371,7 +386,7 @@ const agencySignup = async (req, res, next) => {
                 role: role[0].name,
             }, 
             process.env.SECRET_KEY, 
-            { expiresIn: '31d' }
+            { expiresIn: '3h' }
         );
 
         // Update the collaborator status
@@ -383,7 +398,7 @@ const agencySignup = async (req, res, next) => {
         // await sendConfirmationEmail(new_account, new_token);
 
         // Return the account
-        return res.status(201).json(jwt_token).send();
+        return res.status(201).json({token: jwt_token, refresh_token}).send();
 
     } catch (e) {
         console.log(e);
@@ -521,83 +536,131 @@ const login = async (req, res, next) => {
     try {
 
         // Fetch account
-        const accounts = 
+        const account = 
             await models.Account.query()
-                .where('email', email);
+                .withGraphFetched(`[
+                    collaborator.[
+                        organization,
+                        client,
+                        agency.[
+                            client
+                        ]
+                    ]
+                ]`)
+                .where('email', email)
+                .first();
 
         // Return if the account doesn't exist
-        if (!accounts || accounts.length < 1) return res.status(401).json("Incorrect password or email").send();
-        if (!accounts[0].is_email_verified) return res.status(401).json("Please verify your email").send(); 
+        if (!account) return res.status(401).json("Incorrect password or email").send();
+        if (!account.is_email_verified) return res.status(401).json("Please verify your email").send(); 
 
         // Compare passwords
-        const isCorrectPassword = await bcrypt.compareSync(password, accounts[0].password_hash);
+        const isCorrectPassword = await bcrypt.compareSync(password, account.password_hash);
 
         // If the password is incorrect return
         if (!isCorrectPassword) return res.status(401).json("Incorrect password or email").send(); 
 
         // Validate by admin first
-        let scope = accounts[0].is_admin && 'ADMIN';
-        let role = accounts[0].is_admin && 'ADMIN';
+        let scope = account.is_admin && 'ADMIN';
+        let role = account.is_admin && 'ADMIN';
 
+        
+        // Validate Expiration Date
+        if (!account.is_admin) {
+            if (!account.collaborator) return res.status(401).json('Invalid account').send();
+            if (account.collaborator.organization && new Date(account.collaborator.organization.expiration_date).getTime() <= new Date().getTime()) return res.status(403).json('Account expired, please contact support@boozeboss.co').send();
+            if (account.collaborator.client && new Date(account.collaborator.client.expiration_date).getTime() <= new Date().getTime()) return res.status(403).json('Account expired, please contact support@boozeboss.co').send();
+            if (account.collaborator.agency && account.collaborator.agency.client && new Date(account.collaborator.agency.client.expiration_date).getTime() <= new Date().getTime()) return res.status(403).json('Account expired, please contact support@boozeboss.co').send(); 
+        }
 
         // Validate by brand if it isn't admin
         if (!scope || !role) {
 
-            const brandCollaborators = 
-                await models.ClientCollaborator.query()
-                    .where('account_id', accounts[0].id)
-                    .withGraphFetched('role');
+            const collaborator = 
+                    await models.Collaborator.query()
+                            .withGraphFetched('role')
+                            .where('account_id', account.id)
+                            .first();
 
-                if (brandCollaborators.length > 0) {
-                    scope = brandCollaborators[0].role.scope;
-                    role = brandCollaborators[0].role.name;
-                }
+            if (!collaborator) return res.status(400).json('Invalid scope').send();
+
+            scope = collaborator.role.scope;
+            role = collaborator.role.name;
         }
-
-        // Validate by Agency if it isn't brand
-        if (!scope || !role) {
-
-            const agencyCollaborators = 
-                await models.AgencyCollaborator.query()
-                    .where('account_id', accounts[0].id)
-                    .withGraphFetched('role');
-
-                if (agencyCollaborators.length > 0) {
-                    scope = agencyCollaborators[0].role.scope;
-                    role = agencyCollaborators[0].role.name;
-                }
-        }
-
-        // Validate by Guests if it isn't brand
-        if (!scope || !role) {
-
-            const event_guests = 
-                await models.EventGuest.query()
-                    .where('account_id', accounts[0].id)
-                    .withGraphFetched('role');
-
-                if (event_guests.length > 0) {
-                    scope = event_guests[0].role.scope;
-                    role = event_guests[0].role.name;
-                }
-        }
-        
-        if (!scope || !role ) return res.status(401).json('Invalid account').send();
 
         // Sign token
         const token = await jwt.sign(
             {
-                id: accounts[0].id, 
-                email: accounts[0].email, 
+                id: account.id, 
+                email: account.email, 
                 scope,
                 role,
-                is_age_verified: accounts[0].is_age_verified
+                is_age_verified: account.is_age_verified
             }, 
             process.env.SECRET_KEY, 
-            { expiresIn: '31d' }
+            { expiresIn: '3h' }
         );
+
+        const refresh_token = await crypto.randomBytes(16).toString('hex');
+        await models.Account.query().where('id', account.id).update({refresh_token});
                         
-        return res.status(201).json(token);
+        return res.status(200).json({token, refresh_token});
+
+    } catch (e) {
+        console.log(e)
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
+const refreshToken = async (req, res, next) => {
+    try {
+        const { refresh_token } = req.body;
+
+        const account = 
+                await models.Account.query()
+                        .withGraphFetched(`[
+                            role,
+                            collaborator.[
+                                organization,
+                                client,
+                                agency.[
+                                    client
+                                ]
+                            ]
+                        ]`)
+                        .where('refresh_token', refresh_token)
+                        .first();
+
+        if (!account) return res.status(400).json('Invalid account').send();
+        const scope = account.is_admin ? 'ADMIN' : account.role.scope;
+        const role = account.is_admin ? 'ADMIN' : account.role.name;
+
+        // Validate Expiration Date
+        if (!account.is_admin) {
+            if (!account.collaborator) return res.status(401).json({message: 'Invalid collaborator', status: 401}).send();
+            if (account.collaborator.organization && new Date(account.collaborator.organization.expiration_date).getTime() <= new Date().getTime()) return res.status(403).json({message: 'Expired account', status: 401}).send();
+            if (account.collaborator.client && new Date(account.collaborator.client.expiration_date).getTime() <= new Date().getTime()) return res.status(403).json({message: 'Expired account', status: 401}).send();
+            if (account.collaborator.agency && account.collaborator.agency.client && new Date(account.collaborator.agency.client.expiration_date).getTime() <= new Date().getTime()) return res.status(403).json({message: 'Expired account', status: 401}).send(); 
+        }
+
+
+        // Sign token
+        const token = await jwt.sign(
+            {
+                id: account.id, 
+                email: account.email, 
+                scope,
+                role,
+                is_age_verified: account.is_age_verified
+            }, 
+            process.env.SECRET_KEY, 
+            { expiresIn: '3h' }
+        );
+
+        const new_refresh_token = await crypto.randomBytes(16).toString('hex');
+        await models.Account.query().where('id', account.id).update({refresh_token: new_refresh_token});
+                        
+        return res.status(200).json({token, refresh_token: new_refresh_token});
 
     } catch (e) {
         console.log(e)
@@ -930,6 +993,7 @@ const userController = {
     agencySignup,
     guestSignup,
     login,
+    refreshToken,
     confirmation, 
     resendToken,
     resendInvitation,

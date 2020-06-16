@@ -10,7 +10,7 @@ const verification = (req, res, next) => {
     }
 
     jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
-        if (err) return res.status(500).send({ message: 'Failed to authenticate Token'});
+        if (err) return res.status(401).send({ message: 'Failed to authenticate Token', status: 401});
 
         req.account_id = decoded.id;
         req.email = decoded.email;

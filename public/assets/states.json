@@ -1,1 +1,3362 @@
-[{"name":"Bengo Province","is_country":false,"parent_name":"Angola","currency":"AOA"},{"name":"Benguela Province","is_country":false,"parent_name":"Angola","currency":"AOA"},{"name":"Bié Province","is_country":false,"parent_name":"Angola","currency":"AOA"},{"name":"Cabinda Province","is_country":false,"parent_name":"Angola","currency":"AOA"},{"name":"Cuando Cubango Province","is_country":false,"parent_name":"Angola","currency":"AOA"},{"name":"Cuanza Norte Province","is_country":false,"parent_name":"Angola","currency":"AOA"},{"name":"Cuanza Sul","is_country":false,"parent_name":"Angola","currency":"AOA"},{"name":"Cunene Province","is_country":false,"parent_name":"Angola","currency":"AOA"},{"name":"Huambo Province","is_country":false,"parent_name":"Angola","currency":"AOA"},{"name":"Huíla Province","is_country":false,"parent_name":"Angola","currency":"AOA"},{"name":"Luanda Province","is_country":false,"parent_name":"Angola","currency":"AOA"},{"name":"Lunda Norte Province","is_country":false,"parent_name":"Angola","currency":"AOA"},{"name":"Lunda Sul Province","is_country":false,"parent_name":"Angola","currency":"AOA"},{"name":"Malanje Province","is_country":false,"parent_name":"Angola","currency":"AOA"},{"name":"Moxico Province","is_country":false,"parent_name":"Angola","currency":"AOA"},{"name":"Uíge Province","is_country":false,"parent_name":"Angola","currency":"AOA"},{"name":"Zaire Province","is_country":false,"parent_name":"Angola","currency":"AOA"},{"name":"Acre","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Alagoas","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Amapá","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Amazonas","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Bahia","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Ceará","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Espírito Santo","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Federal District","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Goiás","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Maranhão","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Mato Grosso","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Mato Grosso do Sul","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Minas Gerais","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Pará","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Paraíba","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Paraná","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Pernambuco","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Piauí","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Rio de Janeiro","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Rio Grande do Norte","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Rio Grande do Sul","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Rondônia","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Santa Catarina","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"São Paulo","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Sergipe","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Tocantins","is_country":false,"parent_name":"Brazil","currency":"BRL"},{"name":"Amazonas Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Antioquia Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Arauca Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Archipelago of Saint Andréws, Providence and Saint Catalina","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Atlántico Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Bolívar Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Boyacá Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Caldas Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Caquetá Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Casanare Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Cauca Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Cesar Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Chocó Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Córdoba Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Cundinamarca Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Guainía Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Guaviare Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"La Guajira Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Magdalena Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Meta","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Nariño Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Norte de Santander Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Putumayo Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Quindío Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Risaralda Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Santander Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Sucre Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Tolima Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Valle del Cauca Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Vaupés Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Vichada Department","is_country":false,"parent_name":"Colombia","currency":"COP"},{"name":"Alo","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Alsace","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Aquitaine","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Auvergne","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Auvergne-Rhône-Alpes","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Bourgogne-Franche-Comté","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Brittany","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Burgundy","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Centre-Val de Loire","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Champagne-Ardenne","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Corsica","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Franche-Comté","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"French Guiana","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"French Polynesia","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Grand Est","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Guadeloupe","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Hauts-de-France","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Île-de-France","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Languedoc-Roussillon","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Limousin","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Lorraine","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Lower Normandy","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Martinique","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Mayotte","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Nord-Pas-de-Calais","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Normandy","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Nouvelle-Aquitaine","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Occitania","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Paris","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Pays de la Loire","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Picardy","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Poitou-Charentes","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Provence-Alpes-Côte d'Azur","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Réunion","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Rhône-Alpes","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Saint Barthélemy","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Saint Martin","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Saint Pierre and Miquelon","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Sigave","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Upper Normandy","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Uvea","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Wallis and Futuna","is_country":false,"parent_name":"France","currency":"EUR"},{"name":"Ashanti Region","is_country":false,"parent_name":"Ghana","currency":"GHS"},{"name":"Brong-Ahafo Region","is_country":false,"parent_name":"Ghana","currency":"GHS"},{"name":"Central Region","is_country":false,"parent_name":"Ghana","currency":"GHS"},{"name":"Eastern Region","is_country":false,"parent_name":"Ghana","currency":"GHS"},{"name":"Greater Accra Region","is_country":false,"parent_name":"Ghana","currency":"GHS"},{"name":"Northern Region","is_country":false,"parent_name":"Ghana","currency":"GHS"},{"name":"Upper East Region","is_country":false,"parent_name":"Ghana","currency":"GHS"},{"name":"Upper West Region","is_country":false,"parent_name":"Ghana","currency":"GHS"},{"name":"Volta Region","is_country":false,"parent_name":"Ghana","currency":"GHS"},{"name":"Western Region","is_country":false,"parent_name":"Ghana","currency":"GHS"},{"name":"Baringo County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Bomet County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Bungoma County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Busia County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Central Province","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Coast Province","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Eastern Province","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Elgeyo-Marakwet County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Embu County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Garissa County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Homa Bay County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Isiolo County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Kajiado County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Kakamega County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Kericho County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Kiambu County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Kilifi County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Kirinyaga County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Kisii County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Kisumu County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Kitui County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Kwale County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Laikipia County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Lamu County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Machakos County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Makueni County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Mandera County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Marsabit County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Meru County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Migori County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Mombasa County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Muranga County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Nairobi","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Nakuru District","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Nandi District","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Narok County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"North Eastern Province","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Nyamira District","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Nyandarua County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Nyanza Province","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Nyeri County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Rift Valley Province","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Samburu County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Siaya County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Taita–Taveta County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Tana River County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Tharaka Nithi County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Trans-Nzoia District","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Turkana County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Uasin Gishu District","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Vihiga District","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Wajir County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"West Pokot County","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Western Province","is_country":false,"parent_name":"Kenya","currency":"KES"},{"name":"Abia State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Adamawa State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Akwa Ibom State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Anambra State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Bauchi State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Bayelsa State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Benue State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Borno State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Cross River State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Delta State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Ebonyi State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Edo State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Ekiti State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Enugu State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Federal Capital Territory","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Gombe State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Imo State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Jigawa State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Kaduna State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Kano State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Katsina State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Kebbi State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Kogi State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Kwara State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Lagos","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Nasarawa State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Niger State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Ogun State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Ondo State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Osun State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Oyo State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Plateau State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Sokoto State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Taraba State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Yobe State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Zamfara State","is_country":false,"parent_name":"Nigeria","currency":"NGN"},{"name":"Greater Poland Voivodeship","is_country":false,"parent_name":"Poland","currency":"PLN"},{"name":"Kielce","is_country":false,"parent_name":"Poland","currency":"PLN"},{"name":"Kuyavian-Pomeranian Voivodeship","is_country":false,"parent_name":"Poland","currency":"PLN"},{"name":"Lesser Poland Voivodeship","is_country":false,"parent_name":"Poland","currency":"PLN"},{"name":"Lower Silesian Voivodeship","is_country":false,"parent_name":"Poland","currency":"PLN"},{"name":"Lublin Voivodeship","is_country":false,"parent_name":"Poland","currency":"PLN"},{"name":"Lubusz Voivodeship","is_country":false,"parent_name":"Poland","currency":"PLN"},{"name":"Łódź Voivodeship","is_country":false,"parent_name":"Poland","currency":"PLN"},{"name":"Masovian Voivodeship","is_country":false,"parent_name":"Poland","currency":"PLN"},{"name":"Opole Voivodeship","is_country":false,"parent_name":"Poland","currency":"PLN"},{"name":"Podkarpackie Voivodeship","is_country":false,"parent_name":"Poland","currency":"PLN"},{"name":"Podlaskie Voivodeship","is_country":false,"parent_name":"Poland","currency":"PLN"},{"name":"Pomeranian Voivodeship","is_country":false,"parent_name":"Poland","currency":"PLN"},{"name":"Silesian Voivodeship","is_country":false,"parent_name":"Poland","currency":"PLN"},{"name":"Świętokrzyskie Voivodeship","is_country":false,"parent_name":"Poland","currency":"PLN"},{"name":"Warmian-Masurian Voivodeship","is_country":false,"parent_name":"Poland","currency":"PLN"},{"name":"West Pomeranian Voivodeship","is_country":false,"parent_name":"Poland","currency":"PLN"},{"name":"Eastern Cape","is_country":false,"parent_name":"South Africa","currency":"ZAR"},{"name":"Free State","is_country":false,"parent_name":"South Africa","currency":"ZAR"},{"name":"Gauteng","is_country":false,"parent_name":"South Africa","currency":"ZAR"},{"name":"KwaZulu-Natal","is_country":false,"parent_name":"South Africa","currency":"ZAR"},{"name":"Limpopo","is_country":false,"parent_name":"South Africa","currency":"ZAR"},{"name":"Mpumalanga","is_country":false,"parent_name":"South Africa","currency":"ZAR"},{"name":"North West","is_country":false,"parent_name":"South Africa","currency":"ZAR"},{"name":"Northern Cape","is_country":false,"parent_name":"South Africa","currency":"ZAR"},{"name":"Western Cape","is_country":false,"parent_name":"South Africa","currency":"ZAR"},{"name":"A Coruña Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Albacete Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Alicante Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Almería Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Andalusia","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Araba / Álava","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Aragon","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Badajoz Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Balearic Islands","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Barcelona Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Basque Country","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Biscay","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Burgos Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Cáceres Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Cádiz Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Canary Islands","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Cantabria","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Castellón Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Castile and León","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Castile-La Mancha","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Catalonia","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Ceuta","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Ciudad Real Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Community of Madrid","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Córdoba Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Cuenca Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Extremadura","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Galicia","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Gipuzkoa","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Girona Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Granada Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Guadalajara Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Huelva Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Huesca Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Jaén Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"La Rioja","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Las Palmas Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"León Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Lleida Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Lugo Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Madrid Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Málaga Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Melilla","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Murcia Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Navarre","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Ourense Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Palencia Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Pontevedra Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Province of Asturias","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Province of Ávila","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Region of Murcia","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Salamanca Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Santa Cruz de Tenerife Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Segovia Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Seville Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Soria Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Tarragona Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Teruel Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Toledo Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Valencia Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Valencian Community","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Valladolid Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Zamora Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Zaragoza Province","is_country":false,"parent_name":"Spain","currency":"EUR"},{"name":"Abu Dhabi Emirate","is_country":false,"parent_name":"United Arab Emirates","currency":"AED"},{"name":"Ajman Emirate","is_country":false,"parent_name":"United Arab Emirates","currency":"AED"},{"name":"Dubai","is_country":false,"parent_name":"United Arab Emirates","currency":"AED"},{"name":"Fujairah","is_country":false,"parent_name":"United Arab Emirates","currency":"AED"},{"name":"Ras al-Khaimah","is_country":false,"parent_name":"United Arab Emirates","currency":"AED"},{"name":"Sharjah Emirate","is_country":false,"parent_name":"United Arab Emirates","currency":"AED"},{"name":"Umm al-Quwain","is_country":false,"parent_name":"United Arab Emirates","currency":"AED"},{"name":"Aberdeen","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Aberdeenshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Angus","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Antrim","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Antrim and Newtownabbey","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Ards","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Ards and North Down","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Argyll and Bute","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Armagh City and District Council","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Armagh, Banbridge and Craigavon","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Ascension Island","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Ballymena Borough","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Ballymoney","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Banbridge","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Barnsley","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Bath and North East Somerset","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Bedford","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Belfast district","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Birmingham","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Blackburn with Darwen","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Blackpool","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Blaenau Gwent County Borough","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Bolton","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Bournemouth","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Bracknell Forest","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Bradford","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Bridgend County Borough","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Brighton and Hove","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Buckinghamshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Bury","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Caerphilly County Borough","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Calderdale","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Cambridgeshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Carmarthenshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Carrickfergus Borough Council","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Castlereagh","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Causeway Coast and Glens","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Central Bedfordshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Ceredigion","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Cheshire East","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Cheshire West and Chester","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"City and County of Cardiff","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"City and County of Swansea","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"City of Bristol","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"City of Derby","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"City of Kingston upon Hull","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"City of Leicester","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"City of London","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"City of Nottingham","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"City of Peterborough","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"City of Plymouth","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"City of Portsmouth","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"City of Southampton","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"City of Stoke-on-Trent","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"City of Sunderland","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"City of Westminster","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"City of Wolverhampton","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"City of York","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Clackmannanshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Coleraine Borough Council","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Conwy County Borough","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Cookstown District Council","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Cornwall","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"County Durham","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Coventry","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Craigavon Borough Council","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Cumbria","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Darlington","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Denbighshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Derbyshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Derry City and Strabane","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Derry City Council","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Devon","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Doncaster","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Dorset","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Down District Council","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Dudley","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Dumfries and Galloway","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Dundee","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Dungannon and South Tyrone Borough Council","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"East Ayrshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"East Dunbartonshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"East Lothian","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"East Renfrewshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"East Riding of Yorkshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"East Sussex","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Edinburgh","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"England","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Essex","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Falkirk","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Fermanagh and Omagh","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Fermanagh District Council","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Fife","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Flintshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Gateshead","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Glasgow","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Gloucestershire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Gwynedd","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Halton","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Hampshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Hartlepool","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Herefordshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Hertfordshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Highland","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Inverclyde","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Isle of Wight","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Isles of Scilly","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Kent","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Kirklees","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Knowsley","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Lancashire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Larne Borough Council","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Leeds","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Leicestershire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Limavady Borough Council","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Lincolnshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Lisburn and Castlereagh","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Lisburn City Council","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Liverpool","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Barking and Dagenham","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Barnet","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Bexley","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Brent","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Bromley","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Camden","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Croydon","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Ealing","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Enfield","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Hackney","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Hammersmith and Fulham","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Haringey","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Harrow","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Havering","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Hillingdon","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Hounslow","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Islington","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Lambeth","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Lewisham","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Merton","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Newham","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Redbridge","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Richmond upon Thames","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Southwark","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Sutton","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Tower Hamlets","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Waltham Forest","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"London Borough of Wandsworth","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Magherafelt District Council","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Manchester","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Medway","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Merthyr Tydfil County Borough","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Metropolitan Borough of Wigan","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Mid and East Antrim","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Mid Ulster","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Middlesbrough","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Midlothian","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Milton Keynes","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Monmouthshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Moray","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Moyle District Council","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Neath Port Talbot County Borough","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Newcastle upon Tyne","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Newport","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Newry and Mourne District Council","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Newry, Mourne and Down","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Newtownabbey Borough Council","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Norfolk","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"North Ayrshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"North Down Borough Council","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"North East Lincolnshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"North Lanarkshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"North Lincolnshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"North Somerset","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"North Tyneside","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"North Yorkshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Northamptonshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Northern Ireland","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Northumberland","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Nottinghamshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Oldham","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Omagh District Council","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Orkney Islands","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Outer Hebrides","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Oxfordshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Pembrokeshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Perth and Kinross","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Poole","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Powys","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Reading","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Redcar and Cleveland","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Renfrewshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Rhondda Cynon Taf","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Rochdale","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Rotherham","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Royal Borough of Greenwich","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Royal Borough of Kensington and Chelsea","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Royal Borough of Kingston upon Thames","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Rutland","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Saint Helena","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Salford","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Sandwell","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Scotland","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Scottish Borders","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Sefton","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Sheffield","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Shetland Islands","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Shropshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Slough","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Solihull","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Somerset","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"South Ayrshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"South Gloucestershire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"South Lanarkshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"South Tyneside","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Southend-on-Sea","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"St Helens","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Staffordshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Stirling","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Stockport","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Stockton-on-Tees","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Strabane District Council","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Suffolk","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Surrey","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Swindon","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Tameside","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Telford and Wrekin","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Thurrock","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Torbay","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Torfaen","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Trafford","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"United Kingdom","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Vale of Glamorgan","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Wakefield","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Wales","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Walsall","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Warrington","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Warwickshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"West Berkshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"West Dunbartonshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"West Lothian","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"West Sussex","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Wiltshire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Windsor and Maidenhead","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Wirral","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Wokingham","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Worcestershire","is_country":false,"parent_name":"United Kingdom","currency":"GBP"},{"name":"Wrexham County Borough","is_country":false,"parent_name":"United Kingdom","currency":"GBP"}]
+[
+  {
+    "name": "Bengo Province",
+    "is_country": false,
+    "parent_name": "Angola",
+    "currency": "AOA"
+  },
+  {
+    "name": "Benguela Province",
+    "is_country": false,
+    "parent_name": "Angola",
+    "currency": "AOA"
+  },
+  {
+    "name": "Bié Province",
+    "is_country": false,
+    "parent_name": "Angola",
+    "currency": "AOA"
+  },
+  {
+    "name": "Cabinda Province",
+    "is_country": false,
+    "parent_name": "Angola",
+    "currency": "AOA"
+  },
+  {
+    "name": "Cuando Cubango Province",
+    "is_country": false,
+    "parent_name": "Angola",
+    "currency": "AOA"
+  },
+  {
+    "name": "Cuanza Norte Province",
+    "is_country": false,
+    "parent_name": "Angola",
+    "currency": "AOA"
+  },
+  {
+    "name": "Cuanza Sul",
+    "is_country": false,
+    "parent_name": "Angola",
+    "currency": "AOA"
+  },
+  {
+    "name": "Cunene Province",
+    "is_country": false,
+    "parent_name": "Angola",
+    "currency": "AOA"
+  },
+  {
+    "name": "Huambo Province",
+    "is_country": false,
+    "parent_name": "Angola",
+    "currency": "AOA"
+  },
+  {
+    "name": "Huíla Province",
+    "is_country": false,
+    "parent_name": "Angola",
+    "currency": "AOA"
+  },
+  {
+    "name": "Luanda Province",
+    "is_country": false,
+    "parent_name": "Angola",
+    "currency": "AOA"
+  },
+  {
+    "name": "Lunda Norte Province",
+    "is_country": false,
+    "parent_name": "Angola",
+    "currency": "AOA"
+  },
+  {
+    "name": "Lunda Sul Province",
+    "is_country": false,
+    "parent_name": "Angola",
+    "currency": "AOA"
+  },
+  {
+    "name": "Malanje Province",
+    "is_country": false,
+    "parent_name": "Angola",
+    "currency": "AOA"
+  },
+  {
+    "name": "Moxico Province",
+    "is_country": false,
+    "parent_name": "Angola",
+    "currency": "AOA"
+  },
+  {
+    "name": "Uíge Province",
+    "is_country": false,
+    "parent_name": "Angola",
+    "currency": "AOA"
+  },
+  {
+    "name": "Zaire Province",
+    "is_country": false,
+    "parent_name": "Angola",
+    "currency": "AOA"
+  },
+  {
+    "name": "Acre",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Alagoas",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Amapá",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Amazonas",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Bahia",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Ceará",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Espírito Santo",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Federal District",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Goiás",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Maranhão",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Mato Grosso",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Mato Grosso do Sul",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Minas Gerais",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Pará",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Paraíba",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Paraná",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Pernambuco",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Piauí",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Rio de Janeiro",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Rio Grande do Norte",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Rio Grande do Sul",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Rondônia",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Santa Catarina",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "São Paulo",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Sergipe",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Tocantins",
+    "is_country": false,
+    "parent_name": "Brazil",
+    "currency": "BRL"
+  },
+  {
+    "name": "Amazonas Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Antioquia Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Arauca Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Archipelago of Saint Andréws, Providence and Saint Catalina",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Atlántico Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Bolívar Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Boyacá Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Caldas Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Caquetá Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Casanare Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Cauca Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Cesar Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Chocó Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Córdoba Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Cundinamarca Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Guainía Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Guaviare Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "La Guajira Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Magdalena Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Meta",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Nariño Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Norte de Santander Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Putumayo Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Quindío Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Risaralda Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Santander Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Sucre Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Tolima Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Valle del Cauca Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Vaupés Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Vichada Department",
+    "is_country": false,
+    "parent_name": "Colombia",
+    "currency": "COP"
+  },
+  {
+    "name": "Alo",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Alsace",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Aquitaine",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Auvergne",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Auvergne-Rhône-Alpes",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Bourgogne-Franche-Comté",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Brittany",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Burgundy",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Centre-Val de Loire",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Champagne-Ardenne",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Corsica",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Franche-Comté",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "French Guiana",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "French Polynesia",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Grand Est",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Guadeloupe",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Hauts-de-France",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Île-de-France",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Languedoc-Roussillon",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Limousin",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Lorraine",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Lower Normandy",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Martinique",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Mayotte",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Nord-Pas-de-Calais",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Normandy",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Nouvelle-Aquitaine",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Occitania",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Paris",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Pays de la Loire",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Picardy",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Poitou-Charentes",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Provence-Alpes-Côte d'Azur",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Réunion",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Rhône-Alpes",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Saint Barthélemy",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Saint Martin",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Saint Pierre and Miquelon",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Sigave",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Upper Normandy",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Uvea",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Wallis and Futuna",
+    "is_country": false,
+    "parent_name": "France",
+    "currency": "EUR"
+  },
+  {
+    "name": "Ashanti Region",
+    "is_country": false,
+    "parent_name": "Ghana",
+    "currency": "GHS"
+  },
+  {
+    "name": "Brong-Ahafo Region",
+    "is_country": false,
+    "parent_name": "Ghana",
+    "currency": "GHS"
+  },
+  {
+    "name": "Central Region",
+    "is_country": false,
+    "parent_name": "Ghana",
+    "currency": "GHS"
+  },
+  {
+    "name": "Eastern Region",
+    "is_country": false,
+    "parent_name": "Ghana",
+    "currency": "GHS"
+  },
+  {
+    "name": "Greater Accra Region",
+    "is_country": false,
+    "parent_name": "Ghana",
+    "currency": "GHS"
+  },
+  {
+    "name": "Northern Region",
+    "is_country": false,
+    "parent_name": "Ghana",
+    "currency": "GHS"
+  },
+  {
+    "name": "Upper East Region",
+    "is_country": false,
+    "parent_name": "Ghana",
+    "currency": "GHS"
+  },
+  {
+    "name": "Upper West Region",
+    "is_country": false,
+    "parent_name": "Ghana",
+    "currency": "GHS"
+  },
+  {
+    "name": "Volta Region",
+    "is_country": false,
+    "parent_name": "Ghana",
+    "currency": "GHS"
+  },
+  {
+    "name": "Western Region",
+    "is_country": false,
+    "parent_name": "Ghana",
+    "currency": "GHS"
+  },
+  {
+    "name": "Baringo County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Bomet County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Bungoma County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Busia County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Central Province",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Coast Province",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Eastern Province",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Elgeyo-Marakwet County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Embu County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Garissa County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Homa Bay County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Isiolo County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Kajiado County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Kakamega County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Kericho County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Kiambu County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Kilifi County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Kirinyaga County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Kisii County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Kisumu County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Kitui County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Kwale County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Laikipia County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Lamu County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Machakos County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Makueni County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Mandera County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Marsabit County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Meru County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Migori County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Mombasa County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Muranga County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Nairobi",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Nakuru District",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Nandi District",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Narok County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "North Eastern Province",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Nyamira District",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Nyandarua County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Nyanza Province",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Nyeri County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Rift Valley Province",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Samburu County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Siaya County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Taita–Taveta County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Tana River County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Tharaka Nithi County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Trans-Nzoia District",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Turkana County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Uasin Gishu District",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Vihiga District",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Wajir County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "West Pokot County",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Western Province",
+    "is_country": false,
+    "parent_name": "Kenya",
+    "currency": "KES"
+  },
+  {
+    "name": "Abia State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Adamawa State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Akwa Ibom State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Anambra State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Bauchi State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Bayelsa State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Benue State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Borno State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Cross River State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Delta State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Ebonyi State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Edo State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Ekiti State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Enugu State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Federal Capital Territory",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Gombe State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Imo State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Jigawa State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Kaduna State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Kano State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Katsina State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Kebbi State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Kogi State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Kwara State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Lagos",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Nasarawa State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Niger State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Ogun State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Ondo State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Osun State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Oyo State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Plateau State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Sokoto State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Taraba State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Yobe State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Zamfara State",
+    "is_country": false,
+    "parent_name": "Nigeria",
+    "currency": "NGN"
+  },
+  {
+    "name": "Greater Poland Voivodeship",
+    "is_country": false,
+    "parent_name": "Poland",
+    "currency": "PLN"
+  },
+  {
+    "name": "Kielce",
+    "is_country": false,
+    "parent_name": "Poland",
+    "currency": "PLN"
+  },
+  {
+    "name": "Kuyavian-Pomeranian Voivodeship",
+    "is_country": false,
+    "parent_name": "Poland",
+    "currency": "PLN"
+  },
+  {
+    "name": "Lesser Poland Voivodeship",
+    "is_country": false,
+    "parent_name": "Poland",
+    "currency": "PLN"
+  },
+  {
+    "name": "Lower Silesian Voivodeship",
+    "is_country": false,
+    "parent_name": "Poland",
+    "currency": "PLN"
+  },
+  {
+    "name": "Lublin Voivodeship",
+    "is_country": false,
+    "parent_name": "Poland",
+    "currency": "PLN"
+  },
+  {
+    "name": "Lubusz Voivodeship",
+    "is_country": false,
+    "parent_name": "Poland",
+    "currency": "PLN"
+  },
+  {
+    "name": "Łódź Voivodeship",
+    "is_country": false,
+    "parent_name": "Poland",
+    "currency": "PLN"
+  },
+  {
+    "name": "Masovian Voivodeship",
+    "is_country": false,
+    "parent_name": "Poland",
+    "currency": "PLN"
+  },
+  {
+    "name": "Opole Voivodeship",
+    "is_country": false,
+    "parent_name": "Poland",
+    "currency": "PLN"
+  },
+  {
+    "name": "Podkarpackie Voivodeship",
+    "is_country": false,
+    "parent_name": "Poland",
+    "currency": "PLN"
+  },
+  {
+    "name": "Podlaskie Voivodeship",
+    "is_country": false,
+    "parent_name": "Poland",
+    "currency": "PLN"
+  },
+  {
+    "name": "Pomeranian Voivodeship",
+    "is_country": false,
+    "parent_name": "Poland",
+    "currency": "PLN"
+  },
+  {
+    "name": "Silesian Voivodeship",
+    "is_country": false,
+    "parent_name": "Poland",
+    "currency": "PLN"
+  },
+  {
+    "name": "Świętokrzyskie Voivodeship",
+    "is_country": false,
+    "parent_name": "Poland",
+    "currency": "PLN"
+  },
+  {
+    "name": "Warmian-Masurian Voivodeship",
+    "is_country": false,
+    "parent_name": "Poland",
+    "currency": "PLN"
+  },
+  {
+    "name": "West Pomeranian Voivodeship",
+    "is_country": false,
+    "parent_name": "Poland",
+    "currency": "PLN"
+  },
+  {
+    "name": "Eastern Cape",
+    "is_country": false,
+    "parent_name": "South Africa",
+    "currency": "ZAR"
+  },
+  {
+    "name": "Free State",
+    "is_country": false,
+    "parent_name": "South Africa",
+    "currency": "ZAR"
+  },
+  {
+    "name": "Gauteng",
+    "is_country": false,
+    "parent_name": "South Africa",
+    "currency": "ZAR"
+  },
+  {
+    "name": "KwaZulu-Natal",
+    "is_country": false,
+    "parent_name": "South Africa",
+    "currency": "ZAR"
+  },
+  {
+    "name": "Limpopo",
+    "is_country": false,
+    "parent_name": "South Africa",
+    "currency": "ZAR"
+  },
+  {
+    "name": "Mpumalanga",
+    "is_country": false,
+    "parent_name": "South Africa",
+    "currency": "ZAR"
+  },
+  {
+    "name": "North West",
+    "is_country": false,
+    "parent_name": "South Africa",
+    "currency": "ZAR"
+  },
+  {
+    "name": "Northern Cape",
+    "is_country": false,
+    "parent_name": "South Africa",
+    "currency": "ZAR"
+  },
+  {
+    "name": "Western Cape",
+    "is_country": false,
+    "parent_name": "South Africa",
+    "currency": "ZAR"
+  },
+  {
+    "name": "A Coruña Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Albacete Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Alicante Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Almería Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Andalusia",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Araba / Álava",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Aragon",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Badajoz Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Balearic Islands",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Barcelona Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Basque Country",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Biscay",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Burgos Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Cáceres Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Cádiz Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Canary Islands",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Cantabria",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Castellón Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Castile and León",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Castile-La Mancha",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Catalonia",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Ceuta",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Ciudad Real Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Community of Madrid",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Córdoba Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Cuenca Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Extremadura",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Galicia",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Gipuzkoa",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Girona Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Granada Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Guadalajara Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Huelva Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Huesca Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Jaén Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "La Rioja",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Las Palmas Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "León Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Lleida Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Lugo Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Madrid Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Málaga Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Melilla",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Murcia Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Navarre",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Ourense Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Palencia Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Pontevedra Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Province of Asturias",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Province of Ávila",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Region of Murcia",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Salamanca Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Santa Cruz de Tenerife Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Segovia Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Seville Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Soria Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Tarragona Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Teruel Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Toledo Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Valencia Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Valencian Community",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Valladolid Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Zamora Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Zaragoza Province",
+    "is_country": false,
+    "parent_name": "Spain",
+    "currency": "EUR"
+  },
+  {
+    "name": "Abu Dhabi Emirate",
+    "is_country": false,
+    "parent_name": "United Arab Emirates",
+    "currency": "AED"
+  },
+  {
+    "name": "Ajman Emirate",
+    "is_country": false,
+    "parent_name": "United Arab Emirates",
+    "currency": "AED"
+  },
+  {
+    "name": "Dubai",
+    "is_country": false,
+    "parent_name": "United Arab Emirates",
+    "currency": "AED"
+  },
+  {
+    "name": "Fujairah",
+    "is_country": false,
+    "parent_name": "United Arab Emirates",
+    "currency": "AED"
+  },
+  {
+    "name": "Ras al-Khaimah",
+    "is_country": false,
+    "parent_name": "United Arab Emirates",
+    "currency": "AED"
+  },
+  {
+    "name": "Sharjah Emirate",
+    "is_country": false,
+    "parent_name": "United Arab Emirates",
+    "currency": "AED"
+  },
+  {
+    "name": "Umm al-Quwain",
+    "is_country": false,
+    "parent_name": "United Arab Emirates",
+    "currency": "AED"
+  },
+  {
+    "name": "Aberdeen",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Aberdeenshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Angus",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Antrim",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Antrim and Newtownabbey",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Ards",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Ards and North Down",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Argyll and Bute",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Armagh City and District Council",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Armagh, Banbridge and Craigavon",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Ascension Island",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Ballymena Borough",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Ballymoney",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Banbridge",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Barnsley",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Bath and North East Somerset",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Bedford",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Belfast district",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Birmingham",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Blackburn with Darwen",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Blackpool",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Blaenau Gwent County Borough",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Bolton",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Bournemouth",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Bracknell Forest",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Bradford",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Bridgend County Borough",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Brighton and Hove",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Buckinghamshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Bury",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Caerphilly County Borough",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Calderdale",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Cambridgeshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Carmarthenshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Carrickfergus Borough Council",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Castlereagh",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Causeway Coast and Glens",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Central Bedfordshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Ceredigion",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Cheshire East",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Cheshire West and Chester",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "City and County of Cardiff",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "City and County of Swansea",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "City of Bristol",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "City of Derby",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "City of Kingston upon Hull",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "City of Leicester",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "City of London",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "City of Nottingham",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "City of Peterborough",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "City of Plymouth",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "City of Portsmouth",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "City of Southampton",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "City of Stoke-on-Trent",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "City of Sunderland",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "City of Westminster",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "City of Wolverhampton",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "City of York",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Clackmannanshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Coleraine Borough Council",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Conwy County Borough",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Cookstown District Council",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Cornwall",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "County Durham",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Coventry",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Craigavon Borough Council",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Cumbria",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Darlington",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Denbighshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Derbyshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Derry City and Strabane",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Derry City Council",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Devon",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Doncaster",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Dorset",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Down District Council",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Dudley",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Dumfries and Galloway",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Dundee",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Dungannon and South Tyrone Borough Council",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "East Ayrshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "East Dunbartonshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "East Lothian",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "East Renfrewshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "East Riding of Yorkshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "East Sussex",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Edinburgh",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "England",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Essex",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Falkirk",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Fermanagh and Omagh",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Fermanagh District Council",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Fife",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Flintshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Gateshead",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Glasgow",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Gloucestershire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Gwynedd",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Halton",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Hampshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Hartlepool",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Herefordshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Hertfordshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Highland",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Inverclyde",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Isle of Wight",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Isles of Scilly",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Kent",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Kirklees",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Knowsley",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Lancashire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Larne Borough Council",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Leeds",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Leicestershire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Limavady Borough Council",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Lincolnshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Lisburn and Castlereagh",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Lisburn City Council",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Liverpool",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Barking and Dagenham",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Barnet",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Bexley",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Brent",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Bromley",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Camden",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Croydon",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Ealing",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Enfield",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Hackney",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Hammersmith and Fulham",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Haringey",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Harrow",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Havering",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Hillingdon",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Hounslow",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Islington",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Lambeth",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Lewisham",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Merton",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Newham",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Redbridge",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Richmond upon Thames",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Southwark",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Sutton",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Tower Hamlets",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Waltham Forest",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "London Borough of Wandsworth",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Magherafelt District Council",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Manchester",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Medway",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Merthyr Tydfil County Borough",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Metropolitan Borough of Wigan",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Mid and East Antrim",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Mid Ulster",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Middlesbrough",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Midlothian",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Milton Keynes",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Monmouthshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Moray",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Moyle District Council",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Neath Port Talbot County Borough",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Newcastle upon Tyne",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Newport",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Newry and Mourne District Council",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Newry, Mourne and Down",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Newtownabbey Borough Council",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Norfolk",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "North Ayrshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "North Down Borough Council",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "North East Lincolnshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "North Lanarkshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "North Lincolnshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "North Somerset",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "North Tyneside",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "North Yorkshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Northamptonshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Northern Ireland",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Northumberland",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Nottinghamshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Oldham",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Omagh District Council",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Orkney Islands",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Outer Hebrides",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Oxfordshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Pembrokeshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Perth and Kinross",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Poole",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Powys",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Reading",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Redcar and Cleveland",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Renfrewshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Rhondda Cynon Taf",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Rochdale",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Rotherham",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Royal Borough of Greenwich",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Royal Borough of Kensington and Chelsea",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Royal Borough of Kingston upon Thames",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Rutland",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Saint Helena",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Salford",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Sandwell",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Scotland",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Scottish Borders",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Sefton",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Sheffield",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Shetland Islands",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Shropshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Slough",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Solihull",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Somerset",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "South Ayrshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "South Gloucestershire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "South Lanarkshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "South Tyneside",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Southend-on-Sea",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "St Helens",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Staffordshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Stirling",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Stockport",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Stockton-on-Tees",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Strabane District Council",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Suffolk",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Surrey",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Swindon",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Tameside",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Telford and Wrekin",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Thurrock",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Torbay",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Torfaen",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Trafford",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "United Kingdom",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Vale of Glamorgan",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Wakefield",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Wales",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Walsall",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Warrington",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Warwickshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "West Berkshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "West Dunbartonshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "West Lothian",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "West Sussex",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Wiltshire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Windsor and Maidenhead",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Wirral",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Wokingham",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Worcestershire",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  },
+  {
+    "name": "Wrexham County Borough",
+    "is_country": false,
+    "parent_name": "United Kingdom",
+    "currency": "GBP"
+  }
+]

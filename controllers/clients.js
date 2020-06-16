@@ -124,6 +124,7 @@ const inviteClient = async (req, res, next) => {
 
         // If its invited by a regional owner assign the correct id
         const regional_organization_id = collaborator && collaborator.organization && collaborator.organization.id;
+        const client_expiration_date = collaborator && collaborator.organization ? collaborator.organization.expiration_date : expiration_date;
 
         // Create client
         const client = 
@@ -141,7 +142,7 @@ const inviteClient = async (req, res, next) => {
                     identity_verifications_limit, 
                     agencies_limit, 
                     agency_collaborators_limit,
-                    expiration_date,
+                    expiration_date: client_expiration_date,
                     regional_organization_id, 
                 })
 

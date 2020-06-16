@@ -41,6 +41,12 @@ router.post(
     accountController.resendInvitation
 );
 
+/* POST Refresh a token */
+router.post(
+    '/refresh-token', 
+    accountController.refreshToken
+);
+
 /* POST Resend the verification email */
 router.post('/forgot', accountController.forgot);
 
