@@ -1,7 +1,23 @@
 const config = require('../populate_config');
 
 exports.seed = async (knex) => {
+
+    /* REMOVE CLIENT */
+    // Remove clients
+    const client_filters = config.CLIENTS.map(client => {
+        return {
+            name: client.client_data.name,
+            description: client.client_data.description
+        }
+    })
     
+    for (let client_filter of client_filters) {
+        await knex('clients')
+                .where(client_filter)
+                .del();
+
+    }
+
     /* REMOVE ORGANIZATION */
     // Fetch organization
     const organization =

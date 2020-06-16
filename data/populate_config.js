@@ -6,6 +6,7 @@ const getExpirationDate = (years) => {
 }
 
 module.exports = {
+    /* ORGANIZATION */
     // Organization
     ORGANIZATION_NAME: 'Seed Organization',
     ORGANIZATON_DESCRIPTION: 'This is a description for a seed organization',
@@ -32,6 +33,30 @@ module.exports = {
                 scope: 'REGION',
                 name: 'OWNER',
             }
+        }
+    ],
+    /* CLIENTS */
+    CLIENTS: [
+        {
+            client_data: {
+                name: 'Nigeria Team',
+                location: 'Nigeria',
+                description: 'This is the nigeria team',
+                contact_email: 'nigeria@seed.com',
+                collaborator_limit: 5,
+                briefs_limit: 10,
+                brands_limit: 3,
+                warehouses_limit: 3,
+                locations_limit: 1,
+                identity_verifications_limit: 100,
+                agencies_limit: 5,
+                agency_collaborators_limit: 5,
+                brief_attachment_limits: 52428800,
+                requisition_current_serial: 100000,
+                active: true,
+                expiration_date: getExpirationDate(1),
+            }
+            
         }
     ]
 }

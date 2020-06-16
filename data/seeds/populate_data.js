@@ -73,4 +73,21 @@ exports.seed = async (knex) => {
     }
   }
 
+  /* CLIENTS */
+  for (let client of config.CLIENTS) {
+
+    // Find the location_id
+    const location = await knex('locations').where({name: client.client_data.location}).first();
+    client.client_data.location_id = Number(location.id);
+    client.client_data.regional_organization_id = Number(organization_id);
+    delete client.client_data.location;
+
+    // Add the client
+    if (location) {
+        await knex('clients')
+              .insert(client.client_data)
+    }
+
+  }
+
 }; 
