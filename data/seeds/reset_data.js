@@ -4,18 +4,40 @@ exports.seed = async (knex) => {
 
     /* REMOVE CLIENT */
     // Remove clients
-    const client_filters = config.CLIENTS.map(client => {
-        return {
-            name: client.client_data.name,
-            description: client.client_data.description
+    for (let client of config.CLIENTS) {
+        // Remove venues 
+        for (let venue of client.venues) {
+            await knex('venues')
+                    .where({
+                        name: venue.name,
+                        contact_email: venue.contact_email,
+                    })
+                    .del();
         }
-    })
-    
-    for (let client_filter of client_filters) {
-        await knex('clients')
-                .where(client_filter)
+
+        // Remove collaborators
+        const collaborator_emails = client.collaborators.map(collaborator => collaborator.account.email);
+        const accounts = 
+            await knex('accounts')
+                    .whereIn('email', collaborator_emails);
+
+        const account_ids = accounts.map(account => account.id);
+
+        await knex('collaborators')
+                .whereIn('account_id', account_ids)
                 .del();
 
+        await knex('accounts')
+                .whereIn('id', account_ids)
+                .del();
+
+        // Remove client
+        await knex('clients')
+                .where({
+                    name: client.client_data.name,
+                    description: client.client_data.description
+                })
+                .del();
     }
 
     /* REMOVE ORGANIZATION */

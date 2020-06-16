@@ -84,10 +84,52 @@ exports.seed = async (knex) => {
 
     // Add the client
     if (location) {
-        await knex('clients')
+        const client_id = 
+          await knex('clients')
               .insert(client.client_data)
-    }
+              .returning('id');
 
+
+        // Add client collaborators
+        for (let collaborator of client.collaborators) {
+          // Get collaborator role
+          const role = 
+              await knex('roles')
+                .where({
+                  scope: collaborator.role.scope,
+                  name: collaborator.role.name
+                })
+                .first();
+            
+          if (role) {
+            // Hash Password
+            const password_hash = await hashPassword(collaborator.account.password);
+            collaborator.account.password_hash = password_hash;
+            delete collaborator.account.password;
+
+            // Create account 
+            const account_id = 
+              await knex('accounts')
+                      .insert(collaborator.account)
+                      .returning('id');
+
+              // Create the collaborator
+              await knex('collaborators')
+                      .insert({
+                          account_id: Number(account_id),
+                          client_id: Number(client_id),
+                          role_id: Number(role.id)
+                      })
+              }
+        }
+
+        // Add Venues 
+        for (let venue of client.venues) {
+          venue.created_by = Number(client_id);
+          await knex('venues')
+                  .insert(venue);
+        }
+    }
   }
 
 }; 
