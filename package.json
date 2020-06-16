@@ -7,7 +7,9 @@
     "start:dev": "env-cmd -f .env nodemon -r esm ./bin/www",
     "start:prod": "env-cmd -f .env.prod nodemon -r esm ./bin/www",
     "migrate": "knex migrate:latest",
-    "unmigrate": "knex migrate:rollback"
+    "unmigrate": "knex migrate:rollback",
+    "populate": "knex seed:run --specific=populate_data.js",
+    "unpopulate": "knex seed:run --specific=reset_data.js"
   },
   "engines": {
     "node": "10.x"
