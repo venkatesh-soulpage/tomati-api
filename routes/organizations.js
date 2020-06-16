@@ -26,4 +26,15 @@ router.post(
     organizationsController.inviteOrganization,
 );
 
+/* PUT - Change primary location */
+router.put(
+    '/:regional_organization_id/locations/select-primary', 
+    VerifyToken, 
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'REGION', role: 'OWNER'},
+    ]),
+    organizationsController.changePrimaryLocation,
+);
+
 module.exports = router;

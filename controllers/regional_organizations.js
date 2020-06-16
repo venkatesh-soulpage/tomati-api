@@ -74,10 +74,12 @@ const inviteOrganization = async (req, res, next) => {
 
         // Create client locations
         // Validate that there are locations
-        const locations = selected_locations.map(selected => {
+        const locations = selected_locations.map((selected, index) => {
+            const is_primary_location = index < 1;
             return {
                 location_id: selected.id,
                 regional_organization_id: organization.id,
+                is_primary_location
             }
         });
 
@@ -135,11 +137,47 @@ const inviteOrganization = async (req, res, next) => {
 }
 
 
+// PUT - Change primary location
+const changePrimaryLocation = async (req, res, next) => {
+    try {
+        const {account_id, scope} = req;
+        const {regional_organization_id} = req.params;
+        const {regional_organization_location_id} = req.body;
+
+        // Validate roles
+        const collaborator = 
+            await models.Collaborator.query()
+                    .withGraphFetched('organization')
+                    .where('account_id', account_id)
+                    .first();
+
+        if (!collaborator && scope !== 'ADMIN') return res.status(400).json('Invalid Role').send();
+        if (collaborator && collaborator.organization && collaborator.organization.id !== regional_organization_id) return res.status(400).json('Invalid Organization').send();
+
+        // Set all locations to false
+        await models.RegionalOrganizationLocation.query()
+                .where('regional_organization_id', regional_organization_id)
+                .update({is_primary_location: false});
+
+        // Change primary location
+        await models.RegionalOrganizationLocation.query()
+                .update({is_primary_location: true})
+                .where('id', regional_organization_location_id);
+
+        return res.status(200).json('Primary location changed successfully').send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 
 
 const regionalOrganizationController = {
     getOrganizations,
-    inviteOrganization
+    inviteOrganization,
+    changePrimaryLocation
 }
 
 export default regionalOrganizationController;
