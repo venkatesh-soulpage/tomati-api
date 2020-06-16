@@ -5,6 +5,54 @@ exports.seed = async (knex) => {
     /* REMOVE CLIENT */
     // Remove clients
     for (let client of config.CLIENTS) {
+
+        for (let agency of client.agencies) {            
+            // Delete accounts and collaborators.
+            const collaborator_emails = agency.collaborators.map(collaborator => collaborator.account.email);
+            
+            const accounts = 
+                    await knex('accounts')
+                            .whereIn('email', collaborator_emails);
+
+            const account_ids = accounts.map(account => account.id);
+
+            await knex('collaborators')
+                    .whereIn('account_id', account_ids)
+                    .del();
+
+            await knex('accounts')
+                    .whereIn('id', account_ids)
+                    .del();
+
+            // Remove agency
+            await knex('agencies')
+                    .where({
+                        name: agency.agency_data.name,
+                        contact_email: agency.agency_data.contact_email,
+                    })
+                    .del();
+        }
+
+        // Remove Warehouses
+        for (let warehouse of client.warehouses) {
+            await knex('warehouses')
+                    .where({
+                        name: warehouse.name,
+                        address: warehouse.address
+                    })
+                    .del();
+        }
+        
+        // Remove Brands 
+        for (let brand of client.brands) {
+            await knex('brands')
+                    .where({
+                        name: brand.name,
+                        description: brand.description
+                    })
+                    .del();
+        }
+        
         // Remove venues 
         for (let venue of client.venues) {
             await knex('venues')

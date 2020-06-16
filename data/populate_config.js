@@ -128,8 +128,86 @@ module.exports = {
                     latitude: 0,
                     longitude: 0
                 }, 
+            ],
+            brands: [
+                {
+                    name: 'Mezcal Brand',
+                    product_type: 'Mezcal',
+                    product_subtype: 'Mezcal',
+                    description: 'A Mezcal brand'
+                },
+                {
+                    name: 'Tequila Brand',
+                    product_type: 'Tequila',
+                    product_subtype: 'Tequila',
+                    description: 'A Tequila brand'
+                },
+                {
+                    name: 'Gin Brand',
+                    product_type: 'Gin',
+                    product_subtype: 'Gin',
+                    description: 'A Gin brand'
+                },
+            ],
+            warehouses: [
+                {
+                    name: 'Warehouse #1',
+                    address: 'Warehouse #1 Address',
+                },
+                {
+                    name: 'Warehouse #2',
+                    address: 'Warehouse #2 Address'
+                },
+            ], 
+            agencies: [
+                {
+                    agency_data: {
+                        name: 'Nigeria Agency',
+                        description: 'Nigeria Agency Description',
+                        contact_email: 'nigeria_agency@seed.com',
+                        sla_terms: 'Placeholder sla',
+                        sla_hours_before_event_creation: 24,
+                        sla_hours_before_event_update: 24,
+                        sla_accepted: true
+                    },
+                    collaborators: [
+                        {
+                            account: {
+                                first_name: 'Nigeria',
+                                last_name: 'Agency Owner',
+                                email: 'nigeria_agencyowner@seed.com',
+                                phone_number: '17811111111',
+                                is_admin: false,
+                                is_email_verified: true, 
+                                is_age_verified: true,
+                                is_phone_number_verified: true,
+                                password: '12345',
+                            },
+                            role: {
+                                scope: 'AGENCY',
+                                name: 'OWNER',
+                            }
+                        },
+                        {
+                            account: {
+                                first_name: 'Nigeria',
+                                last_name: 'Agency Manager',
+                                email: 'nigeria_agencymanager@seed.com',
+                                phone_number: '17811111111',
+                                is_admin: false,
+                                is_email_verified: true, 
+                                is_age_verified: true,
+                                is_phone_number_verified: true,
+                                password: '12345',
+                            },
+                            role: {
+                                scope: 'AGENCY',
+                                name: 'MANAGER',
+                            }
+                        },
+                    ]
+                }
             ]
-            
         },
         /* {
             client_data: {

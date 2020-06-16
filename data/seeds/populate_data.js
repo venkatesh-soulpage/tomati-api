@@ -129,6 +129,66 @@ exports.seed = async (knex) => {
           await knex('venues')
                   .insert(venue);
         }
+
+        // Add Brands 
+        for (let brand of client.brands) {
+          brand.client_id = Number(client_id);
+          await knex('brands')
+                  .insert(brand);
+        }
+
+        // Add Warehouses
+        for (let warehouse of client.warehouses) {
+          const state = await knex('locations').where('parent_location', location.id).first();
+          warehouse.client_id = Number(client_id);
+          warehouse.location_id = Number(state.id);
+          await knex('warehouses')
+                  .insert(warehouse);
+        }
+
+        // Add Agencies 
+        for (let agency of client.agencies) {
+          const collaborator = await knex('collaborators').where({client_id: Number(client_id)}).first();
+          agency.agency_data.owner_id = collaborator.account_id;
+          agency.agency_data.invited_by = collaborator.client_id;
+          const agency_id =
+            await knex('agencies')
+                  .insert(agency.agency_data)
+                  .returning('id');
+
+          // Add collaborators
+          for (let collaborator of agency.collaborators) {
+            // Get collaborator role
+            const role = 
+              await knex('roles')
+                .where({
+                  scope: collaborator.role.scope,
+                  name: collaborator.role.name
+                })
+                .first();
+        
+            if (role) {
+              // Hash Password
+              const password_hash = await hashPassword(collaborator.account.password);
+              collaborator.account.password_hash = password_hash;
+              delete collaborator.account.password;
+
+              // Create account 
+              const account_id = 
+                await knex('accounts')
+                        .insert(collaborator.account)
+                        .returning('id');
+
+                // Create the collaborator
+                await knex('collaborators')
+                        .insert({
+                            account_id: Number(account_id),
+                            agency_id: Number(agency_id),
+                            role_id: Number(role.id)
+                        })
+              }
+          }
+        }
     }
   }
 
