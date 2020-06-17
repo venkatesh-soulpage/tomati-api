@@ -11,7 +11,9 @@
     "populate_organizations": "knex seed:run --specific=populate_organizations_data.js",
     "reset_organizations": "knex seed:run --specific=reset_organizations_data.js",
     "populate_briefs": "knex seed:run --specific=populate_brief_data.js",
-    "reset_briefs": "knex seed:run --specific=reset_brief_data.js"
+    "reset_briefs": "knex seed:run --specific=reset_brief_data.js",
+    "populate_products": "knex seed:run --specific=populate_products_data.js",
+    "reset_products": "knex seed:run --specific=reset_products_data.js"
   },
   "engines": {
     "node": "10.x"
