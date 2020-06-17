@@ -1,4 +1,4 @@
-const config = require('../populate_config');
+const config = require('../organizations_data');
 const bcrypt = require('bcrypt');
 
 const hashPassword = async (password) => {
