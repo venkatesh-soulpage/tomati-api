@@ -13,7 +13,9 @@
     "populate_briefs": "knex seed:run --specific=populate_brief_data.js",
     "reset_briefs": "knex seed:run --specific=reset_brief_data.js",
     "populate_products": "knex seed:run --specific=populate_products_data.js",
-    "reset_products": "knex seed:run --specific=reset_products_data.js"
+    "reset_products": "knex seed:run --specific=reset_products_data.js",
+    "populate_requisitions": "knex seed:run --specific=populate_requisitions_data.js",
+    "reset_requisitions": "knex seed:run --specific=reset_requisitions_data.js"
   },
   "engines": {
     "node": "10.x"

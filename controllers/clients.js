@@ -81,9 +81,6 @@ const getClients = async (req, res, next) => {
                         .modifyGraph('client_collaborators', builder => {
                             builder.select('id');
                         }) 
-                        /* .modifyGraph('collaborator_invitations', builder => {
-                            builder.where('collaborator_invitations.expiration_date', '>', new Date())
-                        })  */
                         .orderBy('name', 'ASC');
         }   
         

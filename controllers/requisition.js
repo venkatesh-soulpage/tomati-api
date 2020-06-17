@@ -17,28 +17,28 @@ const getRequisitions = async (req, res, next) => {
         
         const {scope, account_id} = req;
 
-        // Validate the collaborators
-        let collaborator;
-        // If client query client collaborators
-        if (scope === 'BRAND') {
-            const client_collaborators = 
-                        await models.ClientCollaborator.query()
-                            .where('account_id', account_id);
-
-            collaborator = client_collaborators[0];
-        } 
-
-        // If agency bring Agency collaborators with client graph
-        if (scope === 'AGENCY') {
-                const agency_collaborators = 
-                        await models.AgencyCollaborator.query()
-                            .where('account_id', account_id)
-                            .withGraphFetched('[client]')
-                            
-            collaborator = agency_collaborators[0];
-        }
+        // Get the collaborators
+        const collaborator =   
+            await models.Collaborator.query()
+                    .withGraphFetched(`[client, agency]`)
+                    .where('account_id', account_id)
+                    .first();
 
         if (!collaborator) return res.status(400).json('Invalid collaborator').send();
+
+        // Get the client briefs
+        const briefs = 
+                await models.Brief.query()
+                        .modify(queryBuilder => {
+                            if (scope === 'AGENCY') {
+                                queryBuilder.where('client_id', collaborator.agency.invited_by);
+                            }
+                            if (scope === 'BRAND') {
+                                queryBuilder.where('client_id', collaborator.client_id)
+                            } 
+                        });
+        
+        const briefs_ids = briefs.map(brief => brief.id);
 
         // Get the requisitions
         const requisitions = 
@@ -66,22 +66,22 @@ const getRequisitions = async (req, res, next) => {
                         ]
                     ]`
                 )
+                .whereIn('brief_id', briefs_ids)
                 .modify((queryBuilder) => {
                     if (scope === 'BRAND') {
                         queryBuilder
                             .whereIn('status', ['SUBMITTED', 'APPROVED', 'DELIVERED']);
                     }
                 })
-                .modify((queryBuilder) => {
+                .modifyGraph((queryBuilder) => {
                     if (scope === 'AGENCY') {
-                        queryBuilder.where('created_by', collaborator.client.id);
+                        queryBuilder.where('brief_id', collaborator.agency.invited_by);
                     }
                     if (scope === 'BRAND') {
-                        queryBuilder.where('created_by', collaborator.client_id)
+                        queryBuilder.where('brief_id', collaborator.client_id)
                     }   
                 })
                 .orderBy('created_at', 'desc')
-                
                 
 
         // Send the briefs
