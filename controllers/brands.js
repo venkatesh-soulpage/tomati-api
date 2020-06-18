@@ -91,9 +91,13 @@ const createBrand = async (req, res, next) => {
         const collaborator =    
                 await models.Collaborator.query()
                         .withGraphFetched(`[
-                            client,
+                            client.[
+                                brands
+                            ],
                             organization.[
-                                clients
+                                clients.[
+                                    brands
+                                ]
                             ]
                         ]`)
                         .where('account_id', account_id)
@@ -106,6 +110,13 @@ const createBrand = async (req, res, next) => {
             if (clients.indexOf(client_id) < 0) return res.status(400).json('Invalid organization').send();
         }
 
+        // Validate brand limit
+        if (collaborator.client && collaborator.client.brands_limit <= collaborator.client.brands.length + 1) return res.status(400).json('Limit exceeded, please contact support@boozeboss.co to increase your limit').send();
+        if (collaborator.organization) {
+            const client = collaborator.organization.clients.find(client => client.id === client_id);
+            if (client.brands_limit <= client.brands.length) return res.status(400).json('Limit exceeded, please contact support@boozeboss.co to increase your limit').send();
+        }
+ 
         const new_brand =  
             await models.Brand.query()
                 .insert({
