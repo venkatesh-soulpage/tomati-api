@@ -566,7 +566,7 @@ const login = async (req, res, next) => {
 
         
         // Validate Expiration Date
-        if (!account.is_admin) {
+        if (!account.is_admin && account.collaborator) {
             if (!account.collaborator) return res.status(401).json('Invalid account').send();
             if (account.collaborator.organization && new Date(account.collaborator.organization.expiration_date).getTime() <= new Date().getTime()) return res.status(403).json('Account expired, please contact support@boozeboss.co').send();
             if (account.collaborator.client && new Date(account.collaborator.client.expiration_date).getTime() <= new Date().getTime()) return res.status(403).json('Account expired, please contact support@boozeboss.co').send();
@@ -575,17 +575,8 @@ const login = async (req, res, next) => {
 
         // Validate by brand if it isn't admin
         if (!scope || !role) {
-
-            const collaborator = 
-                    await models.Collaborator.query()
-                            .withGraphFetched('role')
-                            .where('account_id', account.id)
-                            .first();
-
-            if (!collaborator) return res.status(400).json('Invalid scope').send();
-
-            scope = collaborator.role.scope;
-            role = collaborator.role.name;
+            scope = account.collaborator && collaborator.role.scope;
+            role = account.collaborator && collaborator.role.name;
         }
 
         // Sign token
@@ -593,8 +584,8 @@ const login = async (req, res, next) => {
             {
                 id: account.id, 
                 email: account.email, 
-                scope,
-                role,
+                scope: scope || 'GUEST',
+                role: role || 'REGULAR',
                 is_age_verified: account.is_age_verified
             }, 
             process.env.SECRET_KEY, 

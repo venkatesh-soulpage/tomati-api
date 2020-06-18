@@ -89,8 +89,8 @@ exports.seed = async (knex) => {
       const product = products[product_index];
       const mixer = mixers[mixer_index];
 
-      const random_product_quantity = Math.floor(Math.random() * 10) + 100;
-      const random_mixer_quantity = Math.floor(Math.random() * 10) + 100;
+      const random_product_quantity = randomIntFromInterval(10, 100);
+      const random_mixer_quantity = randomIntFromInterval(10, 100);
 
       const base_price = ((product.base_price / product.metric_amount) * random_product_quantity) + ((mixer.base_price / mixer.metric_amount) * random_mixer_quantity); 
 

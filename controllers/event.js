@@ -51,9 +51,11 @@ const getEvents = async (req, res, next) => {
         // Get brief
         const events = []; 
         await briefs.map(brief => {
-            brief.brief_events.map(be => {
-                events.push(be);
-            })
+            brief.brief_events
+                .filter(be => be.event)
+                .map(be => {
+                    events.push(be);
+                })
         })            
 
         // Send the clientss
