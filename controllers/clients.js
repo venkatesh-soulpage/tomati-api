@@ -205,7 +205,7 @@ const inviteClient = async (req, res, next) => {
 const inviteCollaborator = async (req, res, next) => {
     try {
         const {account_id} = req;
-        const { email, role_id, client_id, name, custom_message } = req.body;
+        const { email, role_id, client_id, display_name, custom_message } = req.body;
 
         if (!email || !role_id || !client_id) return res.status(400).json('Missing fields').send();
 
@@ -307,24 +307,24 @@ const inviteCollaborator = async (req, res, next) => {
 // PUT - Revoke collaborator invitations 
 const revokeCollaboratorInvite = async (req, res, next) => {
     try {
-        const {account_id} = req;
+        const {account_id, scope} = req;
         const {collaborator_invitation_id} = req.params;
 
         // Validate collaborator id 
-        const client_collaborator = 
-                await models.ClientCollaborator.query()
+        const collaborator = 
+                await models.Collaborator.query()
                         .where('account_id', account_id)
                         .first();
             
-        if (!client_collaborator) return res.status(400).json('Invalid collaborator id').send();
+        if (!collaborator && scope !== 'ADMIN') return res.status(400).json('Invalid collaborator id').send();
         
         const collaborator_invitation =
                 await models.CollaboratorInvitation.query()
-                        .findById(collaborator_invitation_id);
+                        .findById(Number(collaborator_invitation_id));
 
         if (!collaborator_invitation) return res.status(400).json('Invalid invitation id').send();
 
-        if (collaborator_invitation.client_id !== client_collaborator.client_id) return res.status(400).json("You're not allowed to do this").send();
+        if (collaborator_invitation.client_id !== collaborator.client_id && scope !== 'ADMIN') return res.status(400).json("You're not allowed to do this").send();
         
         await models.CollaboratorInvitation.query()
                 .deleteById(collaborator_invitation_id);
