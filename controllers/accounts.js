@@ -544,7 +544,8 @@ const login = async (req, res, next) => {
                         client,
                         agency.[
                             client
-                        ]
+                        ],
+                        role
                     ]
                 ]`)
                 .where('email', email)
@@ -575,8 +576,8 @@ const login = async (req, res, next) => {
 
         // Validate by brand if it isn't admin
         if (!scope || !role) {
-            scope = account.collaborator && collaborator.role.scope;
-            role = account.collaborator && collaborator.role.name;
+            scope = account.collaborator && account.collaborator.role.scope;
+            role = account.collaborator && account.collaborator.role.name;
         }
 
         // Sign token
