@@ -324,7 +324,7 @@ const revokeCollaboratorInvite = async (req, res, next) => {
 
         if (!collaborator_invitation) return res.status(400).json('Invalid invitation id').send();
 
-        if (collaborator_invitation.client_id !== collaborator.client_id && scope !== 'ADMIN') return res.status(400).json("You're not allowed to do this").send();
+        if (scope !== 'ADMIN' && collaborator && collaborator_invitation.client_id !== collaborator.client_id) return res.status(400).json("You're not allowed to do this").send();
         
         await models.CollaboratorInvitation.query()
                 .deleteById(collaborator_invitation_id);
