@@ -14,6 +14,8 @@ function randomIntFromInterval(min, max) { // min and max included
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
+var randomSample = function(arr,num){ return arr.map(a => [a,Math.random()]).sort((a,b) => {return a[1] < b[1] ? -1 : 1;}).slice(0,num).map(a => a[0]); }
+
 exports.seed = async (knex) => {
     for (const config_client of config.CLIENTS) {
       // Get data
@@ -52,6 +54,29 @@ exports.seed = async (knex) => {
                   name: 'REGULAR'
                 })
                 .first();
+
+          // Add event products
+          const products =
+                 await knex('products')
+                        .where({
+                          client_id: client.id,
+                          is_cocktail: true,
+                        })
+            
+          const event_products_amount = randomIntFromInterval(1, 5);
+          const random_products = randomSample(products, event_products_amount);
+
+          for (let random_product of random_products) {
+            await knex('event_products')
+                    .insert({
+                      event_id: Number(event_id),
+                      product_id: Number(random_product.id),
+                      price: Math.round(random_product.base_price),
+                      active: true
+                    })
+          }
+
+          
           
           for (let guest_index = 0; guest_index < guest_numbers; guest_index++) {
             // Get collaborator role
