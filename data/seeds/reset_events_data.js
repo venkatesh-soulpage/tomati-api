@@ -15,16 +15,22 @@ exports.seed = async (knex) => {
         // Iterate through all the brief_events and create an actual event
         for (const brief_event of brief_events) {
           // Create a event for each brief event
+          const event = await knex('events').where({brief_event_id: brief_event.id}).first();
           
           // Delete all accounts and event guests related to this event
-          const event_guests = await knex('event_guests').where({brief_event_id: brief_event.id});
+          const event_guests = await knex('event_guests').where({event_id: event.id});
           const account_ids = event_guests.map(eg => eg.account_id);
 
           // Delete all guests
           await knex('event_guests')
-                  .where({brief_event_id: brief_event.id})
+                  .where({event_id: event.id})
                   .del();
             
+          // Delete all wallets
+          await knex('wallets')
+                  .whereIn('account_id', account_ids)
+                  .del();
+
           // Delete all accounts
           await knex('accounts')
                   .whereIn('id', account_ids)

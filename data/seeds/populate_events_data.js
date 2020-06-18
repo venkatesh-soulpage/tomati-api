@@ -64,6 +64,7 @@ exports.seed = async (knex) => {
                 is_email_verified: true, 
                 is_age_verified: true,
                 is_phone_number_verified: true,
+                age_verification_status: 'APPROVED',
                 password: '12345',
             }
 
@@ -77,18 +78,26 @@ exports.seed = async (knex) => {
                       .insert(account)
                       .returning('id');
 
-              // Create the collaborator
-              await knex('event_guests')
-                      .insert({
-                          account_id: Number(account_id),
-                          role_id: Number(role.id),
-                          event_id: Number(event_id),
-                          first_name: account.first_name,
-                          last_name: account.last_name,
-                          email: account.email,
-                          phone_number: account.phone_number,
-                          code: Math.random().toString(36).substring(7).toUpperCase()
-                      })     
+            // Create a wallet
+            await knex('wallets')
+                    .insert({
+                      account_id: Number(account_id),
+                      loyalty_points: 0,
+                      balance: 1000,
+                    })
+
+            // Create the collaborator
+            await knex('event_guests')
+                    .insert({
+                        account_id: Number(account_id),
+                        role_id: Number(role.id),
+                        event_id: Number(event_id),
+                        first_name: account.first_name,
+                        last_name: account.last_name,
+                        email: account.email,
+                        phone_number: account.phone_number,
+                        code: Math.random().toString(36).substring(7).toUpperCase()
+                    })     
           }
         }
       }
