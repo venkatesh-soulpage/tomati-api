@@ -16,6 +16,12 @@ function randomIntFromInterval(min, max) { // min and max included
 
 var randomSample = function(arr,num){ return arr.map(a => [a,Math.random()]).sort((a,b) => {return a[1] < b[1] ? -1 : 1;}).slice(0,num).map(a => a[0]); }
 
+function getRandomCheckoutDate(hours) {
+  let checkout_date = new Date();
+  checkout_date.setHours(checkout_date.getHours() + hours);
+  return checkout_date;
+}
+
 exports.seed = async (knex) => {
     for (const config_client of config.CLIENTS) {
       // Get data
@@ -112,6 +118,10 @@ exports.seed = async (knex) => {
                     })
 
             // Create the collaborator
+            const checked_in = Math.random() >= 0.5;
+            const check_in_time = checked_in ? getRandomCheckoutDate(randomIntFromInterval(1, 3)) : null;
+            const check_out_time = (Math.random() >= 0.5 && check_in_time) ? getRandomCheckoutDate(4, 8) : null;
+            
             await knex('event_guests')
                     .insert({
                         account_id: Number(account_id),
@@ -121,6 +131,9 @@ exports.seed = async (knex) => {
                         last_name: account.last_name,
                         email: account.email,
                         phone_number: account.phone_number,
+                        checked_in,
+                        check_in_time,
+                        check_out_time,
                         code: Math.random().toString(36).substring(7).toUpperCase()
                     })     
           }

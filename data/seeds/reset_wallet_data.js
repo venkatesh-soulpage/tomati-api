@@ -24,6 +24,7 @@ exports.seed = async (knex) => {
         // Iterate through all the brief_events and create an actual event
         for (const brief_event of brief_events) {
           const event = await knex('events').where({brief_event_id: brief_event.id}).first();
+          if (!event) return;
 
           const guests = await knex('event_guests').where({event_id: event.id});
           // Start event 

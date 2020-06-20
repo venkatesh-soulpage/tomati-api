@@ -4,9 +4,11 @@ exports.seed = async (knex) => {
 
     /* REMOVE CLIENT */
     // Remove clients
-    for (let client of config.CLIENTS) {
+    for (let config_client of config.CLIENTS) {
 
-        for (let agency of client.agencies) {            
+        const client = await knex('clients').where({name: config_client.client_data.name}).first();
+        
+        for (let agency of config_client.agencies) {            
             // Delete accounts and collaborators.
             const collaborator_emails = agency.collaborators.map(collaborator => collaborator.account.email);
             
@@ -34,37 +36,23 @@ exports.seed = async (knex) => {
         }
 
         // Remove Warehouses
-        for (let warehouse of client.warehouses) {
-            await knex('warehouses')
-                    .where({
-                        name: warehouse.name,
-                        address: warehouse.address
-                    })
-                    .del();
-        }
+        await knex('warehouses')
+                .where({ client_id: client.id})
+                .del();
+
         
         // Remove Brands 
-        for (let brand of client.brands) {
-            await knex('brands')
-                    .where({
-                        name: brand.name,
-                        description: brand.description
-                    })
-                    .del();
-        }
+        await knex('brands')
+                .where({client_id: client.id})
+                .del();
         
         // Remove venues 
-        for (let venue of client.venues) {
-            await knex('venues')
-                    .where({
-                        name: venue.name,
-                        contact_email: venue.contact_email,
-                    })
-                    .del();
-        }
+        await knex('venues')
+                .where({created_by: client.id})
+                .del();
 
         // Remove collaborators
-        const collaborator_emails = client.collaborators.map(collaborator => collaborator.account.email);
+        const collaborator_emails = config_client.collaborators.map(collaborator => collaborator.account.email);
         const accounts = 
             await knex('accounts')
                     .whereIn('email', collaborator_emails);
@@ -79,11 +67,11 @@ exports.seed = async (knex) => {
                 .whereIn('id', account_ids)
                 .del();
 
-        // Remove client
+        // Remove config_client
         await knex('clients')
                 .where({
-                    name: client.client_data.name,
-                    description: client.client_data.description
+                    name: config_client.client_data.name,
+                    description: config_client.client_data.description
                 })
                 .del();
     }

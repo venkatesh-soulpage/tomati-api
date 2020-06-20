@@ -25,6 +25,7 @@ var eventsRoute = require('./routes/events');
 var verificationsRoute = require('./routes/verifications');
 var pdfRoute = require('./routes/pdf');
 var walletRoute = require('./routes/wallets');
+var analyticsRoute = require('./routes/analytics');
 
 var app = express();
 
@@ -65,6 +66,7 @@ app.use('/api/events', eventsRoute);
 app.use('/api/verifications', verificationsRoute);
 app.use('/api/pdf', pdfRoute);
 app.use('/api/wallets', walletRoute);
+app.use('/api/analytics', analyticsRoute);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
