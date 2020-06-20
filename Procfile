@@ -1,1 +1,1 @@
-web: knex migrate:latest && npm run start 
+web: knex migrate:latest && npm run populate_all && npm run start 
