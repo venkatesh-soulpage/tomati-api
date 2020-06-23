@@ -17,8 +17,18 @@ exports.seed = async (knex) => {
 
     const briefs_ids = briefs.map(brief => brief.id);
     
+    const requisitions = 
+      await knex('requisitions')
+              .whereIn('brief_id', briefs_ids)
+
+    const requisition_ids = requisitions.map(req => req.id);
+      
+    await knex('requisition_orders')
+            .whereIn('requisition_id', requisition_ids)
+            .del();
+
     await knex('requisitions')
-            .whereIn('brief_id', briefs_ids)
+            .whereIn('id', requisition_ids)
             .del();
   }  
 };
