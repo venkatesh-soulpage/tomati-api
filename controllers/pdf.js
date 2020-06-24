@@ -478,10 +478,204 @@ const helloSignPDF = async (requisition_id) => {
     }
 }
 
+/* Event Report */
+const eventReportHeader = async (doc, top) => {
+    const margin_top = 50;
+    doc
+        .fillColor("#444444")
+        .fontSize(16)
+        .text("Marketing Activity Report", 200, margin_top);
+
+    return top + margin_top;
+}
+
+const eventData = async (doc, event, top) => {
+    let margin_top = top + 65;
+
+    doc
+        .fontSize(12)
+        .text("Report date:", 50, margin_top)
+        .font("Helvetica")
+        .text(`${moment().format('DD/MM/YYYY LT')}`, 120, margin_top)
+        .fontSize(12)
+        .font("Helvetica-Bold")
+        .text("Timestamp:", 300, margin_top)
+        .font("Helvetica")
+        .text(`${moment().unix()}`, 370, margin_top)
+    
+    margin_top = margin_top + 30; 
+
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text("Activity:", 50, margin_top)
+        .font("Helvetica")
+        .text(`${event.brief_event.name}`, 120, margin_top)
+    
+    margin_top = margin_top + 30; 
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text("Project:", 50, margin_top)
+        .font("Helvetica")
+        .text(`${event.brief_event.brief.name} (#${event.brief_event.brief.requisition.serial_number})`, 120, margin_top)
+    
+    margin_top = margin_top + 30; 
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text("Created by:", 50, margin_top)
+        .font("Helvetica")
+        .text(`${event.brief_event.brief.client_collaborator.account.first_name} ${event.brief_event.brief.client_collaborator.account.last_name}`, 120, margin_top)
+    
+    margin_top = margin_top + 30; 
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text("Owner:", 50, margin_top)
+        .font("Helvetica")
+        .text(`${event.brief_event.brief.client.name}`, 120, margin_top)
+    
+    margin_top = margin_top + 30; 
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text("Agency:", 50, margin_top)
+        .font("Helvetica")
+        .text(`${event.brief_event.brief.agency.name}`, 120, margin_top)
+    
+    margin_top = margin_top + 30; 
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text("Project Summary:", 50, margin_top)
+
+    margin_top = margin_top + 15; 
+    doc
+        .font("Helvetica")
+        .fontSize(12)
+        .text(event.brief_event.brief.description, 50, margin_top)
+    
+    margin_top = margin_top + 30; 
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text("Activity Summary:", 50, margin_top)
+
+    margin_top = margin_top + 15; 
+    doc
+        .font("Helvetica")
+        .fontSize(12)
+        .text(event.brief_event.comments, 50, margin_top)
+    
+    margin_top = margin_top + 30; 
+    generateHr(doc, margin_top);
+
+    return margin_top;
+}
+
+function generateEventTableRow(doc, y, c1, c2, c3) {
+    doc
+      .fontSize(10)
+      .text(c1, 50, y)
+      .text(c2, 250, y)
+      .text(c3, 450, y)
+      // .text(c4, 370, y, { width: 180, align: 'right'})
+
+    generateHr(doc, y + 15)
+  }
+
+const eventDescription = async (doc, event, top) => {
+     let margin_top = top + 30;
+
+    doc
+        .fontSize(12)
+        .font("Helvetica-Bold")
+        .text(`High level activity summary`, 50, margin_top)
+    
+    margin_top = margin_top + 30; 
+
+    const calculateOrder = (orders) => {
+        const total_order = orders.reduce((acc, curr) => {
+            return acc + Number(curr.units * curr.product.metric_amount);
+        }, 0)
+        return `${(total_order / 1000)} L`;
+    }
+
+    const calculateTotalVolume = (products) => {
+        const actual_volume = products.reduce((pacc, pcurr) => {
+
+            return pacc + Number(pcurr.product.metric_amount * pcurr.transactions.length);
+        }, 0)
+
+        return `${(actual_volume / 1000)} L`;
+    }
+
+    const checkedInGuests = (guests) => {
+        return guests.filter(guest => guest.checked_in).length;
+    }
+    
+    // Generate table row 
+    generateEventTableRow(doc, margin_top, 'Item', 'Briefed', 'Actual');
+    generateEventTableRow(doc, margin_top + 30, 'Event Start Time', moment(event.brief_event.start_time).format('DD/MM/YYYY LT'), moment(event.started_at).format('DD/MM/YYYY LT'));
+    generateEventTableRow(doc, margin_top + 60, 'Event End Time', moment(event.brief_event.end_time).format('DD/MM/YYYY LT'), moment(event.ended_at).format('DD/MM/YYYY LT'));
+    generateEventTableRow(doc, margin_top + 90, 'Volume Depletion', calculateOrder(event.brief_event.brief.requisition.orders), calculateTotalVolume(event.products));
+    generateEventTableRow(doc, margin_top + 120, 'Attendance', event.brief_event.expected_guests, checkedInGuests(event.guests));
+
+    return margin_top;
+}
+
+const eventReport = async (req, res, next) => {
+    try {
+        const { account_id } = req;
+        const { event_id } = req.params;
+
+        const event =
+                await models.Event.query()
+                        .withGraphFetched(`[
+                            brief_event.[
+                                brief.[
+                                    requisition.[
+                                        orders.[
+                                            product
+                                        ]
+                                    ],
+                                    client_collaborator.[
+                                        account
+                                    ],
+                                    client,
+                                    agency
+                                ],
+                            ],
+                            products.[
+                                product,
+                                transactions
+                            ],
+                            guests
+                        ]`)
+                        .where('id', event_id)
+                        .first();
+
+        let doc = new PDFDocument({ margin: 50 });
+
+        let top = 0; 
+        
+        top = await eventReportHeader(doc, top);
+        top = await eventData(doc, event, top);
+        top = await eventDescription(doc, event, top);
+
+        doc.pipe(res)
+        doc.end();
+
+    } catch (e) {
+        console.log(e);
+    }
+}
 
 const pdfController = {
     getRequisitionApprovalPdf,
-    helloSignPDF
+    helloSignPDF,
+    eventReport
 }
 
 export default pdfController;

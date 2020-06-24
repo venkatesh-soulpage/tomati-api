@@ -96,6 +96,14 @@ export default class Client extends Model {
             to: 'warehouses.client_id'
           }
         },
+        briefs: {
+          relation: Model.HasManyRelation,
+          modelClass: models.Brief,
+          join: {
+            from: 'clients.id',
+            to: 'briefs.client_id'
+          }
+        }
       }
     }
   }

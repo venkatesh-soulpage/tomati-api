@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 import eventsController from '../controllers/event';
+import pdfController from '../controllers/pdf';
 import VerifyToken from '../utils/verification'
 import VerifyRole from '../utils/verification_role'
 
@@ -15,6 +16,16 @@ router.get(
     eventsController.getEvents
 );
 
+/* GET - Get a list of client organizations */
+router.get(
+    '/organization', 
+    VerifyToken, 
+    VerifyRole([
+        {scope: 'REGION', role: 'OWNER'},   
+    ]),
+    eventsController.getOrganizationEvents
+);
+
 /* PATCH - Update a field of an event */
 router.patch(
     '/:event_id', 
@@ -24,6 +35,19 @@ router.patch(
         {scope: 'AGENCY', role: 'MANAGER'},
     ]),
     eventsController.updateEventField
+);
+
+/* GET - Get event pdf report */
+router.get(
+    '/:event_id/report', 
+    VerifyToken, 
+    VerifyRole([
+        {scope: 'REGION', role: 'OWNER'},
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+        {scope: 'AGENCY', role: 'OWNER'},
+    ]),
+    pdfController.eventReport
 );
 
 /* GET - Get a list of client organizations */
