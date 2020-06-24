@@ -622,6 +622,176 @@ const eventDescription = async (doc, event, top) => {
     generateEventTableRow(doc, margin_top + 90, 'Volume Depletion', calculateOrder(event.brief_event.brief.requisition.orders), calculateTotalVolume(event.products));
     generateEventTableRow(doc, margin_top + 120, 'Attendance', event.brief_event.expected_guests, checkedInGuests(event.guests));
 
+    return margin_top + 120;
+}
+
+const eventAttendance = (doc, event, top) => {
+
+    const calculate_gender_amount = (guests, gender) => {
+        return guests.filter(guest => guest.check_in_time && guest.account && guest.account.gender === gender).length;
+    }
+
+    const calculate_gender_average_date = (guests, gender) => {
+        const gender_guests = guests.filter(guest => guest.check_in_time && guest.account && guest.account.gender === gender);
+        const gender_age_amount = gender_guests.reduce((acc, curr) => {
+            return acc +  Number(moment(curr.account.date_of_birth, "MM/DD/YYYY").fromNow().split(" ")[0]);
+        }, 0)
+
+        return gender_guests.length > 0 ? Math.round(gender_age_amount / gender_guests.length) : 0;
+    }
+
+    const average_duration = (event) => {
+        const {guests} = event;
+        const checked_in_guests = guests.filter(guest => guest.check_in_time);
+        const total_time = checked_in_guests.reduce((acc, curr) => {
+            const start_time = moment(curr.check_in_time);
+            const end_time = curr.check_out_time ? moment(curr.check_out_time) : moment(event.ended_at);
+        
+            const duration = moment.duration(end_time.diff(start_time));
+
+            return acc + Number(duration.asMinutes());
+        }, 0);
+
+        return Math.round(total_time / checked_in_guests.length );
+    }
+
+    const most_check_ins = (event) => {
+        const start_time = moment(event.started_at);
+        const end_time = moment(event.ended_at);
+        const duration = moment.duration(end_time.diff(start_time));
+        const hours = Math.round(duration.asHours());
+
+        const ranges = [];
+        for (let hour = 0; hour < hours; hour++) {
+            // Calculate range and add hours
+            const low_range = moment(event.started_at).add(hour, 'hours');
+            const upper_range = moment(event.started_at).add(hour + 1, 'hours');
+            const checked_in_guests = event.guests.filter(guest => {
+                const was_on_event = guest.check_in_time ;
+                const check_in_before_upper_range = moment.duration(upper_range.diff(moment(guest.check_in_time))).asMinutes() < 60;
+                const check_in_after_lower_range = moment.duration(moment(guest.check_in_time).diff(low_range)).asMinutes() < 60;
+                
+                return was_on_event && check_in_before_upper_range && check_in_after_lower_range;
+            })
+
+            ranges.push({
+                time: `${low_range.format('DD/MM/YYYY LT')} - ${upper_range.format('DD/MM/YYYY LT')}`,
+                amount: checked_in_guests.length
+            })
+        }
+
+        const best_hour = ranges.sort( 
+            function(a, b) {
+               return parseFloat(b['amount']) - parseFloat(a['amount']);
+            }
+          )[0];
+
+        return `${best_hour.time} : ${best_hour.amount} guests`;
+    }
+
+    const most_check_outs = (event) => {
+        const start_time = moment(event.started_at);
+        const end_time = moment(event.ended_at);
+        const duration = moment.duration(end_time.diff(start_time));
+        const hours = Math.round(duration.asHours());
+
+        const ranges = [];
+        for (let hour = 0; hour < hours; hour++) {
+            // Calculate range and add hours
+            const low_range = moment(event.started_at).add(hour, 'hours');
+            const upper_range = moment(event.started_at).add(hour + 1, 'hours');
+            const checked_out_guests = event.guests.filter(guest => {
+                const check_out_time = guest.check_out_time ? moment(guest.check_out_time) : moment(event.ended_at).add(-5, 'minutes');
+                const was_on_event = guest.check_in_time;
+                const check_out_before_upper_range = moment.duration(upper_range.diff(check_out_time)).asMinutes() < 60;
+                const check_out_after_lower_range = moment.duration(check_out_time.diff(low_range)).asMinutes() < 60;
+                
+                return was_on_event && check_out_before_upper_range && check_out_after_lower_range;
+            })
+
+            ranges.push({
+                time: `${low_range.format('DD/MM/YYYY LT')} - ${upper_range.format('DD/MM/YYYY LT')}`,
+                amount: checked_out_guests.length
+            })
+        }
+
+        const best_hour = ranges.sort( 
+            function(a, b) {
+               return parseFloat(b['amount']) - parseFloat(a['amount']);
+            }
+          )[0];
+
+        return `${best_hour.time} : ${best_hour.amount} guests`;
+    }
+
+    let margin_top = top + 45;
+    
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text("Attendance Details", 50, margin_top);
+
+    margin_top = margin_top + 30;
+
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text("Gender Distribution:", 50, margin_top)
+        .font("Helvetica")
+        .text(
+            `${calculate_gender_amount(event.guests, 'MALE')} M | ${calculate_gender_amount(event.guests, 'FEMALE')} F | ${calculate_gender_amount(event.guests, 'OTHER')} O`, 
+            200, 
+            margin_top
+        )
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text("Age Distribution", 350, margin_top)
+        .font("Helvetica")
+        .text(
+            `${calculate_gender_average_date(event.guests, 'MALE')} M | ${calculate_gender_average_date(event.guests, 'FEMALE')} F | ${calculate_gender_average_date(event.guests, 'OTHER')} O`, 
+            450, 
+            margin_top
+        );
+
+    margin_top = margin_top + 15;
+
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text("Average Duration:", 50, margin_top)
+        .font("Helvetica")
+        .text(
+            `${average_duration(event)} minutes`,
+            200, 
+            margin_top
+        )
+    
+    margin_top = margin_top + 15;
+
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text("Attendance Peak", 50, margin_top)
+        .font("Helvetica")
+        .text(
+            `${most_check_ins(event)}`,
+            200, 
+            margin_top
+        )
+    
+    margin_top = margin_top + 15;
+
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text("Attendance Dwindled", 50, margin_top)
+        .font("Helvetica")
+        .text(
+            `${most_check_outs(event)}`,
+            200, 
+            margin_top
+        )
+
     return margin_top;
 }
 
@@ -651,7 +821,9 @@ const eventReport = async (req, res, next) => {
                                 product,
                                 transactions
                             ],
-                            guests
+                            guests.[
+                                account
+                            ]
                         ]`)
                         .where('id', event_id)
                         .first();
@@ -663,6 +835,7 @@ const eventReport = async (req, res, next) => {
         top = await eventReportHeader(doc, top);
         top = await eventData(doc, event, top);
         top = await eventDescription(doc, event, top);
+        top = await eventAttendance(doc, event, top);
 
         doc.pipe(res)
         doc.end();

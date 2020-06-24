@@ -85,6 +85,12 @@ exports.seed = async (knex) => {
           
           
           for (let guest_index = 0; guest_index < guest_numbers; guest_index++) {
+
+            // Random gender
+            const gender = Math.random() > 0.5 ? 'MALE' : 'FEMALE';
+            const age = randomIntFromInterval(18,40);
+            const date_of_birth = new Date().setFullYear(new Date().getFullYear() - age);
+
             // Get collaborator role
             let account = {
                 first_name: faker.name.firstName(),
@@ -97,6 +103,8 @@ exports.seed = async (knex) => {
                 is_phone_number_verified: true,
                 age_verification_status: 'APPROVED',
                 password: '12345',
+                gender,
+                date_of_birth: new Date(date_of_birth),
             }
 
             const password_hash = await hashPassword(account.password);

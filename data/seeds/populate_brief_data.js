@@ -20,7 +20,6 @@ exports.seed = async (knex) => {
     const collaborator = 
       await knex('collaborators')
               .where({client_id: client.id})
-              .join('accounts', {'collaborators.account_id': 'accounts.id'})
               .first();
 
     // Add 3 briefs to each client
@@ -28,7 +27,7 @@ exports.seed = async (knex) => {
     for (let i = 0; i < 5; i++) {
       const brief = {
         client_id: client.id,
-        created_by: collaborator.account_id,
+        created_by: collaborator.id,
         agency_id: agency.id,
         name: faker.lorem.words(),
         description: faker.lorem.sentence(),
