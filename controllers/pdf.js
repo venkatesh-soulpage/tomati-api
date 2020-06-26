@@ -795,6 +795,431 @@ const eventAttendance = (doc, event, top) => {
     return margin_top;
 }
 
+const eventConsumption = async (doc, event, top) => {
+    let margin_top = 50;
+    const demographics = [
+        {name: 'Boomer', min_age: 56, max_age: 76},
+        {name: 'Gen X', min_age: 41, max_age: 55},
+        {name: 'Millenials Y2', min_age: 30, max_age: 40},
+        {name: 'Millenials Y1', min_age: 25, max_age: 29 },
+        {name: 'Gen Z', min_age: 18, max_age: 24 },
+    ]
+
+
+    const getDemographicMetrics = (transactions, demographic, gender ) => {
+        const total_transactions = transactions.length;
+        const gender_transactions = transactions.filter(transaction => transaction.wallet.account.gender === gender);
+        
+        const demographic_group = demographics.find(demographic_value => demographic_value.name === demographic);
+        
+        const demographic_transactions = gender_transactions.filter((gender_transaction) => {
+            const age = Number(moment(gender_transaction.wallet.account.date_of_birth, "MM/DD/YYYY").fromNow().split(" ")[0]);
+            const is_inside_demographic = demographic_group.min_age <= age && demographic_group.max_age >= age;
+            return is_inside_demographic;
+        })
+        return gender_transactions.length < 1 ? `0% ${gender}` : `${Math.round(demographic_transactions.length / total_transactions * 10000) / 100}% ${gender}`;
+
+    }
+
+    const getDemographicTotals = (products, demographic) => {
+        const all_transactions = [];
+        products.map(product => {
+            product.transactions.map(tx => all_transactions.push(tx));
+        });
+
+        const demographic_group = demographics.find(demographic_value => demographic_value.name === demographic);
+
+        const demographic_transactions = 
+            all_transactions.filter(tx => {
+                const age = Number(moment(tx.wallet.account.date_of_birth, "MM/DD/YYYY").fromNow().split(" ")[0]);
+                const is_inside_demographic = demographic_group.min_age <= age && demographic_group.max_age >= age;
+                return is_inside_demographic;
+            })
+
+        if (all_transactions.length < 1) return `0%`; 
+        return demographic_transactions.length < 1 ? `0%` : `${Math.round(demographic_transactions.length / all_transactions.length * 10000) / 100}%`;
+
+    }
+
+    doc.addPage();
+
+    // Make demographic consumption 
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(10)
+        .text('Demographic Group', 50, margin_top)
+        .text('Gen Z', 200, margin_top)
+        .text('Millenial Y1', 275, margin_top)
+        .text('Millenial Y2', 350, margin_top)
+        .text('Gen X', 425, margin_top)
+        .text('Boomer', 500, margin_top)
+    
+    margin_top = margin_top + 15;
+    generateHr(doc, margin_top);
+
+    for (let product_index = 0; product_index < event.products.length; product_index++) {
+        
+        margin_top = margin_top + 60;
+
+        doc
+            .font("Helvetica-Bold")
+            .fontSize(10)
+            .text(event.products[product_index].product.name, 50, margin_top - 45, {
+                width: 130,
+                align: 'left'
+            })
+            .font("Helvetica")
+            .fontSize(8)
+            .text(getDemographicMetrics(event.products[product_index].transactions, 'Gen Z', 'MALE'), 200, margin_top - 45)
+            .text(getDemographicMetrics(event.products[product_index].transactions, 'Gen Z', 'FEMALE'), 200, margin_top -30)
+            .text(getDemographicMetrics(event.products[product_index].transactions, 'Gen Z', 'OTHER'), 200, margin_top - 15)
+            .text(getDemographicMetrics(event.products[product_index].transactions, 'Millenials Y1', 'MALE'), 275, margin_top - 45)
+            .text(getDemographicMetrics(event.products[product_index].transactions, 'Millenials Y1', 'FEMALE'), 275, margin_top -30)
+            .text(getDemographicMetrics(event.products[product_index].transactions, 'Millenials Y1', 'OTHER'), 275, margin_top - 15)
+            .text(getDemographicMetrics(event.products[product_index].transactions, 'Millenials Y2', 'MALE'), 350, margin_top - 45)
+            .text(getDemographicMetrics(event.products[product_index].transactions, 'Millenials Y2', 'FEMALE'), 350, margin_top -30)
+            .text(getDemographicMetrics(event.products[product_index].transactions, 'Millenials Y2', 'OTHER'), 350, margin_top - 15)
+            .text(getDemographicMetrics(event.products[product_index].transactions, 'Gen X', 'MALE'), 425, margin_top - 45)
+            .text(getDemographicMetrics(event.products[product_index].transactions, 'Gen X', 'FEMALE'), 425, margin_top -30)
+            .text(getDemographicMetrics(event.products[product_index].transactions, 'Gen X', 'OTHER'), 425, margin_top - 15)
+            .text(getDemographicMetrics(event.products[product_index].transactions, 'Boomer', 'MALE'), 500, margin_top - 45)
+            .text(getDemographicMetrics(event.products[product_index].transactions, 'Boomer', 'FEMALE'), 500, margin_top -30)
+            .text(getDemographicMetrics(event.products[product_index].transactions, 'Boomer', 'OTHER'), 500, margin_top - 15)
+
+        
+        margin_top = margin_top + 10;
+        generateHr(doc, margin_top);
+    }
+
+    margin_top = margin_top + 50;
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(10)
+        .text('Total', 50, margin_top - 30, {
+            width: 130,
+            align: 'left'
+        })
+        .fontSize(8)
+        .text(getDemographicTotals(event.products, 'Gen Z'), 200, margin_top - 30)
+        .text(getDemographicTotals(event.products, 'Millenials Y1'), 275, margin_top - 30)
+        .text(getDemographicTotals(event.products, 'Millenials Y2'), 350, margin_top - 30)
+        .text(getDemographicTotals(event.products, 'Gen X'), 425, margin_top - 30)
+        .text(getDemographicTotals(event.products, 'Boomer'), 500, margin_top - 30)
+}
+
+const eventSales = async (doc, event, top) => {
+    let margin_top = 50;
+
+    const demographics = [
+        {name: 'Boomer', min_age: 56, max_age: 76},
+        {name: 'Gen X', min_age: 41, max_age: 55},
+        {name: 'Millenials Y2', min_age: 30, max_age: 40},
+        {name: 'Millenials Y1', min_age: 25, max_age: 29 },
+        {name: 'Gen Z', min_age: 18, max_age: 24 },
+    ]
+
+    const most_profitable_demographic = (event) => {
+        const all_transactions = [];
+        event.products.map(product => {
+            product.transactions.map(tx => all_transactions.push(tx));
+        });
+
+        const available_demographics = [ 'Gen Z', 'Millenials Y1', 'Millenials Y2', 'Gen X', 'Boomer'];
+        const available_gender = ['MALE', 'FEMALE', 'OTHER'];
+
+        const calculated_values = [];
+
+        for (const available_demographic of available_demographics) {
+            for (const gender of available_gender) {
+                const demographic_group = demographics.find(demographic_value => demographic_value.name === available_demographic);
+
+                const demographic_transactions = 
+                    all_transactions
+                        .filter(tx => tx.wallet.account.gender === gender)
+                        .filter(tx => {
+                            const age = Number(moment(tx.wallet.account.date_of_birth, "MM/DD/YYYY").fromNow().split(" ")[0]);
+                            const is_inside_demographic = demographic_group.min_age <= age && demographic_group.max_age >= age;
+                            return is_inside_demographic;
+                        });
+                
+                const total_consumption = 
+                        demographic_transactions
+                            .reduce((acc, curr) => {
+                                return acc + Number(curr.event_product.price);
+                            }, 0);
+                
+                calculated_values.push({ name: `${demographic_group.name} (${gender})`, total_consumption });
+            }
+        }
+
+        const max = calculated_values.sort( 
+            function(a, b) {
+               return parseFloat(b['total_consumption']) - parseFloat(a['total_consumption']);
+            }
+        )[0]
+
+        return `${max.name} : ${max.total_consumption} credits`;
+    }
+
+    const less_profitable_demographic = (event) => {
+        const all_transactions = [];
+        event.products.map(product => {
+            product.transactions.map(tx => all_transactions.push(tx));
+        });
+
+        const available_demographics = [ 'Gen Z', 'Millenials Y1', 'Millenials Y2', 'Gen X', 'Boomer'];
+        const available_gender = ['MALE', 'FEMALE', 'OTHER'];
+
+        const calculated_values = [];
+
+        for (const available_demographic of available_demographics) {
+            for (const gender of available_gender) {
+                const demographic_group = demographics.find(demographic_value => demographic_value.name === available_demographic);
+
+                const demographic_transactions = 
+                    all_transactions
+                        .filter(tx => tx.wallet.account.gender === gender)
+                        .filter(tx => {
+                            const age = Number(moment(tx.wallet.account.date_of_birth, "MM/DD/YYYY").fromNow().split(" ")[0]);
+                            const is_inside_demographic = demographic_group.min_age <= age && demographic_group.max_age >= age;
+                            return is_inside_demographic;
+                        });
+                
+                const total_consumption = 
+                        demographic_transactions
+                            .reduce((acc, curr) => {
+                                return acc + Number(curr.event_product.price);
+                            }, 0);
+                
+                if (total_consumption > 0) {
+                    calculated_values.push({ name: `${demographic_group.name} (${gender})`, total_consumption });
+                }
+                
+            }
+        }
+
+        const min = calculated_values.sort( 
+            function(a, b) {
+               return parseFloat(a['total_consumption']) - parseFloat(b['total_consumption']);
+            }
+        )[0]
+
+        return `${min.name} : ${min.total_consumption} credits`;
+    }
+
+    const most_profitable_hour = (event) => {
+
+        const all_transactions = [];
+        event.products.map(product => {
+            product.transactions.map(tx => all_transactions.push(tx));
+        });
+
+        const start_time = moment(event.started_at);
+        const end_time = moment(event.ended_at);
+        const duration = moment.duration(end_time.diff(start_time));
+        const hours = Math.round(duration.asHours());
+
+        const ranges = [];
+        for (let hour = 0; hour < hours; hour++) {
+            // Calculate range and add hours
+            const low_range = moment(event.started_at).add(hour, 'hours');
+            const upper_range = moment(event.started_at).add(hour + 1, 'hours');
+            const products_sold = all_transactions.filter(tx => {
+                const sold_before_upper_range = moment.duration(upper_range.diff(moment(tx.created_at))).asMinutes() < 60;
+                const sold_after_lower_range = moment.duration(moment(tx.created_at).diff(low_range)).asMinutes() < 60;
+                
+                return sold_before_upper_range && sold_after_lower_range;
+            })
+
+            ranges.push({
+                time: `${low_range.format('DD/MM/YYYY LT')} - ${upper_range.format('DD/MM/YYYY LT')}`,
+                amount: products_sold.length
+            })
+        }
+
+        const best_hour = ranges.sort( 
+            function(a, b) {
+               return parseFloat(b['amount']) - parseFloat(a['amount']);
+            }
+          )[0];
+
+        return `${best_hour.time} : ${best_hour.amount} products sold`;
+    }
+    
+    doc.addPage();
+
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text('Menu Item', 50, margin_top)
+        .text('Sales (Units)', 275, margin_top)
+        .text('Sales (Value)', 425, margin_top)
+
+    margin_top = margin_top + 15;
+    generateHr(doc, margin_top);
+
+    for (const product of event.products) {
+        margin_top = margin_top + 30;
+
+        doc
+            .font("Helvetica")
+            .fontSize(12)
+            .text(product.product.name, 50, margin_top - 15, { width: 200, align: 'left'})
+            .text(product.transactions.length, 275, margin_top - 15, { width: 75, align: 'center'})
+            .text(product.price * product.transactions.length, 425, margin_top - 15, { width: 75, align: 'center'})
+
+        margin_top = margin_top + 20;
+        generateHr(doc, margin_top);
+    }
+
+    margin_top = margin_top + 30; 
+
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text("Most profitable demographic:", 50, margin_top)
+        .font("Helvetica")
+        .text(
+            `${most_profitable_demographic(event)}`,
+            270, 
+            margin_top
+        )
+    
+    margin_top = margin_top + 30; 
+
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text("Less profitable demographic:", 50, margin_top)
+        .font("Helvetica")
+        .text(
+            `${less_profitable_demographic(event)}`,
+            270, 
+            margin_top
+        )
+    margin_top = margin_top + 30; 
+
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text("Most profitable hour:", 50, margin_top)
+        .font("Helvetica")
+        .text(
+            `${most_profitable_hour(event)}`,
+            270, 
+            margin_top
+        )
+
+    return margin_top;
+}
+
+const eventStock = (doc, event, products, top) => {
+    const get_unique_brands = (event) => {
+        const {orders} = event.brief_event;
+
+        // Filter the products for the brand
+        // Products for brands
+        const category_products = 
+                orders
+                    .filter(order => !order.product.is_cocktail)
+                    .map(order => order.product_id);
+            
+        const cocktail_products_id = [];
+        orders   
+            .filter(order => order.product.is_cocktail)
+            .map(order => {
+                order.product.ingredients.map(ing => {
+                    cocktail_products_id.push(ing.product_id);
+                })
+            })   
+
+        const all_ids = [...category_products, ...cocktail_products_id];
+        return [...new Set(all_ids)];
+    }
+
+    const getCurrentUnits = (event, product_id) => {
+        const {orders} = event.brief_event;
+        
+        const currentUnits = orders.reduce((acc, curr) => {
+
+            const ingredient_ids = curr.product.ingredients.map(ing => ing.product_id);
+
+            if ( product_id === curr.product_id ) {
+                return Number(acc) + Number(curr.units);
+            } else if ( ingredient_ids.indexOf(product_id) > -1 ){
+                // Calculate bottles from units
+                const ingredient = curr.product.ingredients.find(ing => ing.product_id === product_id );
+                const totalml = ingredient.quantity * curr.units;
+                const totalUnits = Math.round(totalml / curr.product.metric_amount); 
+                return acc + totalUnits;
+            } else {
+                return acc;
+            }
+        }, 0);
+
+        return currentUnits;
+    }
+
+    const get_brand_consumption = (event, product) => {
+        // Get the correct consumption
+        const products = event.products.filter(event_product => {
+            const is_brand = event_product.product_id === product.id;
+            const ingredients_ids = event_product.product.ingredients.map(ing => ing.product_id);
+            const has_ingredient = ingredients_ids.indexOf(product.id) > -1;
+            return is_brand || has_ingredient;
+        })
+
+        const total_metric_amount = 
+            products.reduce((acc, curr) => {
+                if (!curr.product.is_cocktail) {
+                    return acc + Number(curr.product.metric_amount);
+                } else if (curr.product.is_cocktail) {
+                    const ingredient = curr.product.ingredients.find(ing => ing.product_id === product.id);
+                    if (ingredient) {
+                        return acc + Number(ingredient.quantity);
+                    }
+                } else {
+                    return acc;
+                }
+            }, 0);
+
+
+        const units = total_metric_amount / product.metric_amount;
+        return units;
+        
+    }
+
+    const unique_brands = get_unique_brands(event);
+
+    let margin_top = top + 60;
+
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(10)
+        .text('Menu Item', 50, margin_top)
+        .text('Opening Stock', 250, margin_top)
+        .text('Consumption', 350, margin_top)
+        .text('Closing Stock', 450, margin_top)
+
+    margin_top = margin_top + 15;
+    generateHr(doc, margin_top)
+
+    
+    for (const brand of unique_brands) {
+        margin_top = margin_top + 30;
+        const current_brand = products.find(prod => brand === prod.id);
+
+        doc
+        .font("Helvetica")
+        .fontSize(10)
+        .text(current_brand.name, 50, margin_top)
+        .text(getCurrentUnits(event, current_brand.id), 250, margin_top)
+        .text(get_brand_consumption(event, current_brand), 350, margin_top)
+        .text(getCurrentUnits(event, current_brand.id) - get_brand_consumption(event, current_brand), 450, margin_top)
+    }
+
+}
+
 const eventReport = async (req, res, next) => {
     try {
         const { account_id } = req;
@@ -816,17 +1241,33 @@ const eventReport = async (req, res, next) => {
                                     client,
                                     agency
                                 ],
+                                orders.[
+                                    product.[
+                                        ingredients
+                                    ]
+                                ]
                             ],
                             products.[
-                                product,
-                                transactions
+                                product.[
+                                    ingredients
+                                ],
+                                transactions.[
+                                    wallet.[
+                                        account
+                                    ],
+                                    event_product
+                                ]
                             ],
                             guests.[
                                 account
-                            ]
+                            ],
                         ]`)
                         .where('id', event_id)
                         .first();
+
+        const products = 
+            await models.Product.query()
+                        .where({client_id: event.brief_event.brief.client_id});
 
         let doc = new PDFDocument({ margin: 50 });
 
@@ -836,6 +1277,9 @@ const eventReport = async (req, res, next) => {
         top = await eventData(doc, event, top);
         top = await eventDescription(doc, event, top);
         top = await eventAttendance(doc, event, top);
+        top = await eventConsumption(doc, event, top);
+        top = await eventSales(doc, event, top);
+        top = await eventStock(doc, event, products, top);
 
         doc.pipe(res)
         doc.end();
