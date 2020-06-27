@@ -26,6 +26,17 @@ router.get(
     eventsController.getOrganizationEvents
 );
 
+/* GET - Get a list of client */
+router.get(
+    '/client', 
+    VerifyToken, 
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},    
+        {scope: 'BRAND', role: 'MANAGER'},   
+    ]),
+    eventsController.getClientEvents
+);
+
 /* PATCH - Update a field of an event */
 router.patch(
     '/:event_id', 

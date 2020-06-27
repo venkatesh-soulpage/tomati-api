@@ -134,6 +134,12 @@ const organizationSignup = async (req, res, next) => {
                     refresh_token
                 });
 
+        // Add a new wallet for the organization collaborator
+        await models.Wallet.query()
+                    .insert({
+                        account_id: new_account.id,
+                    })
+
         // Delete confirmation token
         await models.Token.query()
                 .delete()
@@ -240,6 +246,12 @@ const clientSignup = async (req, res, next) => {
                     refresh_token
                 });
 
+        // Add wallet to client account
+        await models.Wallet.query()
+            .insert({
+                account_id: new_account.id,
+            })
+
         // Update the Client organization owner_id
         if (decoded.scope === 'BRAND' && decoded.name === 'OWNER') {
             
@@ -345,6 +357,12 @@ const agencySignup = async (req, res, next) => {
                     is_age_verified: true,
                     refresh_token
                 });
+
+        // Add wallet to client account
+        await models.Wallet.query()
+            .insert({
+                account_id: new_account.id,
+            })
 
         // Update the Client organization owner_id
         if (decoded.scope === 'AGENCY' && decoded.name === 'OWNER') {

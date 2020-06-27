@@ -54,11 +54,50 @@ const getOrganizationEvents = async (req, res, next) => {
     }
 }
 
+// GET - Get clients events 
+const getClientEvents = async (req, res, next) => {
+    try {
+        const {account_id} = req;
+
+        // Validate collaborator
+        const collaborator =
+                await models.Collaborator.query()
+                        .withGraphFetched('client')
+                        .where('account_id', account_id)
+                        .first();
+
+        if (!collaborator || !collaborator.client) return res.status(400).json('Invalid collaborator').send();
+
+        const client = 
+            await models.Client.query()
+                    .withGraphFetched(`[
+                        briefs.[
+                            brief_events.[
+                                event
+                            ]
+                        ]
+                    ]`)
+                    .where('id', collaborator.client.id)
+                    .first();
+        
+        const events = [];
+        client.briefs.map(brief => {
+            brief.brief_events
+                    .filter(brief_event => {
+                        return brief_event.event && new Date(brief_event.event.ended_at).getTime() <= new Date().getTime()
+                    })
+                    .map(brief_event => events.push(brief_event));
+        })
+
+        return res.status(200).send(events);
+    } catch (e) {
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 // GET - Get a list of venues
 const getEvents = async (req, res, next) => {
-    
     try {    
-
         const {account_id} = req;
     
         // Validate the account is a client collaborator
@@ -605,6 +644,7 @@ const getEventStats = async (req, res, next) => {
 
 const eventsController = {
     getEvents,
+    getClientEvents,
     getOrganizationEvents,
     getEvent,
     updateEventField,
