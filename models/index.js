@@ -25,6 +25,7 @@ import RequisitionDelivery from './requisition_delivery';
 import RequisitionDeliveryProduct from './requisition_delivery_product';
 import Event from './event';
 import EventGuest from './event_guest';
+import EventCondition from './event_free_drinks_conditions';
 import VerificationAttachment from './verification_attachment';
 import Wallet from './wallet';
 import EventProduct from './event_product';
@@ -64,6 +65,7 @@ export default {
     RequisitionDeliveryProduct,
     Event,
     EventGuest,
+    EventCondition,
     VerificationAttachment,
     Wallet,
     EventProduct, 

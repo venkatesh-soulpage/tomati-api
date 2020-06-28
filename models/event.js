@@ -20,6 +20,14 @@ export default class Event extends Model {
             to: 'briefs.id'
           }
         },
+        condition: {
+          relation: Model.HasOneRelation,
+          modelClass: models.EventCondition,
+          join: {
+            from: 'events.id',
+            to: 'event_free_drinks_conditions.event_id'
+          }
+        },
         brief_event: {
           relation: Model.HasOneRelation,
           modelClass: models.BriefEvent,

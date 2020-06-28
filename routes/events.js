@@ -203,6 +203,17 @@ router.delete(
     eventsController.revokeEventGuest
 );
 
+// POST - Add event condition
+router.post(
+    '/:event_id/condition',
+    VerifyToken,
+    VerifyRole([
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
+    eventsController.addEventCondition
+)
+
 // Stats
 router.get(
     '/:event_id/stats',

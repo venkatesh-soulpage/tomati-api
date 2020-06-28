@@ -124,7 +124,8 @@ const getEvents = async (req, res, next) => {
                                 ],
                                 products.[
                                     product
-                                ]
+                                ],
+                                condition
                             ], 
                             venue
                         ]
@@ -642,6 +643,32 @@ const getEventStats = async (req, res, next) => {
     }
 }
 
+// Add event condition 
+const addEventCondition = async (req, res, next) => {
+    try {
+
+        const {event_id} = req.params;
+        const {condition_type, end_time, gender, limit, max_age, min_age, start_time} = req.body;
+
+        // Delete conditions for this event
+        await models.EventCondition.query()
+                .where({id: event_id})
+                .del();
+        
+        await models.EventCondition.query()
+                .insert({
+                    event_id,
+                    condition_type, end_time, gender, limit, max_age, min_age, start_time
+                })
+
+        return res.status(200).json('Condition created').send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();  
+    }
+}
+
 const eventsController = {
     getEvents,
     getClientEvents,
@@ -658,7 +685,8 @@ const eventsController = {
     redeemCode, 
     addEventProduct, 
     removeEventProduct,
-    getEventStats
+    getEventStats,
+    addEventCondition
 }
 
 export default eventsController;
