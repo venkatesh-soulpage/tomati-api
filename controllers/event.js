@@ -318,7 +318,14 @@ const getGuestEvents = async (req, res, next) => {
         // Get the events where the user is a guest
         const guest_of_events = 
                 await models.EventGuest.query()
-                    .withGraphFetched('[event.[brief_event.[venue]]]')
+                    .withGraphFetched(`[
+                        event.[
+                            brief_event.[
+                                venue
+                            ], 
+                            condition
+                        ]
+                    ]`)
                     .where('account_id', account_id)
                     .orderBy('created_at', 'DESC');        
 
@@ -605,6 +612,28 @@ const removeEventProduct = async (req, res, next) => {
     }
 }
 
+const updateEventProduct = async (req, res, next) => {
+    try {
+        const {event_id, event_product_id } = req.params;
+        const {field, value} = req.body;
+
+        await models.EventProduct.query()
+                .patch({
+                    [field]: value
+                })
+                .where({
+                    id: event_product_id,
+                    event_id,
+                });
+
+        return res.status(200).json('Update product').send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();  
+    }
+}
+
 const getEventStats = async (req, res, next) => {
     try {
         const {event_id} = req.params;
@@ -652,7 +681,7 @@ const addEventCondition = async (req, res, next) => {
 
         // Delete conditions for this event
         await models.EventCondition.query()
-                .where({id: event_id})
+                .where({event_id: event_id})
                 .del();
         
         await models.EventCondition.query()
@@ -662,6 +691,25 @@ const addEventCondition = async (req, res, next) => {
                 })
 
         return res.status(200).json('Condition created').send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();  
+    }
+}
+
+// Add event condition 
+const removeEventCondition = async (req, res, next) => {
+    try {
+
+        const {event_id} = req.params;
+
+        // Delete conditions for this event
+        await models.EventCondition.query()
+                .where({event_id: event_id})
+                .del();
+
+        return res.status(200).json('Condition removed').send();
 
     } catch (e) {
         console.log(e);
@@ -686,7 +734,9 @@ const eventsController = {
     addEventProduct, 
     removeEventProduct,
     getEventStats,
-    addEventCondition
+    addEventCondition, 
+    removeEventCondition, 
+    updateEventProduct
 }
 
 export default eventsController;

@@ -122,14 +122,13 @@ const getAgencySla = async (req, res, next) => {
 const inviteAgency = async (req, res, next) => {
     try {
         /* Todo add client organization logic */
-        const { name, description, owner_email, sla_terms, sla_hours_before_event_creation,  sla_hours_before_event_update } = req.body;
+        const { name, description, owner_email, sla_terms, sla_hours_before_event_creation,  sla_hours_before_event_update, display_name, custom_message } = req.body;
 
-        const client_collaborators = 
+        const collaborator = 
             await models.ClientCollaborator.query()
-                .withGraphFetched('[client.[warehouses, agencies]]')
-                .where('account_id', req.account_id);
-
-        const collaborator = client_collaborators[0];
+                .withGraphFetched('[client.[warehouses, agencies], account]')
+                .where('account_id', req.account_id)
+                .first();
 
         // Validate client
         if (!collaborator) return res.status(400).json('Invalid client').send();
@@ -182,15 +181,19 @@ const inviteAgency = async (req, res, next) => {
             })
 
         // Create agency collaborator invitation
+        let invitation_expiration_date = new Date();
+        invitation_expiration_date.setHours(invitation_expiration_date.getHours() + 1); // Default expiration time to 1 hour.
         await models.CollaboratorInvitation.query()
                 .insert({ 
                     agency_id: agency.id,
                     role_id: role[0].id,
-                    email: owner_email
+                    email: owner_email,
+                    expiration_date: invitation_expiration_date,
                 })
 
+        const host = collaborator && collaborator.account ? collaborator.account : {first_name: 'Booze Boss', last_name: 'Team'};
         // TODO send invite email
-        await agencyInviteEmail(owner_email, new_token, {scope: 'AGENCY', name: 'OWNER'});
+        await agencyInviteEmail(owner_email, new_token, {scope: 'AGENCY', name: 'OWNER'}, {display_name, custom_message, host});
 
         return res.status(201).json(agency).send();
     } catch (e) {

@@ -130,7 +130,7 @@ const agencyInviteEmail = (account_email, token, role, options) => {
             to: account_email,
         },
         locals: {
-            email: options.name || account_email,
+            email: options && options.name ?  options.name : account_email,
             role: `${capitalizeFirstLetter(role.scope)} ${capitalizeFirstLetter(role.name)}`, 
             signupUrl: `${process.env.SCHEMA}://${process.env.FRONT_HOST}:${process.env.FRONT_PORT}/agency-signup?email=${account_email}&token=${token.token}`,
             custom_message: options && options.custom_message, 

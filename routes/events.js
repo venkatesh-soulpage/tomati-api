@@ -179,6 +179,19 @@ router.delete(
     eventsController.removeEventProduct
 )
 
+
+// PATCH - Updte event product
+router.patch(
+    '/:event_id/product/:event_product_id',
+    VerifyToken,
+    VerifyRole([
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
+    eventsController.updateEventProduct
+)
+
+
 // EVENT GUESTS
 
 /* POST - Invite a new user*/
@@ -212,6 +225,17 @@ router.post(
         {scope: 'AGENCY', role: 'MANAGER'},
     ]),
     eventsController.addEventCondition
+)
+
+// POST - Add event condition
+router.delete(
+    '/:event_id/condition',
+    VerifyToken,
+    VerifyRole([
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
+    eventsController.removeEventCondition
 )
 
 // Stats
