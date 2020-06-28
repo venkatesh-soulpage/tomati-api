@@ -66,6 +66,8 @@ router.get(
     '/my-events', 
     VerifyToken, 
     VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
         {scope: 'GUEST', role: 'REGULAR'},
         {scope: 'GUEST', role: 'VIP'},
         {scope: 'GUEST', role: 'VVIP'},
@@ -105,6 +107,8 @@ router.get(
     '/:event_id/get-token', 
     VerifyToken, 
     VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
         {scope: 'GUEST', role: 'REGULAR'},
         {scope: 'GUEST', role: 'VIP'},
         {scope: 'GUEST', role: 'VVIP'},
@@ -141,6 +145,8 @@ router.post(
     '/redeem-code', 
     VerifyToken, 
     VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
         {scope: 'GUEST', role: 'REGULAR'},
         {scope: 'GUEST', role: 'VIP'},
         {scope: 'GUEST', role: 'VVIP'},
