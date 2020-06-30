@@ -12,6 +12,10 @@ router.get(
     VerifyRole([
         {scope: 'BRAND', role: 'OWNER'},
         {scope: 'BRAND', role: 'MANAGER'},
+        {scope: 'BRAND', role: 'WAREHOUSE_MANAGER'},
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+        {scope: 'AGENCY', role: 'STAFF'},
     ]),
     pdfController.getRequisitionApprovalPdf
 );
