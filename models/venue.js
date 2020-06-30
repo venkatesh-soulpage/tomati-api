@@ -20,10 +20,18 @@ export default class Venue extends Model {
           relation: Model.HasManyRelation,
           modelClass: models.BriefEvent,
           join: {
-            from: 'venue.id',
+            from: 'venues.id',
             to: 'brief_events.venue_id'
           }
         },
+        location: {
+          relation: Model.HasOneRelation,
+          modelClass: models.Location,
+          join: {
+            from: 'venues.location_id',
+            to: 'locations.id'
+          }
+        }
       }
     }
   }

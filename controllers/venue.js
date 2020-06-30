@@ -62,7 +62,7 @@ const createVenue = async (req, res, next) => {
     
     try {    
         const {account_id, scope} = req;
-        const {created_by, name, contact_name, contact_email, contact_phone_number, address, latitude, longitude} = req.body;
+        const {created_by, name, contact_name, contact_email, contact_phone_number, address, latitude, longitude, location_id} = req.body;
 
         // Validate the account is a client collaborator
         const collaborator = 
@@ -88,7 +88,7 @@ const createVenue = async (req, res, next) => {
         const new_venue =  
             await models.Venue.query()
                 .insert({
-                    created_by, name, contact_name, contact_email, contact_phone_number, address, latitude, longitude
+                    created_by, name, contact_name, contact_email, contact_phone_number, address, latitude, longitude, location_id
                 }); 
 
         // Send the clients

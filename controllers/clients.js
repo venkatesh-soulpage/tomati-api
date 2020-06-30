@@ -31,7 +31,9 @@ const getClients = async (req, res, next) => {
                     childrens
                 ]
             ], 
-            venues, 
+            venues.[
+                location
+            ], 
             brands, 
             warehouses.[
                 location
