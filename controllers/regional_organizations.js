@@ -43,7 +43,8 @@ const getOrganizations = async (req, res, next) => {
                         if (scope === 'REGION') {
                             queryBuilder.where('id', collaborator.organization.id); 
                         }
-                    }) 
+                    })
+                    .orderBy('name', 'DESC');
 
         return res.status(201).json(organizations).send();
 
@@ -172,12 +173,33 @@ const changePrimaryLocation = async (req, res, next) => {
     }
 }
 
+// PATCH 
+const editSla = async (req, res, next) => {
+    try {
+        const {regional_organization_id} = req.params;
+        const {field, value} = req.body;
+
+        if (!regional_organization_id) return res.status(400).json('Invalid Organization');
+
+        await models.RegionalOrganization.query()
+                .update({[field]: value})
+                .where('id', regional_organization_id);
+            
+        return res.status(200).json('Organization successfully updated')
+        
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 
 
 const regionalOrganizationController = {
     getOrganizations,
     inviteOrganization,
-    changePrimaryLocation
+    changePrimaryLocation,
+    editSla
 }
 
 export default regionalOrganizationController;

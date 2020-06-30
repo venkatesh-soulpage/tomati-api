@@ -38,4 +38,14 @@ router.put(
     organizationsController.changePrimaryLocation,
 );
 
+/* PATCH - Change primary location */
+router.patch(
+    '/:regional_organization_id/update-sla', 
+    VerifyToken, 
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+    ]),
+    organizationsController.editSla,
+);
+
 module.exports = router;
