@@ -18,12 +18,16 @@ const getOrganizationAnalytics = async (req, res, next) => {
         const collaborator = 
                 await models.Collaborator.query()
                         .withGraphFetched(`[
-                            organization,
+                            organization.[
+                                clients
+                            ],
                         ]`)
                         .where('account_id', account_id)
                         .first();
 
         if (!collaborator && !collaborator.organization) return res.status(400).json('Require organization role').send();
+
+        const client_ids = collaborator.organization.clients.map(client => client.id);
 
         // Get Briefs and Events
         const briefs = 
@@ -36,11 +40,7 @@ const getOrganizationAnalytics = async (req, res, next) => {
                     .modifyGraph('brief_events.event', builder => {
                         builder.where('ended_at', '>', new Date())
                     })
-                    .modify(queryBuilder => {
-                        if (client_id) {
-                            queryBuilder.where('client_id', client_id);
-                        } 
-                    });
+                    .whereIn('client_id', client_ids);
 
         const available_events = [];
         briefs.map(brief => {

@@ -9,29 +9,33 @@ exports.seed = async (knex) => {
     // Get the first agency
     const agency = await knex('agencies').where({invited_by: client.id}).first();
 
-    // Get the briefs id for this client
-    const briefs = 
-          await knex('briefs')
-                  .where({
-                    client_id: client.id,
-                    agency_id: agency.id,
-                  })
+    if (client && agency) {
 
-    const briefs_ids = briefs.map(brief => brief.id);
+        // Get the briefs id for this client
+        const briefs = 
+                await knex('briefs')
+                        .where({
+                        client_id: client.id,
+                        agency_id: agency.id,
+                        })
 
-    // Remove brief brands
-    await knex('brief_brands')
-            .whereIn('brief_id', briefs_ids)
-            .del();
-    
-    // Remove brief brands
-    await knex('brief_events')
-            .whereIn('brief_id', briefs_ids)
-            .del();
-            
-    // Remove actual briefs
-    await knex('briefs')
-            .whereIn('id', briefs_ids)
-            .del()
+        const briefs_ids = briefs.map(brief => brief.id);
+
+        // Remove brief brands
+        await knex('brief_brands')
+                .whereIn('brief_id', briefs_ids)
+                .del();
+        
+        // Remove brief brands
+        await knex('brief_events')
+                .whereIn('brief_id', briefs_ids)
+                .del();
+                
+        // Remove actual briefs
+        await knex('briefs')
+                .whereIn('id', briefs_ids)
+                .del()
+    }
+
   }
 };

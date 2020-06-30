@@ -85,7 +85,7 @@ const getClients = async (req, res, next) => {
         }   
         
         // Send the clients
-        return res.status(201).json(clients).send();
+        return res.status(201).send(clients);
 
     } catch (e) {
         console.log(e);

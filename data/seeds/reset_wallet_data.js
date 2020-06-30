@@ -39,31 +39,34 @@ exports.seed = async (knex) => {
 
             const wallet = await knex('wallets').where({account_id: guest.account_id}).first();
 
-            // Delete wallet orders
-            const wallet_orders =
+            if (wallet) {
+
+              // Delete wallet orders
+              const wallet_orders =
+                await knex('wallet_orders')
+                        .where({
+                          wallet_id: Number(wallet.id),
+                        })
+              
+              const wallet_orders_ids = wallet_orders.map(wallet_order => wallet_order.id);
+
+              // Delete all transactions with this wallet orders
+              await knex('wallet_order_transactions')
+                      .whereIn('wallet_order_id', wallet_orders_ids)
+                      .del();
+
+              // Delete all wallet orders
               await knex('wallet_orders')
-                      .where({
-                        wallet_id: Number(wallet.id),
+                      .whereIn('id', wallet_orders_ids)
+                      .del();
+
+              // Reset Wallet
+              await knex('wallets')
+                      .where({id: wallet.id})
+                      .update({
+                        balance: 1000,
                       })
-            
-            const wallet_orders_ids = wallet_orders.map(wallet_order => wallet_order.id);
-
-            // Delete all transactions with this wallet orders
-            await knex('wallet_order_transactions')
-                    .whereIn('wallet_order_id', wallet_orders_ids)
-                    .del();
-
-            // Delete all wallet orders
-            await knex('wallet_orders')
-                    .whereIn('id', wallet_orders_ids)
-                    .del();
-
-            // Reset Wallet
-            await knex('wallets')
-                    .where({id: wallet.id})
-                    .update({
-                      balance: 1000,
-                    })
+            }
           }
         }
       }

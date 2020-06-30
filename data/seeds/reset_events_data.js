@@ -31,6 +31,11 @@ exports.seed = async (knex) => {
           await knex('event_products')
                   .where({event_id: event.id})
                   .del();
+          
+        // Delete all event_products
+          await knex('event_free_drinks_conditions')
+                  .where({event_id: event.id})
+                  .del();
                   
           // Delete all wallets
           await knex('wallets')
