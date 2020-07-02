@@ -18,7 +18,7 @@ const getWarehouses = async (req, res, next) => {
 
         const warehouses =  
             await models.Warehouse.query()
-                .withGraphFetched('[location, stocks.[product, transactions.[account]]]')
+                .withGraphFetched('[location, stocks.[product, transactions.[account, requisition]]]')
                 .modify((queryBuilder) => {
                     if (scope !== 'ADMIN') {
                         queryBuilder.where('client_id', client_collaborators[0].client_id);

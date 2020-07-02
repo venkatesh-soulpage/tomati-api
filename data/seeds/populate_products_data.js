@@ -113,8 +113,8 @@ exports.seed = async (knex) => {
       // Register product ingredients
       await knex('product_ingredients')
               .insert({
-                product_parent_id: Number(product.id),
-                product_id: Number(cocktail_id),
+                product_parent_id: Number(cocktail_id),
+                product_id: Number(product.id),
                 quantity: Number(random_product_quantity),
               })
       

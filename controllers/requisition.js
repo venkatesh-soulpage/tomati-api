@@ -142,7 +142,7 @@ const updateRequisitionStatus = async (req, res, next) => {
     try {
         const {account_id} = req;
         const {requisition_id} =req.params;
-        const { status, hellosign_signature_id } = req.body;
+        const { status, hellosign_signature_id, comments } = req.body;
 
         const requisition = 
             await models.Requisition.query()
@@ -169,7 +169,7 @@ const updateRequisitionStatus = async (req, res, next) => {
                     .findById(requisition_id);
 
         await models.Requisition.query()
-            .patch({status, hellosign_signature_id})
+            .patch({status, comments, hellosign_signature_id})
             .where('id', requisition_id);
 
         // If approved
@@ -211,7 +211,7 @@ const updateRequisitionStatus = async (req, res, next) => {
         }
 
         // IF REQUEST MODIFICATIONS
-        if (status == 'DRAFT') {
+        if (status == 'DRAFT' || status === 'CHANGES REQUIRED') {
             await models.Brief.query()
                 .update({status: 'ON PROGRESS'})
                 .where('id', requisition.brief_id);
