@@ -14,14 +14,16 @@
     "reset_briefs": "knex seed:run --specific=reset_brief_data.js",
     "populate_products": "knex seed:run --specific=populate_products_data.js",
     "reset_products": "knex seed:run --specific=reset_products_data.js",
+    "populate_warehouses": "knex seed:run --specific=populate_inventory_data.js",
+    "reset_warehouses": "knex seed:run --specific=reset_inventory_data.js",
     "populate_requisitions": "knex seed:run --specific=populate_requisitions_data.js",
     "reset_requisitions": "knex seed:run --specific=reset_requisitions_data.js",
     "populate_events": "knex seed:run --specific=populate_events_data.js",
     "reset_events": "knex seed:run --specific=reset_events_data.js",
     "populate_wallet": "knex seed:run --specific=populate_wallet_data.js",
     "reset_wallet": "knex seed:run --specific=reset_wallet_data.js",
-    "populate_all": "npm run populate_organizations && npm run populate_products &&  npm run populate_briefs && npm run populate_requisitions && npm run populate_events && npm run populate_wallet",
-    "reset_all": "npm run reset_wallet && npm run reset_events && npm run reset_requisitions && npm run reset_briefs && npm run reset_products && npm run reset_organizations"
+    "populate_all": "npm run populate_organizations && npm run populate_products && npm run populate_warehouses &&  npm run populate_briefs && npm run populate_requisitions && npm run populate_events && npm run populate_wallet",
+    "reset_all": "npm run reset_wallet && npm run reset_events && npm run reset_requisitions && npm run reset_briefs && npm run reset_warehouses && npm run reset_products && npm run reset_organizations"
   },
   "engines": {
     "node": "10.x"
