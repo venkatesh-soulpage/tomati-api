@@ -10,6 +10,7 @@ router.get(
     VerifyToken,
     VerifyRole([
         {scope: 'REGION', role: 'OWNER'},
+        {scope: 'REGION', role: 'MANAGER'},
         {scope: 'BRAND', role: 'OWNER'},
     ]),
     analyticsController.getOrganizationAnalytics

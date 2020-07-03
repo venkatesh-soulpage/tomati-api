@@ -12,6 +12,7 @@ router.get(
     VerifyRole([
         {scope: 'ADMIN', role: 'ADMIN'},
         {scope: 'REGION', role: 'OWNER'},
+        {scope: 'REGION', role: 'MANAGER'},
     ]),
     organizationsController.getOrganizations,
 );
@@ -25,6 +26,18 @@ router.post(
         {scope: 'ADMIN', role: 'ADMIN'},
     ]),
     organizationsController.inviteOrganization,
+);
+
+/* POST - Invite new collaborator */
+router.post(
+    '/invite-collaborator', 
+    VerifyToken, 
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'REGION', role: 'OWNER'},
+        {scope: 'REGION', role: 'MANAGER'},
+    ]),
+    organizationsController.inviteCollaborator,
 );
 
 /* PUT - Change primary location */

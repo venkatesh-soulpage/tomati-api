@@ -7,6 +7,7 @@ exports.seed = function(knex) {
       return knex('roles').insert([
         {scope: 'BRAND', name: 'OWNER'},
         {scope: 'REGION', name: 'OWNER'},
+        {scope: 'REGION', name: 'MANAGER'},
         {scope: 'BRAND', name: 'MANAGER'},
         {scope: 'BRAND', name: 'WAREHOUSE_MANAGER'},
         {scope: 'AGENCY', name: 'OWNER'},
