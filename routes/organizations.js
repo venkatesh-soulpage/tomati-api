@@ -40,6 +40,19 @@ router.post(
     organizationsController.inviteCollaborator,
 );
 
+
+/* POST - Invite new collaborator */
+router.delete(
+    '/revoke-collaborator/:collaborator_invitation_id',
+    VerifyToken,
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'REGION', role: 'OWNER'}
+    ]),
+    organizationsController.revokeCollaboratorInvite
+);
+
+
 /* PUT - Change primary location */
 router.put(
     '/:regional_organization_id/locations/select-primary', 
