@@ -754,6 +754,33 @@ const removeEventCondition = async (req, res, next) => {
     }
 }
 
+// Generate QR code for free drinks
+const generateFreeDrinkCode  = async (req, res, next) => {
+    try {
+
+        const {event_id, event_guest_id} = req.params;
+
+        // Generate code and update the table
+        const free_drink_code = crypto.randomBytes(16).toString('hex');
+
+        await models.EventGuest.query()
+                .update({free_drink_code})
+                .where({id: event_guest_id});
+
+        const free_drink = 
+            await models.EventProduct.query()
+                    .withGraphFetched(`[product]`)
+                    .where({event_id, is_free_drink: true })
+                    .first();
+
+        return res.status(200).json({free_drink_code, free_drink}).send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();  
+    }
+}
+
 const eventsController = {
     getEvents,
     getClientEvents,
@@ -774,7 +801,8 @@ const eventsController = {
     getEventStats,
     addEventCondition, 
     removeEventCondition, 
-    updateEventProduct
+    updateEventProduct,
+    generateFreeDrinkCode
 }
 
 export default eventsController;

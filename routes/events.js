@@ -227,6 +227,18 @@ router.delete(
     eventsController.revokeEventGuest
 );
 
+/* POST - Create a new code for drink redemption */
+router.post(
+    '/:event_id/guest/:event_guest_id/free-drink-code', 
+    VerifyToken, 
+    VerifyRole([
+        {scope: 'GUEST', role: 'REGULAR'},
+        {scope: 'GUEST', role: 'VIP'},
+        {scope: 'GUEST', role: 'VVIP'},
+    ]),
+    eventsController.generateFreeDrinkCode
+);
+
 // POST - Add event condition
 router.post(
     '/:event_id/condition',
