@@ -388,6 +388,14 @@ const transferCredits = async (req, res, next) => {
                     id: target_account.wallet.id
                 });
 
+        // Save the transfer log
+        await models.TransferLog.query()
+                .insert({
+                    from_account_id: account_id,
+                    to_account_id: target_account.id,
+                    amount,
+                })
+
         return res.status(200).json(`${amount} credits successfully transfered to ${target_email}`).send();
 
     } catch (e) {

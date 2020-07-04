@@ -36,6 +36,7 @@ import WalletPurchase from './wallet_purchase';
 import RegionalOrganization from './regional_organization';
 import RegionalOrganizationLocation from './regional_organization_location';
 import Collaborator from './collaborator';
+import TransferLog from './transfer_log';
 
 export default {
     Location,
@@ -75,5 +76,6 @@ export default {
     WalletPurchase,
     RegionalOrganization, 
     RegionalOrganizationLocation, 
-    Collaborator
+    Collaborator,
+    TransferLog
 };
