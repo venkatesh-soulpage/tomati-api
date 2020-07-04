@@ -45,7 +45,33 @@ const getAgencies = async (req, res, next) => {
                     }) 
                     .orderBy('name', 'ASC');;
 
-        } else if (req.scope === 'BRAND') {
+        } else if (req.scope === 'REGION') {
+
+            let collaborator = 
+                await models.Collaborator.query()
+                    .withGraphFetched(`[
+                        organization.[
+                            clients
+                        ]
+                    ]`)
+                    .where('account_id', req.account_id)
+                    .first();
+                
+            const clients_ids = collaborator.organization.clients.map(client => client.id);
+
+            agencies = 
+                await models.Agency.query()
+                    .whereIn('invited_by', clients_ids)
+                    .withGraphFetched(query)
+                    .modifyGraph('agency_collaborators', builder => {
+                        builder.select('id');
+                    })
+                    .modifyGraph('collaborator_invitations', builder => {
+                        builder.where('collaborator_invitations.expiration_date', '>', new Date())
+                    }) 
+                    .orderBy('name', 'ASC');
+        } 
+        else if (req.scope === 'BRAND') {
 
             let client_collaborator = 
                 await models.ClientCollaborator.query()
@@ -61,7 +87,7 @@ const getAgencies = async (req, res, next) => {
                     .modifyGraph('collaborator_invitations', builder => {
                         builder.where('collaborator_invitations.expiration_date', '>', new Date())
                     }) 
-                    .orderBy('name', 'ASC');;
+                    .orderBy('name', 'ASC');
 
         } else if (req.scope === 'AGENCY') {
 

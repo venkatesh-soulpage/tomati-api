@@ -47,7 +47,7 @@ router.delete(
     VerifyToken,
     VerifyRole([
         {scope: 'ADMIN', role: 'ADMIN'},
-        {scope: 'BRAND', role: 'OWNER'}
+        {scope: 'BRAND', role: 'OWNER'},
     ]),
     clientController.revokeCollaboratorInvite
 );
