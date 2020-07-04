@@ -106,5 +106,17 @@ router.put(
     walletController.scanOrder
 );
 
+/* POST - Transfer credits from one wallet to another*/
+router.post(
+    '/transfer', 
+    VerifyToken, 
+    VerifyRole([
+        {scope: 'GUEST', role: 'REGULAR'},
+        {scope: 'GUEST', role: 'VIP'},
+        {scope: 'GUEST', role: 'VVIP'},
+    ]),
+    walletController.transferCredits
+);
+
 
 module.exports = router;

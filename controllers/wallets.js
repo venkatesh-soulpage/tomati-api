@@ -347,6 +347,55 @@ const getWalletPurchase = async (req, res, next) => {
     }
 }
 
+const transferCredits = async (req, res, next) => {
+    try {
+        const { account_id } = req;
+        const {amount, target_email} = req.body;
+
+        // Validate the source wallet
+        const source_wallet = await models.Wallet.query().where({account_id}).first();
+
+        if (!source_wallet) return res.status(400).json('Invalid wallet').send();
+        if (amount < 1) return res.status(400).json('Invalid transfer amount').send();
+        if (amount > source_wallet.balance) return res.status(400).json('Insufficient balance').send();
+
+        // Validate target wallet
+        const target_account = 
+            await models.Account.query()
+                    .withGraphFetched('[wallet]')
+                    .where({email: target_email})
+                    .first();
+
+        if (!target_account) return res.status(400).json('Invalid email').send();
+        if (!target_account.wallet) return res.status(400).json('Invalid walet').send();
+
+        // Transfer balances
+        // Substract from source wallet 
+        await models.Wallet.query()
+                .update({
+                    balance: Number(source_wallet.balance) - Number(amount),
+                })
+                .where({
+                    id: source_wallet.id
+                });
+        
+        // Add to target wallet
+        await models.Wallet.query()
+                .update({
+                    balance: Number(target_account.wallet.balance) + Number(amount),
+                })
+                .where({
+                    id: target_account.wallet.id
+                });
+
+        return res.status(200).json(`${amount} credits successfully transfered to ${target_email}`).send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 const walletController = {
     createOrder,
     getOrder,
@@ -355,7 +404,8 @@ const walletController = {
     addCreditsWithPaypal,
     addCreditsWithQR, 
     approveCreditsWithQR,
-    getWalletPurchase
+    getWalletPurchase, 
+    transferCredits
 }
 
 export default walletController;
