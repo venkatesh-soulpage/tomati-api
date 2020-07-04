@@ -191,6 +191,17 @@ router.patch(
     eventsController.updateEventProduct
 )
 
+// POST - Updte event product
+router.post(
+    '/:event_id/product/:event_product_id/free-drink',
+    VerifyToken,
+    VerifyRole([
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
+    eventsController.selectFreeDrink
+)
+
 
 // EVENT GUESTS
 

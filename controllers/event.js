@@ -634,11 +634,48 @@ const updateEventProduct = async (req, res, next) => {
     }
 }
 
+const selectFreeDrink = async (req, res, next) => {
+    try {
+        const {account_id} = req;
+        const {event_id, event_product_id} = req.params;
+
+        // Validate valid agency collaborator
+        const collaborator = 
+            await models.AgencyCollaborator.query()
+                    .withGraphFetched(`[client]`)
+                    .where('account_id', account_id)
+                    .first();
+
+        if (!collaborator) return res.status(400).json('Invalid collaborator').send();
+        
+        // Validate that the collaborator has the correct access  
+        const event = await models.Event.query()
+                        .withGraphFetched('[brief]')
+                        .findById(event_id);
+
+        if (!event) return res.status(400).json('Invalid event id').send();
+        if (event.brief.agency_id !== collaborator.agency_id) return res.status(400).json('Invalid agency').send();
+        
+        await models.EventProduct.query()
+                .update({is_free_drink: false})
+                .where({event_id: event_id});
+
+        await models.EventProduct.query()
+                .update({is_free_drink: true})
+                .where({id: event_product_id});    
+
+        return res.status(200).json('Update redeemable drink').send();        
+        
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();  
+    }
+}
+
+
 const getEventStats = async (req, res, next) => {
     try {
         const {event_id} = req.params;
-
-        console.log(event_id)
 
         const event_products = 
             await models.EventProduct.query()
@@ -733,6 +770,7 @@ const eventsController = {
     redeemCode, 
     addEventProduct, 
     removeEventProduct,
+    selectFreeDrink,
     getEventStats,
     addEventCondition, 
     removeEventCondition, 
