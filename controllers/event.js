@@ -760,6 +760,15 @@ const generateFreeDrinkCode  = async (req, res, next) => {
 
         const {event_id, event_guest_id} = req.params;
 
+        // Validate that the user hasn't redeemed a code
+        const guest = 
+            await models.EventGuest.query()
+                    .where({id: event_guest_id})
+                    .first();
+        
+        if (!guest) return res.status(400).json('Invalid guest id').send();
+        if (guest.free_drink_redemeed) return res.status(400).json('A drink has already been redemeed').json();
+
         // Generate code and update the table
         const free_drink_code = crypto.randomBytes(16).toString('hex');
 
@@ -774,6 +783,61 @@ const generateFreeDrinkCode  = async (req, res, next) => {
                     .first();
 
         return res.status(200).json({free_drink_code, free_drink}).send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();  
+    }
+}
+
+// Scan and give a free drink
+const redeemFreeDrinkCode = async (req, res, next) => {
+    try {
+        const {code} = req.body;
+        
+        const guest = 
+                await models.EventGuest.query()
+                        .where({
+                            free_drink_code: code,
+                        })
+                        .first();
+                
+        if (!guest) return res.status(400).json('Invalid Code').send();
+        if (guest.free_drink_redemeed) return res.status(400).json('Code already used').send();
+
+        // Update the event redemed limit 
+        const event = 
+                await models.Event.query()
+                        .withGraphFetched('[condition]')
+                        .findById(guest.event_id);
+
+        if (event.condition.limit <= (event.free_redemeed_drinks + 1)) return res.status(400).json('Free drink limit reached').send();
+
+
+        // Mark the code as redeemed
+        await models.EventGuest.query()
+                .update({
+                    free_drink_redemeed: true
+                })
+                .where({
+                    id: guest.id,
+                });
+                
+        await models.Event.query()
+                .update({
+                    free_redemeed_drinks: (event.free_redemeed_drinks + 1)
+                })
+
+        const free_drink = 
+            await models.EventProduct.query()
+                    .withGraphFetched(`[product]`)
+                    .where({
+                        event_id: guest.event_id, 
+                        is_free_drink: true 
+                    })
+                    .first();
+
+        return res.status(200).send(free_drink);
 
     } catch (e) {
         console.log(e);
@@ -802,7 +866,8 @@ const eventsController = {
     addEventCondition, 
     removeEventCondition, 
     updateEventProduct,
-    generateFreeDrinkCode
+    generateFreeDrinkCode,
+    redeemFreeDrinkCode
 }
 
 export default eventsController;

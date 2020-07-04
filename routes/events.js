@@ -239,6 +239,18 @@ router.post(
     eventsController.generateFreeDrinkCode
 );
 
+/* POST - Redeem a code for drink redemption */
+router.post(
+    '/approve-free-drink', 
+    VerifyToken, 
+    VerifyRole([
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+        {scope: 'AGENCY', role: 'STAFF'},
+    ]),
+    eventsController.redeemFreeDrinkCode
+);
+
 // POST - Add event condition
 router.post(
     '/:event_id/condition',
