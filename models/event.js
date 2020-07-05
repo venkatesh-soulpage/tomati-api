@@ -52,7 +52,14 @@ export default class Event extends Model {
                 to: 'event_products.event_id'
             }
         },
-      
+        purchases: {
+          relation: Model.HasManyRelation,
+          modelClass: models.WalletPurchase,
+          join: {
+            from: 'events.id',
+            to: 'wallet_purchases.event_id'
+          }
+        }
       }
     }
   }

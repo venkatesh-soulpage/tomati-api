@@ -1420,6 +1420,54 @@ const eventStock = (doc, event, products, top) => {
         .text(getCurrentUnits(event, current_brand.id) - get_brand_consumption(event, current_brand), 450, margin_top)
     }
 
+    return margin_top;
+}
+
+const eventCollaboratorsSales = async (doc, event, top) => {
+    let margin_top = top + 40;
+
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text("Collaborator Sales:", 50, margin_top);
+
+    margin_top = margin_top + 30;
+
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(10)
+        .text('Team Member', 50, margin_top)
+        .text('Role', 250, margin_top)
+        .text('Tokens Approved', 400, margin_top)
+
+    margin_top = margin_top + 15;
+    generateHr(doc, margin_top);
+
+
+    const account_ids = event.purchases.map(purchase => purchase.scanned_by_account.id);
+    const unique_accounts = [...new Set(account_ids)];
+
+
+    for (const account_id of unique_accounts) {
+        const account = event.purchases.find(purch => purch.scanned_by_account.id === account_id).scanned_by_account;
+
+        const purchases = event.purchases.filter(purch => purch.scanned_by_account.id === account_id);
+        const total_tokens_approved = purchases.reduce((acc, curr) => acc + Number(curr.amount), 0);
+
+        margin_top = margin_top + 25;
+
+        doc
+        .font("Helvetica")
+        .fontSize(10)
+        .text(`${account.first_name} ${account.last_name}`, 50, margin_top)
+        .text(`${account.role.scope} ${account.role.name}`, 250, margin_top)
+        .text(total_tokens_approved, 400, margin_top)
+
+        margin_top = margin_top + 20;
+        generateHr(doc, margin_top);
+    }
+
+    return top;
 }
 
 const eventReport = async (req, res, next) => {
@@ -1463,7 +1511,12 @@ const eventReport = async (req, res, next) => {
                             guests.[
                                 account
                             ],
-                            condition
+                            condition,
+                            purchases.[
+                                scanned_by_account.[
+                                    role
+                                ]
+                            ]
                         ]`)
                         .where('id', event_id)
                         .first();
@@ -1485,6 +1538,7 @@ const eventReport = async (req, res, next) => {
         top = await eventConsumption(doc, event, top);
         top = await eventSales(doc, event, top);
         top = await eventStock(doc, event, products, top);
+        top = await eventCollaboratorsSales(doc, event, top);
 
         doc.pipe(res)
         doc.end();
