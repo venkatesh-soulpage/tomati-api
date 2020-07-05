@@ -962,6 +962,148 @@ const eventDemographics = async (doc, event, top) => {
         .text(getDemographicAssistance('Millenials Y2'), 350, margin_top)
         .text(getDemographicAssistance('Gen X'), 425, margin_top)
         .text(getDemographicAssistance('Boomer'), 500, margin_top)
+
+    return margin_top;
+}
+
+const eventFreeDrinkReport = async (doc, event, top) => {
+    let margin_top = top + 50;
+
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text("Free Drink Details", 50, margin_top);
+
+    margin_top = margin_top + 30;
+
+    const free_drink = event.products.find(product => product.is_free_drink);
+
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(10)
+        .text("Free Drink: ", 50, margin_top)
+        .font("Helvetica")
+        .text(
+            free_drink ? `${free_drink.product.name} (${free_drink.product.metric_amount}${free_drink.product.metric})` : 'N/A', 
+            175, 
+            margin_top
+        )
+
+    margin_top = margin_top + 20
+    
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(10)
+        .text("Condition:", 50, margin_top)
+        .font("Helvetica")
+        .text(
+            event.condition ? `${event.condition.condition_type}` : 'N/A', 
+            175, 
+            margin_top
+        )
+
+    if (event.condition) {
+        
+        if (event.condition.min_age) {
+            margin_top = margin_top + 20
+            doc
+            .font("Helvetica-Bold")
+            .fontSize(10)
+            .text("Minimum Age:", 50, margin_top)
+            .font("Helvetica")
+            .text(
+                event.condition.min_age,
+                175, 
+                margin_top
+            )
+        }
+
+        if (event.condition.max_age) {
+            margin_top = margin_top + 20
+            doc
+            .font("Helvetica-Bold")
+            .fontSize(10)
+            .text("Max Age:", 50, margin_top)
+            .font("Helvetica")
+            .text(
+                event.condition.max_age,
+                175, 
+                margin_top
+            )
+        }
+
+        if (event.condition.gender) {
+            margin_top = margin_top + 20
+            doc
+            .font("Helvetica-Bold")
+            .fontSize(10)
+            .text("Gender:", 50, margin_top)
+            .font("Helvetica")
+            .text(
+                event.condition.gender,
+                175, 
+                margin_top
+            )
+        }
+
+        if (event.condition.limit) {
+            margin_top = margin_top + 20
+            doc
+            .font("Helvetica-Bold")
+            .fontSize(10)
+            .text("Free Drinks Limit:", 50, margin_top)
+            .font("Helvetica")
+            .text(
+                event.condition.limit,
+                175, 
+                margin_top
+            )
+        }
+
+        if (event.condition.start_time) {
+            margin_top = margin_top + 20
+            doc
+            .font("Helvetica-Bold")
+            .fontSize(10)
+            .text("Starting at:", 50, margin_top)
+            .font("Helvetica")
+            .text(
+                moment(event.condition.start_time).format('DD/MM/YYYY LT'),
+                175, 
+                margin_top
+            )
+        }
+
+        if (event.condition.end_time) {
+            margin_top = margin_top + 20
+            doc
+            .font("Helvetica-Bold")
+            .fontSize(10)
+            .text("Ending at:", 50, margin_top)
+            .font("Helvetica")
+            .text(
+                moment(event.condition.end_time).format('DD/MM/YYYY LT'),
+                175, 
+                margin_top
+            )
+        }
+
+        margin_top = margin_top + 20
+
+        doc
+            .font("Helvetica-Bold")
+            .fontSize(10)
+            .text("Free drinks redeemed:", 50, margin_top)
+            .font("Helvetica")
+            .text(
+                event.free_redemeed_drinks,
+                175, 
+                margin_top
+            )
+        
+    }
+
+    return margin_top;
 }
 
 const eventSales = async (doc, event, top) => {
@@ -1321,6 +1463,7 @@ const eventReport = async (req, res, next) => {
                             guests.[
                                 account
                             ],
+                            condition
                         ]`)
                         .where('id', event_id)
                         .first();
@@ -1338,6 +1481,7 @@ const eventReport = async (req, res, next) => {
         top = await eventDescription(doc, event, top);
         top = await eventAttendance(doc, event, top);
         top = await eventDemographics(doc, event, top);
+        top = await eventFreeDrinkReport(doc, event, top);
         top = await eventConsumption(doc, event, top);
         top = await eventSales(doc, event, top);
         top = await eventStock(doc, event, products, top);

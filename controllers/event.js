@@ -827,6 +827,9 @@ const redeemFreeDrinkCode = async (req, res, next) => {
                 .update({
                     free_redemeed_drinks: (event.free_redemeed_drinks + 1)
                 })
+                .where({
+                    id: guest.event_id,
+                })
 
         const free_drink = 
             await models.EventProduct.query()
