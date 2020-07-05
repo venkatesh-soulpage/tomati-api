@@ -625,6 +625,7 @@ const eventDescription = async (doc, event, top) => {
     return margin_top + 120;
 }
 
+
 const eventAttendance = (doc, event, top) => {
 
     const calculate_gender_amount = (guests, gender) => {
@@ -724,7 +725,9 @@ const eventAttendance = (doc, event, top) => {
         return `${best_hour.time} : ${best_hour.amount} guests`;
     }
 
-    let margin_top = top + 45;
+    let margin_top = 50;
+
+    doc.addPage();
     
     doc
         .font("Helvetica-Bold")
@@ -905,6 +908,60 @@ const eventConsumption = async (doc, event, top) => {
         .text(getDemographicTotals(event.products, 'Millenials Y2'), 350, margin_top - 30)
         .text(getDemographicTotals(event.products, 'Gen X'), 425, margin_top - 30)
         .text(getDemographicTotals(event.products, 'Boomer'), 500, margin_top - 30)
+}
+
+const eventDemographics = async (doc, event, top) => {
+
+    const demographics = [
+        {name: 'Boomer', min_age: 56, max_age: 76},
+        {name: 'Gen X', min_age: 41, max_age: 55},
+        {name: 'Millenials Y2', min_age: 30, max_age: 40},
+        {name: 'Millenials Y1', min_age: 25, max_age: 29 },
+        {name: 'Gen Z', min_age: 18, max_age: 24 },
+    ]
+
+    const getDemographicAssistance = (demographic) => {
+        
+        const demographic_group = demographics.find(demographic_value => demographic_value.name === demographic);
+
+        const demographic_guests = 
+            event.guests.filter(guest => guest.check_in_time).filter(guest => {
+                const age = Number(moment(guest.account.date_of_birth, "MM/DD/YYYY").fromNow().split(" ")[0]);
+                const is_inside_demographic = demographic_group.min_age <= age && demographic_group.max_age >= age;
+                return is_inside_demographic;
+            })
+
+        if (demographic_guests.length < 1) return `0%`; 
+        return demographic_guests.length < 1 ? `0%` : `${Math.round(demographic_guests.length / event.guests.length * 10000) / 100}% (${demographic_guests.length})`;
+
+    }
+
+    let margin_top = top + 30;
+
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(10)
+        .text('Demographic Group', 50, margin_top)
+        .text('Gen Z', 200, margin_top)
+        .text('Millenials Y1', 275, margin_top)
+        .text('Millenials Y2', 350, margin_top)
+        .text('Gen X', 425, margin_top)
+        .text('Boomer', 500, margin_top)
+
+    margin_top = margin_top + 15;
+    generateHr(doc, margin_top)
+
+    margin_top = margin_top + 20;
+        
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(10)
+        .text('Attendance', 50, margin_top)
+        .text(getDemographicAssistance('Gen Z'), 200, margin_top)
+        .text(getDemographicAssistance('Millenials Y1'), 275, margin_top)
+        .text(getDemographicAssistance('Millenials Y2'), 350, margin_top)
+        .text(getDemographicAssistance('Gen X'), 425, margin_top)
+        .text(getDemographicAssistance('Boomer'), 500, margin_top)
 }
 
 const eventSales = async (doc, event, top) => {
@@ -1185,13 +1242,16 @@ const eventStock = (doc, event, products, top) => {
 
 
         const units = total_metric_amount / product.metric_amount;
-        return units;
+        return Math.round(units * 100) / 100;
         
     }
 
     const unique_brands = get_unique_brands(event);
 
-    let margin_top = top + 60;
+    let margin_top = 50;
+
+
+    doc.addPage();
 
     doc
         .font("Helvetica-Bold")
@@ -1277,6 +1337,7 @@ const eventReport = async (req, res, next) => {
         top = await eventData(doc, event, top);
         top = await eventDescription(doc, event, top);
         top = await eventAttendance(doc, event, top);
+        top = await eventDemographics(doc, event, top);
         top = await eventConsumption(doc, event, top);
         top = await eventSales(doc, event, top);
         top = await eventStock(doc, event, products, top);
@@ -1286,6 +1347,7 @@ const eventReport = async (req, res, next) => {
 
     } catch (e) {
         console.log(e);
+        return res.status(500).json(e).send();
     }
 }
 
