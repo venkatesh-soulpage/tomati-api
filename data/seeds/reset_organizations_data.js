@@ -64,10 +64,6 @@ exports.seed = async (knex) => {
                 const client_collaborators = await knex('collaborators').where({ client_id: client.id });
                 const account_ids = client_collaborators.map(cc => cc.account_id);
 
-                const accounts = 
-                await knex('accounts')
-                        .whereIn('id', account_ids);
-
                 await knex('collaborator_invitations')
                                 .where({client_id: client.id})
                                 .del();
@@ -77,7 +73,7 @@ exports.seed = async (knex) => {
                         .del();
                 
                 await knex('wallets')
-                        .where({client_id: client.id})
+                        .whereIn('account_id', account_ids)
                         .del();
 
                 await knex('accounts')
