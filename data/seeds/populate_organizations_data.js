@@ -109,6 +109,7 @@ exports.seed = async (knex) => {
             // Hash Password
             const password_hash = await hashPassword(collaborator.account.password);
             collaborator.account.password_hash = password_hash;
+            collaborator.account.location_id = Number(location.id);
             delete collaborator.account.password;
 
             // Create account 
@@ -179,6 +180,7 @@ exports.seed = async (knex) => {
               // Hash Password
               const password_hash = await hashPassword(collaborator.account.password);
               collaborator.account.password_hash = password_hash;
+              collaborator.account.location_id = Number(location.id);
               delete collaborator.account.password;
 
               // Create account 

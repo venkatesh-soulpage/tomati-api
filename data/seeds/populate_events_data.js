@@ -105,6 +105,7 @@ exports.seed = async (knex) => {
                 password: '12345',
                 gender,
                 date_of_birth: new Date(date_of_birth),
+                location_id: client.location_id
             }
 
             const password_hash = await hashPassword(account.password);
