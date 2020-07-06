@@ -175,7 +175,7 @@ const updateRequisitionStatus = async (req, res, next) => {
         // If approved
         if (status === 'APPROVED' ) {
             await models.Brief.query()
-                .patch({status: 'APPROVED'})
+                .patch({ status: 'APPROVED' })
                 .where('id', requisition.brief_id);
 
             // MAIL notifications

@@ -62,6 +62,10 @@ exports.seed = async (knex) => {
           await knex('accounts')
                   .insert(collaborator.account)
                   .returning('id');
+        
+        // Create Wallet 
+          await knex('wallets')
+              .insert({account_id: Number(account_id)});
 
         // Create the collaborator
         await knex('collaborators')
@@ -112,6 +116,10 @@ exports.seed = async (knex) => {
               await knex('accounts')
                       .insert(collaborator.account)
                       .returning('id');
+            
+            // Create account 
+              await knex('wallets')
+                      .insert({account_id: Number(account_id)});
 
               // Create the collaborator
               await knex('collaborators')
