@@ -77,5 +77,5 @@ export default {
     RegionalOrganization, 
     RegionalOrganizationLocation, 
     Collaborator,
-    TransferLog
+    TransferLog,
 };

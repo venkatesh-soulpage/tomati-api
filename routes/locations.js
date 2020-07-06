@@ -28,5 +28,15 @@ router.post(
     locationsController.createLocation
 );
 
+/* Update - Updatee a location rate */
+router.put(
+    '/:location_id/rate', 
+    VerifyToken, 
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+    ]),
+    locationsController.updateCurrencyRate
+);
+
 
 module.exports = router;

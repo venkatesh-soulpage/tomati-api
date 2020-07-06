@@ -31,6 +31,7 @@ const getLocations = async (req, res, next) => {
                     childrens
                 ]`)
                 .where('is_country', true)
+                .orderBy('name', 'asc')
                 .modify(builder => { 
                     // Get the regional organization locations and filter the endpoint to only them
                     if (collaborator && collaborator.organization) {
@@ -66,11 +67,31 @@ const createLocation = async (req, res, next) => {
     }
 }
 
+const updateCurrencyRate = async (req, res, next) => {
+    try {
+        const {location_id} = req.params;
+        const {currency_conversion} = req.body;
+        
+        await models.Location.query()
+                .update({
+                    currency_conversion: Number(currency_conversion)
+                })
+                .where({id: location_id});
+
+        return res.status(200).json('Rate successfully updated.').send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(400).json(e).send();
+    }
+}
+
 
 
 const locationsController = {
     getLocations,
-    createLocation
+    createLocation,
+    updateCurrencyRate,
 }
 
 export default locationsController;

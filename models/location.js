@@ -47,7 +47,7 @@ export default class Location extends Model {
             from: 'locations.id',
             to: 'warehouses.location_id'
           }
-        }
+        },
       }
     }
   }
