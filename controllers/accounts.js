@@ -208,6 +208,7 @@ const clientSignup = async (req, res, next) => {
         // Validate expiration time on cient invitation
         const invitation = 
                     await models.CollaboratorInvitation.query()
+                            .withGraphFetched('client')
                             .where('email', email)
                             .orderBy('created_at', 'DESC')
                             .first();
@@ -243,7 +244,8 @@ const clientSignup = async (req, res, next) => {
                     is_admin: false,
                     is_email_verified: true,
                     is_age_verified: true,
-                    refresh_token
+                    refresh_token,
+                    location_id: invitation.client.location_id
                 });
 
         // Add wallet to client account
@@ -345,6 +347,17 @@ const agencySignup = async (req, res, next) => {
 
         // Generate a refresh token
         const refresh_token = await crypto.randomBytes(16).toString('hex');
+
+        // Validate account location
+        const invitation = await models.CollaboratorInvitation.query()
+                                    .withGraphFetched(`[
+                                        agency.[
+                                            client
+                                        ]
+                                    ]`)
+                                    .where({email})
+                                    .first();
+        
  
         // Add new account
         const new_account = 
@@ -354,7 +367,8 @@ const agencySignup = async (req, res, next) => {
                     is_admin: false,
                     is_email_verified: true,
                     is_age_verified: true,
-                    refresh_token
+                    refresh_token,
+                    location_id: invitation.agency.client.location_id
                 });
 
         // Add wallet to client account
@@ -444,14 +458,20 @@ const guestSignup = async (req, res, next) => {
         if (!code) return res.status(400).json('Invalid invite code'); 
 
         // Search for the token and email 
-        const event_guest = 
+        const guest = 
             await models.EventGuest.query()
-                .withGraphFetched('[role]')
-                .where('code', code);
+                .withGraphFetched(`[
+                    role,
+                    event.[
+                        brief.[
+                            client
+                        ]
+                    ]
+                ]`)
+                .where('code', code)
+                .first();
         
-        if (!event_guest || event_guest.length < 1) return res.status(400).json('Invalid invite code');
-
-        const guest = event_guest[0];
+        if (!guest) return res.status(400).json('Invalid invite code');
 
         // Validate email
         if (guest.email && guest.email !== email) return res.status(400).json("The code doesn't match with the provided email"); 
@@ -463,6 +483,11 @@ const guestSignup = async (req, res, next) => {
             // Hash password
             const salt = await bcrypt.genSalt(10);
             const password_hash = await bcrypt.hash(password, salt);
+
+            // Verify their location 
+            // const location_service = await fetch(`http://ip-api.com/json/${req.connection.remoteAddress}`)
+            // const signup_location = await models.Location.query().where({name: location_service.countrt}).first();
+            // if (!signup_location) return res.status(400).json(`Signup from ${location_service.country} is not available`).send();
  
             // Add new account
             const new_account = 
@@ -472,6 +497,7 @@ const guestSignup = async (req, res, next) => {
                         is_admin: false,
                         is_email_verified: true,
                         is_age_verified: false,
+                        location_id: guest.event.brief.client.location_id,
                     });
 
             // Generate the login token
