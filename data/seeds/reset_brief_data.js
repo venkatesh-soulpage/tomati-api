@@ -7,8 +7,11 @@ exports.seed = async (knex) => {
     // Find the client 
     const client = await knex('clients').where({name: config_client.client_data.name}).first();
     // Get the first agency
-    const agency = await knex('agencies').where({invited_by: client.id}).first();
 
+    if (client) {
+        const agency = await knex('agencies').where({invited_by: client.id}).first();
+    }
+    
     if (client && agency) {
 
         // Get the briefs id for this client

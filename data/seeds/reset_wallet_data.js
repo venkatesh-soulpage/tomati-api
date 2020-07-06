@@ -15,6 +15,7 @@ exports.seed = async (knex) => {
   for (const config_client of config.CLIENTS) {
     const client = await knex('clients').where({name: config_client.client_data.name}).first();
     // Convert brief events into actual event
+      if (client) {
       // 1 - Get the briefs
       const briefs = await knex('briefs').where({client_id: client.id});
       // Iterate through all the briefs and get the brief events
@@ -70,6 +71,6 @@ exports.seed = async (knex) => {
           }
         }
       }
+    }
   }
-
 };

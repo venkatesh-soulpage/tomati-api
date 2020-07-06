@@ -6,19 +6,22 @@ exports.seed = async (knex) => {
       // Get client
       const client = await knex('clients').where({name: config_client.client_data.name}).first();
 
-      const products = 
-            await knex('products')
-                    .where({client_id: client.id});
+      if (client) {
+                const products = 
+                        await knex('products')
+                                .where({client_id: client.id});
 
-      const products_ids = products.map(product => product.id);
+                const products_ids = products.map(product => product.id);
 
-      await knex('product_ingredients')
-              .whereIn('product_parent_id', products_ids)
-              .del();
+                await knex('product_ingredients')
+                        .whereIn('product_parent_id', products_ids)
+                        .del();
 
-      // Delete products
-      await knex('products')
-              .where({client_id: client.id})
-              .del();
+                // Delete products
+                await knex('products')
+                        .where({client_id: client.id})
+                        .del();
+      }
+      
   }
 };

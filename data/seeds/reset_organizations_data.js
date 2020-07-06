@@ -8,85 +8,91 @@ exports.seed = async (knex) => {
 
         const client = await knex('clients').where({name: config_client.client_data.name}).first();
         
-        for (let agency of config_client.agencies) {            
-            // Delete accounts and collaborators.
-            const db_agency = await knex('agencies').where({name: agency.agency_data.name}).first();
-            const collaborator_emails = agency.collaborators.map(collaborator => collaborator.account.email);
-            
-            if (db_agency) {
-                const accounts = 
-                    await knex('accounts')
-                            .whereIn('email', collaborator_emails);
+        if (client) {
+                for (let agency of config_client.agencies) {            
+                // Delete accounts and collaborators.
+                const db_agency = await knex('agencies').where({name: agency.agency_data.name}).first();
+                
+                if (db_agency) {
 
-                const account_ids = accounts.map(account => account.id);
+                        const collaborators = await knex('collaborators').where({ agency_id: db_agency.id });
+                        const account_ids = await collaborators.map(collaborator => collaborator.account_id);
+
+                        await knex('accounts')
+                                .whereIn('id', account_ids);
+
+                        await knex('collaborator_invitations')
+                                        .where({agency_id: db_agency.id})
+                                        .del();
+
+                        await knex('collaborators')
+                                        .where({agency_id: db_agency.id})
+                                        .del();
+
+                        await knex('accounts')
+                                .whereIn('id', account_ids)
+                                .del();
+
+                        // Remove agency
+                        await knex('agencies')
+                                .where({
+                                        name: agency.agency_data.name,
+                                        contact_email: agency.agency_data.contact_email,
+                                })
+                                .del();  
+                }
+                
+                }
+
+                // Remove Warehouses
+                await knex('warehouses')
+                        .where({ client_id: client.id})
+                        .del();
+
+                
+                // Remove Brands 
+                await knex('brands')
+                        .where({client_id: client.id})
+                        .del();
+                
+                // Remove venues 
+                await knex('venues')
+                        .where({created_by: client.id})
+                        .del();
+
+                // Remove collaborators
+                const client_collaborators = await knex('collaborators').where({ client_id: client.id });
+                const account_ids = client_collaborators.map(cc => cc.account_id);
+
+                const accounts = 
+                await knex('accounts')
+                        .whereIn('id', account_ids);
 
                 await knex('collaborator_invitations')
-                                .where({agency_id: db_agency.id})
+                                .where({client_id: client.id})
                                 .del();
 
                 await knex('collaborators')
-                                .where({agency_id: db_agency.id})
-                                .del();
+                        .where({client_id: client.id})
+                        .del();
+                
+                await knex('wallets')
+                        .where({client_id: client.id})
+                        .del();
 
                 await knex('accounts')
                         .whereIn('id', account_ids)
                         .del();
 
-                // Remove agency
-                await knex('agencies')
+                // Remove config_client
+                await knex('clients')
                         .where({
-                                name: agency.agency_data.name,
-                                contact_email: agency.agency_data.contact_email,
+                        name: config_client.client_data.name,
+                        description: config_client.client_data.description
                         })
-                        .del();  
-            }
-            
-        }
-
-        // Remove Warehouses
-        await knex('warehouses')
-                .where({ client_id: client.id})
-                .del();
-
-        
-        // Remove Brands 
-        await knex('brands')
-                .where({client_id: client.id})
-                .del();
-        
-        // Remove venues 
-        await knex('venues')
-                .where({created_by: client.id})
-                .del();
-
-        // Remove collaborators
-        const collaborator_emails = config_client.collaborators.map(collaborator => collaborator.account.email);
-        const accounts = 
-            await knex('accounts')
-                    .whereIn('email', collaborator_emails);
-
-        const account_ids = accounts.map(account => account.id);
-
-        await knex('collaborator_invitations')
-                        .where({client_id: client.id})
                         .del();
-
-        await knex('collaborators')
-                .where({client_id: client.id})
-                .del();
-
-        await knex('accounts')
-                .whereIn('id', account_ids)
-                .del();
-
-        // Remove config_client
-        await knex('clients')
-                .where({
-                    name: config_client.client_data.name,
-                    description: config_client.client_data.description
-                })
-                .del();
-    }
+                }
+        }
 
     /* REMOVE ORGANIZATION */
     // Fetch organization
@@ -101,15 +107,18 @@ exports.seed = async (knex) => {
             .del();
 
     // Delete accounts and collaborators.
-    const collaborator_emails = config.ORGANIZATION_COLLABORATORS.map(collaborator => collaborator.account.email);
+    const organization_collaborators = await knex('collaborators').where({ regional_organization_id: organization.id });
+    const account_ids = await organization_collaborators.map(oc => oc.account_id);
     
-    const accounts = 
-            await knex('accounts')
-                    .whereIn('email', collaborator_emails);
-
-    const account_ids = accounts.map(account => account.id);
+    await knex('collaborator_invitations')
+        .where({regional_organization_id: organization.id})
+        .del();
 
     await knex('collaborators')
+            .whereIn('account_id', account_ids)
+            .del();
+    
+    await knex('wallets')
             .whereIn('account_id', account_ids)
             .del();
 
