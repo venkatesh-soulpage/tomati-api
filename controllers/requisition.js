@@ -55,7 +55,10 @@ const getRequisitions = async (req, res, next) => {
                             ]
                         ],
                         brief.[
-                            brief_events.[venue], 
+                            brief_events.[
+                                venue,
+                                event
+                            ], 
                             brands.[
                                 brand
                             ]
@@ -162,7 +165,7 @@ const updateRequisitionStatus = async (req, res, next) => {
                                 brief_events.[
                                     orders.[
                                         product
-                                    ]
+                                    ],
                                 ]
                             ]
                         ]`)

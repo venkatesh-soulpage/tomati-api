@@ -16,7 +16,10 @@ const getUser = async (req, res, next) => {
 
         const account = 
             await models.Account.query()
-                    .withGraphFetched('[wallet]')
+                    .withGraphFetched(`[
+                        wallet, 
+                        location
+                    ]`)
                     .findById(account_id);
 
         if (!account) return res.status(400).json('Invalid account').send();
