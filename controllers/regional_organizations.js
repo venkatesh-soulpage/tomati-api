@@ -26,7 +26,9 @@ const getOrganizations = async (req, res, next) => {
                     .withGraphFetched(`[
                         clients,
                         collaborators.[
-                            account, 
+                            account.[
+                                wallet
+                            ], 
                             role
                         ],
                         collaborator_invitations.[

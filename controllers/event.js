@@ -206,6 +206,48 @@ const updateEventField = async (req, res, next) => {
     }
 }
 
+// POST - Fund event credit wallet 
+const fundEvent = async (req, res, next) => {
+    try { 
+        const {account_id} = req;  
+        const {event_id} = req.params;
+        const {funding_amount} = req.body;
+
+        const event = await models.Event.query().where({ id: event_id }).first();   
+        
+        // Verify wallet 
+        const wallet = await models.Wallet.query().where({account_id}).first();
+
+        if (!wallet) return res.status(400).json('Invalid funding account').first();
+        if (wallet.balance < funding_amount) return res.status(400).json('Insufficient wallet balance').send();
+
+        // Calculate credits left required
+        const credits_left = (event.credits_left + funding_amount);
+
+        // Substract the credits from account wallet 
+        await models.Wallet.query()
+                .update({
+                    balance: Number(wallet.balance) - Number(funding_amount),
+                })
+                .where({
+                    account_id,
+                })
+
+        // Update credits left
+        await models.Event.query()
+                .update({ 
+                    credits_left,
+                })
+                .where({id: event_id});
+
+        return res.status(200).json(`Successfully added ${funding_amount} credits to ${event.name}`).send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 // POST - Invite a user
 const inviteGuest = async (req, res, next)  => {
     try { 
@@ -870,7 +912,8 @@ const eventsController = {
     removeEventCondition, 
     updateEventProduct,
     generateFreeDrinkCode,
-    redeemFreeDrinkCode
+    redeemFreeDrinkCode,
+    fundEvent
 }
 
 export default eventsController;

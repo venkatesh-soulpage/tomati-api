@@ -154,6 +154,17 @@ router.post(
     eventsController.redeemCode
 );
 
+// POST - Fund an event from client wallet 
+router.post(
+    '/:event_id/fund',
+    VerifyToken,
+    VerifyRole([
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+    ]),
+    eventsController.fundEvent
+)
+
 // EVENT PRODUCTS
 
 // POST - Add a new product to the menu

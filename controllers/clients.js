@@ -39,7 +39,9 @@ const getClients = async (req, res, next) => {
                 location
             ], 
             client_collaborators.[
-                account, 
+                account.[
+                    wallet
+                ], 
                 role
             ],
             collaborator_invitations.[
