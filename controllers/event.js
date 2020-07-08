@@ -219,10 +219,10 @@ const fundEvent = async (req, res, next) => {
         const wallet = await models.Wallet.query().where({account_id}).first();
 
         if (!wallet) return res.status(400).json('Invalid funding account').first();
-        if (wallet.balance < funding_amount) return res.status(400).json('Insufficient wallet balance').send();
+        if (wallet.balance < Number(funding_amount)) return res.status(400).json('Insufficient wallet balance').send();
 
         // Calculate credits left required
-        const credits_left = (event.credits_left + funding_amount);
+        const credits_left = (Number(event.credits_left) + Number(funding_amount));
 
         // Substract the credits from account wallet 
         await models.Wallet.query()

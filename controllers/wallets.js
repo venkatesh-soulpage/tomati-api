@@ -404,6 +404,45 @@ const transferCredits = async (req, res, next) => {
     }
 }
 
+const addFundsToCollaboratorWallet = async (req, res, next) => {
+    try {
+        const {account_id} = req;
+        const {collaborator_account_id, credits_amount} = req.body;
+
+        const sending_account = await models.Account.query().where({ id: account_id }).first();
+        const collaborator_account = 
+                    await models.Account.query()
+                            .withGraphFetched(`[wallet]`)
+                            .where({ id: collaborator_account_id})
+                            .first();
+
+        // Update the collaborator wallet balance
+        const new_balance = Number(collaborator_account.wallet.balance) + Number(credits_amount);
+        await models.Wallet.query()
+                .update({
+                    balance: new_balance > 0 ? new_balance : 0,
+                })
+                .where({
+                    account_id: collaborator_account_id
+                })
+        
+        // Add the transfeer log to the db
+        await models.TransferLog.query()
+                .insert({
+                    from_account_id: sending_account.id,
+                    to_account_id: collaborator_account.id,
+                    amount: credits_amount
+                })
+
+        // Return message
+        return res.status(200).json(`Successfully added ${credits_amount} to ${collaborator_account.email}`).send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 const walletController = {
     createOrder,
     getOrder,
@@ -413,7 +452,8 @@ const walletController = {
     addCreditsWithQR, 
     approveCreditsWithQR,
     getWalletPurchase, 
-    transferCredits
+    transferCredits,
+    addFundsToCollaboratorWallet,
 }
 
 export default walletController;

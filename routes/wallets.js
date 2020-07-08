@@ -118,5 +118,15 @@ router.post(
     walletController.transferCredits
 );
 
+/* POST - Transfer credits from one wallet to another*/
+router.post(
+    '/admin-transfer', 
+    VerifyToken, 
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+    ]),
+    walletController.addFundsToCollaboratorWallet
+);
+
 
 module.exports = router;
