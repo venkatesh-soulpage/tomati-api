@@ -196,7 +196,6 @@ const updateRequisitionStatus = async (req, res, next) => {
                             ended_at: brief_event.end_time,
                             master_code: Math.random().toString(36).substring(7).toUpperCase(),
                             is_master_code_enabled: true,
-                            credits_left: 10000,
                         })
             }
         }

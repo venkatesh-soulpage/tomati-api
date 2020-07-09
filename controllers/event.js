@@ -451,17 +451,6 @@ const checkInGuest = async (req, res, next) => {
                     check_in_time: new Date(),
                 })
                 .where('id', guest.id)
-
-            // Update users wallet with free credits defined on brief event
-            const wallet = await models.Wallet.query().where('account_id', guest.account_id).first();
-        
-            if (wallet) {
-                await models.Wallet.query()
-                        .update({
-                            balance: Number(wallet.balance) + Number(guest.event.brief_event.free_drinks_per_guest),
-                        })
-                        .where('id', wallet.id);
-            }
         }
         
         // Return the gues with account

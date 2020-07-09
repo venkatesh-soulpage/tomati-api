@@ -55,8 +55,10 @@ router.get(
     VerifyRole([
         {scope: 'REGION', role: 'OWNER'},
         {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'WAREHOUSE_MANAGER'},
         {scope: 'BRAND', role: 'MANAGER'},
         {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
     ]),
     pdfController.eventReport
 );
@@ -66,6 +68,8 @@ router.get(
     '/my-events', 
     VerifyToken, 
     VerifyRole([
+        {scope: 'REGION', role: 'OWNER'},
+        {scope: 'REGION', role: 'MANAGER'},
         {scope: 'BRAND', role: 'OWNER'},
         {scope: 'BRAND', role: 'MANAGER'},
         {scope: 'GUEST', role: 'REGULAR'},

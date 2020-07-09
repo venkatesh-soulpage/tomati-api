@@ -444,9 +444,9 @@ const agencySignup = async (req, res, next) => {
 const guestSignup = async (req, res, next) => {
     try { 
 
-        const {email, first_name, last_name, phone_number, code, password} = req.body;
+        const {email, first_name, last_name, phone_number, code, password, gender, date_of_birth} = req.body;
 
-        if (!email || !first_name || !last_name || !phone_number || !code || !password ) return res.status(400).json('Missing fields').send();
+        if (!email || !first_name || !last_name || !phone_number || !code || !password || !gender || !date_of_birth ) return res.status(400).json('Missing fields').send();
 
         // Check if the account doesn't exist
         const account = 
@@ -501,6 +501,8 @@ const guestSignup = async (req, res, next) => {
                         is_email_verified: true,
                         is_age_verified: false,
                         location_id: guest.event.brief.client.location_id,
+                        gender, 
+                        date_of_birth,
                     });
 
             // Generate the login token
