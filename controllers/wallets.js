@@ -132,6 +132,16 @@ const cancelOrder = async (req, res, next) => {
         const {account_id} = req;
         const {order_id} = req.params;
 
+        // Get the account wallet
+        const account = 
+            await models.Account.query()
+                    .withGraphFetched(`[
+                        location
+                    ]`) 
+                    .findById(account_id);
+                    
+        if (!account) return res.status(400).json('Invalid Request').send();
+        
         const order = 
                 await models.WalletOrder.query()
                         .withGraphFetched(`[
@@ -164,7 +174,7 @@ const cancelOrder = async (req, res, next) => {
         // Refund credits
         await models.Wallet.query()
                 .update({
-                    balance: Number(order.total_amount) + Number(order.wallet.balance),
+                    balance: Number(Math.round(order.total_amount * account.location.currency_conversion * 100) / 100) + Number(order.wallet.balance),
                 })
                 .where('id', order.wallet.id);
 
