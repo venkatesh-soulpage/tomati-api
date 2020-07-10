@@ -51,12 +51,18 @@ const createOrder = async (req, res, next) => {
         
         if (wallet.balance < coin_total_amount) return res.status(400).json("Insufficicent balance").send();
 
+        // Get the first reference product and assign the event id to this order
+        const reference_event_product = 
+            await models.EventProduct.query()
+                    .findById(transactions[0]);
+
         // If the wallet has enough balance procced to complete the order.
         const order_identifier = randomString(10); 
         const wallet_order = 
             await models.WalletOrder.query()
                     .insert({
                         wallet_id,
+                        event_id: reference_event_product.event_id,
                         total_amount,
                         order_identifier,
                         status: 'CREATED',
@@ -452,6 +458,103 @@ const addFundsToCollaboratorWallet = async (req, res, next) => {
     }
 }
 
+const getWalletActions = async (req, res, next) => {
+    try {
+
+        const {account_id} = req;
+
+        // Get account wallet
+        const wallet =
+                await models.Wallet.query()
+                        .where({account_id})
+                        .first();
+        
+        // Get all the transfer logs sent or received
+        const sent_transfer_logs = 
+            await models.TransferLog.query()
+                    .withGraphFetched(`[
+                        target_account
+                    ]`)
+                    .where({
+                        from_account_id: account_id,
+                    });
+        
+        const received_transfer_logs = 
+            await models.TransferLog.query()
+                    .withGraphFetched(`[
+                        source_account
+                    ]`)
+                    .where({
+                        to_account_id: account_id,
+                    });
+
+        // Get wallet purchases
+        const wallet_purchases = 
+            await models.WalletPurchase.query()
+                    .withGraphFetched(`[
+                        event.[
+                            brief_event
+                        ]
+                    ]`)
+                    .where({
+                        wallet_id: wallet.id,
+                    })
+
+        // Get wallet orders 
+        const wallet_orders =
+            await models.WalletOrder.query()
+                    .withGraphFetched(`[
+                        event.[
+                            brief_event
+                        ]
+                    ]`)
+                    .where({
+                        wallet_id: wallet.id
+                    })
+
+        // Normalize all actions into a single object
+        const actions = [];
+
+        sent_transfer_logs.map(transfer_log => {
+            actions.push({
+                ...transfer_log,
+                action: 'SENT_TRANSFER',
+            })
+        })
+
+        received_transfer_logs.map(transfer_log => {
+            actions.push({
+                ...transfer_log,
+                action: 'RECEIVED_TRANSFER',
+            })
+        })
+
+        wallet_purchases.map(wallet_purchase => {
+            actions.push({
+                ...wallet_purchase,
+                action: 'PURCHASE'
+            });
+        })
+
+        wallet_orders.map(wallet_order => {
+            actions.push({
+                ...wallet_order,
+                action: 'ORDER'
+            })
+        });
+
+        // Order the transactions in order
+        const ordered_actions = 
+            actions.sort((a,b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        
+        return res.status(200).send(ordered_actions)
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+} 
+
 const walletController = {
     createOrder,
     getOrder,
@@ -463,6 +566,7 @@ const walletController = {
     getWalletPurchase, 
     transferCredits,
     addFundsToCollaboratorWallet,
+    getWalletActions
 }
 
 export default walletController;

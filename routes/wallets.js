@@ -4,6 +4,18 @@ import walletController from '../controllers/wallets';
 import VerifyToken from '../utils/verification'
 import VerifyRole from '../utils/verification_role'
 
+// Get actions
+router.get(
+    '/:wallet_id/actions',
+    VerifyToken,
+    VerifyRole([
+        {scope: 'GUEST', role: 'REGULAR'},
+        {scope: 'GUEST', role: 'VIP'},
+        {scope: 'GUEST', role: 'VVIP'},
+    ]),
+    walletController.getWalletActions
+)
+
 /* POST - Create a new order with products */
 router.post(
     '/:wallet_id/add-order', 
