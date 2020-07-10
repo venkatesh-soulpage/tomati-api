@@ -16,6 +16,14 @@ export default class EventCondition extends Model {
             to: 'events.id'
           }
         },
+        role: {
+          relation: Model.HasOneRelation,
+          modelClass: models.Role,
+          join: {
+            from: 'event_free_drinks_conditions.role_id',
+            to: 'roles.id'
+          }
+        },
       }
     }
   }

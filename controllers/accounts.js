@@ -18,7 +18,7 @@ const getUser = async (req, res, next) => {
             await models.Account.query()
                     .withGraphFetched(`[
                         wallet, 
-                        location
+                        location,
                     ]`)
                     .findById(account_id);
 

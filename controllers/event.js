@@ -115,6 +115,11 @@ const getEvents = async (req, res, next) => {
                 .withGraphFetched(`
                     [
                         brief_events.[
+                            orders.[
+                                product.[
+                                    ingredients
+                                ]
+                            ],
                             brief.[
                                 brands
                             ],
@@ -125,7 +130,9 @@ const getEvents = async (req, res, next) => {
                                 products.[
                                     product
                                 ],
-                                condition
+                                condition.[
+                                    role
+                                ]
                             ], 
                             venue
                         ]
@@ -213,7 +220,11 @@ const fundEvent = async (req, res, next) => {
         const {event_id} = req.params;
         const {funding_amount} = req.body;
 
-        const event = await models.Event.query().where({ id: event_id }).first();   
+        const event = await models.Event.query()
+                            .withGraphFetched(`[
+                                brief_event
+                            ]`)
+                            .where({ id: event_id }).first();   
         
         // Verify wallet 
         const wallet = await models.Wallet.query().where({account_id}).first();
@@ -223,6 +234,7 @@ const fundEvent = async (req, res, next) => {
 
         // Calculate credits left required
         const credits_left = (Number(event.credits_left) + Number(funding_amount));
+        const total_credits_funded = Number(event.total_credits_funded) + Number(funding_amount);
 
         // Substract the credits from account wallet 
         await models.Wallet.query()
@@ -237,10 +249,11 @@ const fundEvent = async (req, res, next) => {
         await models.Event.query()
                 .update({ 
                     credits_left,
+                    total_credits_funded
                 })
                 .where({id: event_id});
 
-        return res.status(200).json(`Successfully added ${funding_amount} credits to ${event.name}`).send();
+        return res.status(200).json(`Successfully added ${funding_amount} credits to ${event.brief_event.name}`).send();
 
     } catch (e) {
         console.log(e);
@@ -745,7 +758,7 @@ const addEventCondition = async (req, res, next) => {
     try {
 
         const {event_id} = req.params;
-        const {condition_type, end_time, gender, limit, max_age, min_age, start_time} = req.body;
+        const {condition_type, end_time, gender, limit, max_age, min_age, start_time, role_id} = req.body;
 
         // Delete conditions for this event
         await models.EventCondition.query()
@@ -755,7 +768,7 @@ const addEventCondition = async (req, res, next) => {
         await models.EventCondition.query()
                 .insert({
                     event_id,
-                    condition_type, end_time, gender, limit, max_age, min_age, start_time
+                    condition_type, end_time, gender, limit, max_age, min_age, start_time, role_id
                 })
 
         return res.status(200).json('Condition created').send();

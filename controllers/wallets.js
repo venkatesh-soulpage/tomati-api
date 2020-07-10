@@ -18,6 +18,12 @@ const createOrder = async (req, res, next) => {
         const {wallet_id} = req.params;
         const {transactions} = req.body;
 
+        // Get user account with location so we can get the current conversion rate
+        const account = await models.Account.query()
+                                .withGraphFetched(`location`)
+                                .where({id: account_id})
+                                .first();
+
         // Transactions should be an array of event products ids,
         // Get the actual values for the event products and avoid calculating the total price for each item and the order on the front-end
         const event_products = [];
@@ -35,12 +41,15 @@ const createOrder = async (req, res, next) => {
         if (!wallet) return res.status(400).json('Invalid wallet').send();
         if (wallet.account_id !== account_id) return res.status(400).json('Invalid account').send();
 
+        // Validate the correct amount with the current rate
         const total_amount = 
             event_products.reduce((acc, curr) => {
                 return acc + curr.price;
             }, 0);
-            
-        if (wallet.balance < total_amount) return res.status(400).json("Insufficicent balance").send();
+
+        const coin_total_amount = Math.round(total_amount * account.location.currency_conversion * 1000) / 1000;
+        
+        if (wallet.balance < coin_total_amount) return res.status(400).json("Insufficicent balance").send();
 
         // If the wallet has enough balance procced to complete the order.
         const order_identifier = randomString(10); 
@@ -68,7 +77,7 @@ const createOrder = async (req, res, next) => {
        // Reduce the balance from the wallet 
        await models.Wallet.query()
                 .update({
-                    balance: wallet.balance - total_amount
+                    balance: wallet.balance - coin_total_amount
                 })
                 .where('id', wallet.id);
         
