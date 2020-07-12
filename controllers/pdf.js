@@ -34,7 +34,7 @@ const getCurrentDisplayUnits = (requisition, product_id, is_display) => {
                 // Calculate bottles from units
                 const ingredient = curr.product.ingredients.find(ing => ing.product_id === product_id );
                 const totalml = ingredient.quantity * curr.units;
-                const totalUnits = Math.round(totalml / curr.product.metric_amount); 
+                const totalUnits = Math.round(totalml / ingredient.product.metric_amount); 
                 return acc + totalUnits;
             } else {
                 return acc;
@@ -64,7 +64,7 @@ const getCurrentUnits = (requisition, product_id) => {
             // Calculate bottles from units
             const ingredient = curr.product.ingredients.find(ing => ing.product_id === product_id );
             const totalml = ingredient.quantity * curr.units;
-            const totalUnits = Math.round(totalml / curr.product.metric_amount); 
+            const totalUnits = Math.round(totalml / ingredient.product.metric_amount); 
             return acc + totalUnits;
         } else {
             return acc;
@@ -390,7 +390,9 @@ const getRequisitionApprovalPdf = async (req, res, next) => {
                             ],
                             orders.[
                                 product.[
-                                    ingredients
+                                    ingredients.[
+                                        product
+                                    ]
                                 ]
                             ],
                             created_by_account
@@ -449,7 +451,9 @@ const helloSignPDF = async (requisition_id) => {
                             ],
                             orders.[
                                 product.[
-                                    ingredients
+                                    ingredients.[
+                                        product
+                                    ]
                                 ]
                             ],
                             created_by_account,
