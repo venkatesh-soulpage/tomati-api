@@ -34,7 +34,7 @@ const getOrganizationAnalytics = async (req, res, next) => {
                 await models.Brief.query()
                     .withGraphFetched(`[
                         brief_events.[
-                            event
+                            event,
                         ]
                     ]`)
                     .modifyGraph('brief_events.event', builder => {
@@ -60,6 +60,9 @@ const getOrganizationAnalytics = async (req, res, next) => {
                                     client.[
                                         location
                                     ]
+                                ],
+                                venue.[
+                                    location
                                 ]
                             ], 
                             guests,
@@ -126,6 +129,9 @@ const getClientAnalytics = async (req, res, next) => {
                                     client.[
                                         location
                                     ]
+                                ],
+                                venue.[
+                                    location
                                 ]
                             ], 
                             guests,
