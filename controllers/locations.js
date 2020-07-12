@@ -49,6 +49,27 @@ const getLocations = async (req, res, next) => {
     }
 }
 
+const getChildrenLocations = async (req, res, next) => {
+    try {
+        const {location_id} = req.params;
+
+        const available_locations =
+            await models.Location.query()
+                    .withGraphFetched(`[
+                        childrens.[
+                            childrens
+                        ]
+                    ]`)
+                    .findById(location_id);
+
+        return res.status(200).send(available_locations.childrens);
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 // POST - Create a new location
 const createLocation = async (req, res, next) => {
     try {    
@@ -90,6 +111,7 @@ const updateCurrencyRate = async (req, res, next) => {
 
 const locationsController = {
     getLocations,
+    getChildrenLocations,
     createLocation,
     updateCurrencyRate,
 }

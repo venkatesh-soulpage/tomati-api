@@ -18,6 +18,20 @@ router.get(
     locationsController.getLocations
 );
 
+/* GET - Get a list of venues */
+router.get(
+    '/:location_id/children', 
+    VerifyToken, 
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'REGION', role: 'OWNER'},
+        {scope: 'REGION', role: 'MANAGER'},
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+    ]),
+    locationsController.getChildrenLocations
+);
+
 /* POST - Create a location */
 router.post(
     '/', 
