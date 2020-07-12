@@ -600,7 +600,7 @@ const updateRequisitionDelivery = async (req, res, next) => {
                                 account_id,
                                 requisition_id: new_delivery.requisition_id,
                                 quantity: refund.refund_amount,
-                                action: 'DISPUTED'
+                                action: 'REFUND (DISPUTE)'
                             })
                     
                     // Update the current amount
