@@ -212,8 +212,8 @@ const updateRequisitionStatus = async (req, res, next) => {
             }
         }
 
-        // IF REQUEST MODIFICATIONS
-        if (status == 'DRAFT' || status === 'CHANGES REQUIRED') {
+        // IF It's draft
+        if (status == 'DRAFT') {
             await models.Brief.query()
                 .update({status: 'ON PROGRESS'})
                 .where('id', requisition.brief_id);
@@ -221,6 +221,18 @@ const updateRequisitionStatus = async (req, res, next) => {
             // MAIL notifications
             for (const collaborator of requisition.client.client_collaborators) {
                 await sendRequisitionToEmail(requisition, collaborator.account, status);
+            }
+        }
+
+        // IF REQUEST MODIFICATIONS
+        if (status === 'CHANGES REQUIRED') {
+            await models.Brief.query()
+                .update({status: 'ON PROGRESS'})
+                .where('id', requisition.brief_id);
+            
+            // MAIL notifications
+            for (const collaborator of requisition.client.client_collaborators) {
+                await sendRequisitionToEmail(requisition, collaborator.account, status, {comments});
             }
         }
 

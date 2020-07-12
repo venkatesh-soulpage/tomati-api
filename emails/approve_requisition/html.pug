@@ -5,6 +5,10 @@ block content
   p
     | The requisition ##{requisition.serial_number} has been changed to 
     strong #{status}
+  if comments
+    p 
+      | Comments :
+      | #{comments}
   p 
     | Here is a list of the events: 
   div(display="flex", flexDirection="column")

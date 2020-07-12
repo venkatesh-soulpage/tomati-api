@@ -167,7 +167,7 @@ const sendFotgotPasswordEmail = (user, token) => {
     .catch(console.error);
 }
 
-const sendRequisitionToEmail = (requisition, account, status) => {
+const sendRequisitionToEmail = (requisition, account, status, options) => {
     const email = new Email({
         message: {
             from: process.env.SMTP_AUTH,
@@ -190,6 +190,7 @@ const sendRequisitionToEmail = (requisition, account, status) => {
             moment,
             route: `${process.env.SCHEMA}://${process.env.FRONT_HOST}${process.env.FRONT_PORT  && `:${process.env.FRONT_PORT}`}/requisitions`,
             status,
+            comments: options && options.comments
         }
     })
     .then(/* console.log */)
