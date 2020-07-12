@@ -40,7 +40,7 @@ const getOrganizationEvents = async (req, res, next) => {
             client.briefs.map(brief => {
                 brief.brief_events
                         .filter(brief_event => {
-                            return brief_event.event && new Date(brief_event.event.ended_at).getTime() <= new Date().getTime()
+                            return brief_event.event && (new Date(brief_event.event.ended_at).getTime() <= new Date().getTime());
                         })
                         .map(brief_event => events.push(brief_event));
             })

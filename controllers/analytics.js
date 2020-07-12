@@ -33,7 +33,7 @@ const getOrganizationAnalytics = async (req, res, next) => {
         const briefs = 
                 await models.Brief.query()
                     .withGraphFetched(`[
-                    brief_events.[
+                        brief_events.[
                             event
                         ]
                     ]`)
@@ -50,6 +50,7 @@ const getOrganizationAnalytics = async (req, res, next) => {
                 }
             })
         })
+
 
         const events = 
                 await models.Event.query()
