@@ -212,6 +212,7 @@ const inviteCollaborator = async (req, res, next) => {
         // Validate email 
         const account = 
             await models.Account.query()
+                .withGraphFetched('collaborator')
                 .where('email', email)
                 .first();
 

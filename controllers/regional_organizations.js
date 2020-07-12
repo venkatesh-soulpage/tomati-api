@@ -66,7 +66,7 @@ const inviteOrganization = async (req, res, next) => {
 
         // Validate that the client hasn't been registered on the platform
         const client_account = await models.Account.query().where('email', owner_email).first();
-        if (client_account) return res.status(400).json('The owner email is already registered.').send();
+        if (client_account) return res.status(400).json('An account already exists with this email address').send();
 
         // Create client
         const organization = 

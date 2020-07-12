@@ -159,6 +159,12 @@ const inviteAgency = async (req, res, next) => {
         // Validate client
         if (!collaborator) return res.status(400).json('Invalid client').send();
 
+        // Validate that the invite is sent to a new email
+        const new_account = 
+                await models.Account.query().where({email: owner_email}).first();
+
+        if (new_account) return res.status(400).json('An account already exists with this email address').send();
+
         // Validate limits
         if (collaborator.client.agencies_limit <= collaborator.client.agencies.length) {
             return res.status(400).json(
