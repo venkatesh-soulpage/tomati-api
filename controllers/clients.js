@@ -118,10 +118,21 @@ const inviteClient = async (req, res, next) => {
                     .withGraphFetched('[organization, account]')
                     .first();
 
-
         // If its invited by a regional owner assign the correct id
         const regional_organization_id = collaborator && collaborator.organization && collaborator.organization.id;
         const client_expiration_date = collaborator && collaborator.organization ? collaborator.organization.expiration_date : expiration_date;
+
+
+        // Validate that there isn't another client on the same location 1 client = 1 country
+        const same_location_client =
+            await models.Client.query()
+                    .where({
+                        regional_organization_id,
+                        location_id
+                    })
+                    .first();
+        
+        if (same_location_client) return res.status(400).json('You already have a team on this country location.').send();
 
         // Create client
         const client = 

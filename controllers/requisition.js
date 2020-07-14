@@ -20,7 +20,14 @@ const getRequisitions = async (req, res, next) => {
         // Get the collaborators
         const collaborator =   
             await models.Collaborator.query()
-                    .withGraphFetched(`[client, agency]`)
+                    .withGraphFetched(`[
+                        account,
+                        client, 
+                        agency, 
+                        organization.[
+                            clients
+                        ]
+                    ]`)
                     .where('account_id', account_id)
                     .first();
 
@@ -35,7 +42,11 @@ const getRequisitions = async (req, res, next) => {
                             }
                             if (scope === 'BRAND') {
                                 queryBuilder.where('client_id', collaborator.client_id)
-                            } 
+                            }
+                            if (scope === 'REGION') {
+                                const client = collaborator.organization.clients.find(client => client.location_id === collaborator.account.location_id);
+                                queryBuilder.where('client_id', client ? client.id : 0);
+                            }
                         });
         
         const briefs_ids = briefs.map(brief => brief.id);

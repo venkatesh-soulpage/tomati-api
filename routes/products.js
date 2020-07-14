@@ -23,6 +23,8 @@ router.get(
     '/client-products', 
     VerifyToken, 
     VerifyRole([
+        {scope: 'REGION', role: 'OWNER'},
+        {scope: 'REGION', role: 'MANAGER'},
         {scope: 'BRAND', role: 'OWNER'},
         {scope: 'BRAND', role: 'MANAGER'},
         {scope: 'BRAND', role: 'WAREHOUSE_MANAGER'},

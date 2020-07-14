@@ -28,6 +28,24 @@ const getBriefs = async (req, res, next) => {
 
         // Validate the collaborators
         let collaborator;
+        let client;
+
+        // If client query client collaborators
+        if (scope === 'REGION') {
+            collaborator = 
+                await models.Collaborator.query()
+                    .withGraphFetched('[account]')
+                    .where('account_id', account_id)
+                    .first();
+
+            client =
+                await models.Client.query()
+                        .where({
+                            regional_organization_id: collaborator.regional_organization_id,
+                            location_id: collaborator.account.location_id,
+                        })
+                        .first();
+        }
 
         // If client query client collaborators
         if (scope === 'BRAND') {
@@ -51,7 +69,7 @@ const getBriefs = async (req, res, next) => {
         
         if (!collaborator) return res.status(400).json('Invalid collaborator').send();
 
-        // Create the brief
+        // Fetch the brief
         const briefs = 
             await models.Brief.query()
                 .withGraphFetched(`
@@ -69,11 +87,14 @@ const getBriefs = async (req, res, next) => {
                     ]`
                 )
                 .modify((queryBuilder) => {
+                    if (scope === 'REGION') {
+                        return queryBuilder.where('client_id', client ? client.id : 0);
+                    }
                     if (scope === 'BRAND') {
-                        queryBuilder.where('client_id', collaborator.client_id)
+                        return queryBuilder.where('client_id', collaborator.client_id)
                     }
                     if (scope === 'AGENCY') {
-                        queryBuilder
+                        return queryBuilder
                             .where('client_id', collaborator.client.id)
                             .where('agency_id', collaborator.agency_id)
                             .whereNotIn('status', ['DRAFT']);
@@ -89,8 +110,6 @@ const getBriefs = async (req, res, next) => {
         return res.status(200).send(briefs);
 
     } catch (e) {
-        console.log(e);
-        console.log(req.headers);
         return res.status(500).json(JSON.stringify(e)).send();
     }
 }

@@ -14,6 +14,7 @@ const getProducts = async (req, res, next) => {
     
         // Validate the account is a client collaborator
         let client;
+
         if (scope === 'BRAND') {
             const client_collaborators = 
                 await models.ClientCollaborator.query()
@@ -81,7 +82,7 @@ const getClientProducts = async (req, res, next) => {
             collaborator = agency_collaborators[0]; 
         }
 
-        if (scope == 'BRAND') {
+        if (scope === 'BRAND') {
             const client_collaborators =
             await models.ClientCollaborator.query()
                 .withGraphFetched('[client]')
@@ -92,13 +93,38 @@ const getClientProducts = async (req, res, next) => {
             collaborator = client_collaborators[0]; 
         }
 
+        if (scope === 'REGION') {
+            collaborator = 
+                await models.Collaborator.query()
+                    .withGraphFetched(`[
+                        organization.[
+                            clients
+                        ]
+                    ]`)
+                    .where('account_id', account_id)
+                    .first();
+                
+            if (!collaborator) return res.status(400).send('Invalid account');
+        }
+
         // Validate client
         // if (`${collaborator.client.id}` !== client_id) return res.status(400).json("You don't have access to this client").send();
 
         const products = 
             await models.Product.query()
                 .withGraphFetched('[ingredients.[product], brand]')
-                .where('client_id', collaborator.client.id);
+                .modify(queryBuilder => {
+                    if (scope === 'AGENCY') {
+                        queryBuilder.where('client_id', collaborator.client.id);
+                    }
+                    if (scope === 'BRAND') {
+                        queryBuilder.where('client_id', collaborator.client.id);
+                    }
+                    if (scope === 'REGION') {
+                        console.log()
+                        queryBuilder.where('client_id', collaborator.organization.clients[0].id);
+                    }
+                });
 
         return res.status(200).send(products);
 

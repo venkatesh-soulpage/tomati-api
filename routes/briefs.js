@@ -9,6 +9,8 @@ router.get(
     '/', 
     VerifyToken, 
     VerifyRole([
+        {scope: 'REGION', role: 'OWNER'},
+        {scope: 'REGION', role: 'MANAGER'},
         {scope: 'BRAND', role: 'OWNER'},
         {scope: 'BRAND', role: 'MANAGER'},
         {scope: 'AGENCY', role: 'OWNER'},
