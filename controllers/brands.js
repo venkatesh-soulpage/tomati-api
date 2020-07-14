@@ -132,10 +132,74 @@ const createBrand = async (req, res, next) => {
     }
 }
 
+const updateBrand = async (req, res, next) => {
+    try {
+
+        const {account_id, scope} = req;
+        const {brand_id} = req.params;
+        const {brand} = req.body;
+
+        // Validate that the brand is from the collaborator organization
+        const collaborator =
+            await
+                models.Collaborator.query()
+                    .withGraphFetched(`[
+                        account,
+                        organization.[
+                            clients
+                        ],
+                        client
+                    ]`)
+                    .where({
+                        account_id
+                    })
+                    .first();
+
+        if (!collaborator) return res.status(400).json('Invalid Collaborator').send();
+
+        // Get current brand
+        const current_brand =   
+                    await models.Brand.query()
+                            .findById(brand_id);
+
+        // Validate if the user has permissions
+        if (scope === 'REGION') {
+            if (!collaborator.organization) return res.status(400).json('Invalid collaborator').send();
+
+            // Search for the location organization
+            const client = collaborator.organization.clients.find(client => client.location_id === collaborator.account.location_id);
+
+            if (!client) return res.status(400).json('Invalid Client').send();
+
+            // Validate that the brand is inside the team
+            if (client.id !== current_brand.client_id) return res.status(400).json("You don't have permission to edit this brand").send();
+        }
+
+        // Validate for brand scope
+        if (scope === 'BRAND') {
+            if (!collaborator.client)return res.status(400).json('Invalid collaborator').send();
+            if (collaborator.client_id !== current_brand.client_id) return res.status(400).json("You don't have permission to edit this brand").send();
+        }
+    
+        // Validate that is a valid collaborator
+        await models.Brand.query()
+                .update({...brand})
+                .where({id: brand_id});
+
+        return res.status(200).json('Successfully updated').send()
+
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 
 const brandController = {
     getBrands,
-    createBrand
+    createBrand,
+    updateBrand
 }
 
 export default brandController;

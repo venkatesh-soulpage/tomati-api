@@ -32,5 +32,17 @@ router.post(
     brandsController.createBrand
 );
 
+/* PUT - Update an existing brand */
+router.put(
+    '/:brand_id', 
+    VerifyToken, 
+    VerifyRole([
+        {scope: 'REGION', role: 'OWNER'},
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+    ]),
+    brandsController.updateBrand
+);
+
 
 module.exports = router;
