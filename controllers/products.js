@@ -15,6 +15,39 @@ const getProducts = async (req, res, next) => {
         // Validate the account is a client collaborator
         let client;
 
+        if (scope === 'REGION') {
+            const collaborator = 
+                await models.Collaborator.query()
+                    .withGraphFetched(`[
+                        account,
+                        organization.[
+                            clients
+                        ]
+                    ]`)
+                    .where('account_id', account_id)
+                    .first();
+                
+            if (!collaborator) return res.status(400).send('Invalid account');
+
+            const location_client = 
+                collaborator.organization.clients.find(client => collaborator.account.location_id === client.location_id);
+
+            client =
+                await models.Client.query()
+                    .findById(location_client ? location_client.id : 0)
+                    .withGraphFetched(`[
+                        products.[
+                            brand, 
+                            stocks, 
+                            ingredients.[
+                                product
+                            ]
+                        ]
+                    ]`);   
+
+            if (!client) return res.status(200).send([]);
+        }
+
         if (scope === 'BRAND') {
             const client_collaborators = 
                 await models.ClientCollaborator.query()

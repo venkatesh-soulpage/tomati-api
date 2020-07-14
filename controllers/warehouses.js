@@ -12,18 +12,42 @@ const getWarehouses = async (req, res, next) => {
         const {account_id, scope} = req;
 
         // Validate the account is a client collaborator
-        const client_collaborators = 
-            await models.ClientCollaborator.query()
+        const collaborator = 
+            await models.Collaborator.query()
+                .withGraphFetched(`[
+                    account,
+                    organization.[
+                        clients
+                    ]
+                ]`)
                 .where('account_id', account_id)
+                .first();
 
-        const warehouses =  
-            await models.Warehouse.query()
-                .withGraphFetched('[location, stocks.[product, transactions.[account, requisition]]]')
-                .modify((queryBuilder) => {
-                    if (scope !== 'ADMIN') {
-                        queryBuilder.where('client_id', client_collaborators[0].client_id);
-                    }
-                }) 
+        let warehouses;
+
+        if (scope === 'BRAND') {
+            warehouses =  
+                await models.Warehouse.query()
+                    .withGraphFetched('[location, stocks.[product, transactions.[account, requisition]]]')
+                    .modify((queryBuilder) => {
+                        if (scope !== 'ADMIN') {
+                            queryBuilder.where('client_id', collaborator.client_id);
+                        }
+                    }) 
+
+        }
+
+        if (scope === 'REGION') {
+            const location_client = 
+                    collaborator.organization.clients.find(client => client.location_id === collaborator.account.location_id);
+
+            warehouses =  
+                await models.Warehouse.query()
+                    .withGraphFetched('[location, stocks.[product, transactions.[account, requisition]]]')
+                    .where({
+                        client_id: location_client ? location_client.id : 0,
+                    })
+        }
 
         // Send the clients
         return res.status(200).send(warehouses);

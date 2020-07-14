@@ -11,6 +11,7 @@ router.get(
     VerifyRole([
         {scope: 'ADMIN', role: 'ADMIN'},
         {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'REGION', role: 'OWNER'},
         {scope: 'BRAND', role: 'MANAGER'},
         {scope: 'BRAND', role: 'WAREHOUSE_MANAGER'},
     ]),
