@@ -74,4 +74,18 @@ router.patch(
     organizationsController.editSla,
 );
 
+
+/* PUT - Change primary location for collaborator */
+router.put(
+    '/:regional_organization_id/collaborators/:collaborator_id/update-location', 
+    VerifyToken, 
+    VerifyRole([
+        {scope: 'ADMIN', role: 'ADMIN'},
+        {scope: 'REGION', role: 'OWNER'},
+    ]),
+    organizationsController.updatePrimaryLocation,
+);
+
+
+
 module.exports = router;

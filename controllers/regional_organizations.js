@@ -334,6 +334,42 @@ const editSla = async (req, res, next) => {
     }
 }
 
+// Update collaborator primary location
+const updatePrimaryLocation = async (req, res, next) => {
+    try {
+        const {account_id} = req.params;
+        const {regional_organization_id, collaborator_id} = req.params;
+        const {location_id} = req.body;
+
+        const organization = 
+            await models.RegionalOrganization.query()
+                .withGraphFetched('[locations]')
+                .findById(regional_organization_id);
+    
+        const location_ids = organization.locations.map(regional_location => regional_location.location_id);
+
+        if (location_ids.indexOf(location_id) < 0) return res.status(400).json('Invalid location').send();
+
+       
+        const collaborator = await models.Collaborator.query().withGraphFetched('[account]').findById(collaborator_id);
+        if (!collaborator) return res.status(400).json('Invalid Collaborator').send();
+
+        await models.Account.query()
+                .update({
+                    location_id
+                })
+                .where({
+                    id: collaborator.account_id
+                })
+
+        return res.status(200).json('Succesfully updated collaborator primary location').send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 
 
 const regionalOrganizationController = {
@@ -342,7 +378,8 @@ const regionalOrganizationController = {
     changePrimaryLocation,
     inviteCollaborator,
     revokeCollaboratorInvite,
-    editSla
+    editSla,
+    updatePrimaryLocation,
 }
 
 export default regionalOrganizationController;
