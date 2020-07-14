@@ -479,7 +479,10 @@ const guestSignup = async (req, res, next) => {
         if (!code) return res.status(400).json('Invalid invite code'); 
 
         // Search for the token and email 
-        const guest = 
+        let guest; 
+        
+        // Check if there is an existing personal code for this guest.
+        guest =
             await models.EventGuest.query()
                 .withGraphFetched(`[
                     role,
@@ -491,6 +494,50 @@ const guestSignup = async (req, res, next) => {
                 ]`)
                 .where('code', code)
                 .first();
+
+        // If there isnt' a personal code try to get a master code
+        if (!guest) {
+            const event = 
+                await models.Event.query()
+                    .where({master_code: code})
+                    .first();
+
+            // If there is an event with this code create an event guest.        
+            if (event) {
+                // Find the regular role guest
+                const role = await models.Role.query().where({scope: 'GUEST', name: 'REGULAR'}).first();
+
+                await models.EventGuest.query()
+                        .insert({
+                            email, 
+                            first_name,
+                            last_name,
+                            role_id: role.id,
+                            event_id: event.id,
+                            phone_number,
+                            code: `${code}_MASTERCODE`,
+                            code_redeemed: true,
+                        })
+                        .returning('id');
+                
+                // Fetch the guest
+                guest =
+                    await models.EventGuest.query()
+                        .withGraphFetched(`[
+                            role,
+                            event.[
+                                brief.[
+                                    client
+                                ]
+                            ]
+                        ]`)
+                        .where({
+                            email,
+                            event_id: event.id,
+                        })
+                        .first();
+            }
+        }
         
         if (!guest) return res.status(400).json('Invalid invite code');
 
