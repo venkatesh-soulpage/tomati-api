@@ -213,7 +213,7 @@ const clientSignup = async (req, res, next) => {
 
     try { 
 
-        const {email, password, first_name, last_name, phone_number, token } = req.body;
+        const {email, password, first_name, last_name, gender, date_of_birth, phone_number, token } = req.body;
 
         // Check if the account doesn't exist
         const account = 
@@ -263,7 +263,8 @@ const clientSignup = async (req, res, next) => {
                     is_email_verified: true,
                     is_age_verified: true,
                     refresh_token,
-                    location_id: invitation.client.location_id
+                    location_id: invitation.client.location_id,
+                    gender, date_of_birth,
                 });
 
         // Add wallet to client account
@@ -386,7 +387,9 @@ const agencySignup = async (req, res, next) => {
                     is_email_verified: true,
                     is_age_verified: true,
                     refresh_token,
-                    location_id: invitation.agency.client.location_id
+                    location_id: invitation.agency.client.location_id,
+                    gender, 
+                    date_of_birth,
                 });
 
         // Add wallet to client account
