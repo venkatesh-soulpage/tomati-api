@@ -87,7 +87,7 @@ const organizationSignup = async (req, res, next) => {
 
     try { 
 
-        const {email, password, first_name, last_name, phone_number, token } = req.body;
+        const {email, password, first_name, last_name, phone_number, gender, date_of_birth, location_id, token } = req.body;
 
         // Check if the account doesn't exist
         const account = 
@@ -125,6 +125,18 @@ const organizationSignup = async (req, res, next) => {
 
         // Generate a refresh token
         const refresh_token = await crypto.randomBytes(16).toString('hex');
+
+        // Find the organization primary location
+        const organization = 
+                await models.RegionalOrganization.query()
+                        .withGraphFetched(`[
+                            locations
+                        ]`)
+                        .findById(decoded.regional_organization_id)
+
+        const primary_location = 
+                        organization
+                            .locations.find((location) => location.is_primary_location);
  
         // Add new account
         const new_account = 
@@ -134,7 +146,10 @@ const organizationSignup = async (req, res, next) => {
                     is_admin: false,
                     is_email_verified: true,
                     is_age_verified: true,
-                    refresh_token
+                    refresh_token,
+                    gender,
+                    date_of_birth,
+                    location_id: decoded.location_id || primary_location.location_id,
                 });
 
         // Add a new wallet for the organization collaborator

@@ -27,7 +27,8 @@ const getOrganizations = async (req, res, next) => {
                         clients,
                         collaborators.[
                             account.[
-                                wallet
+                                wallet, 
+                                location
                             ], 
                             role
                         ],
@@ -179,7 +180,7 @@ const changePrimaryLocation = async (req, res, next) => {
 const inviteCollaborator = async (req, res, next) => {
     try {
         const {account_id} = req;
-        const { email, role_id, regional_organization_id, display_name, custom_message } = req.body;
+        const { email, role_id, regional_organization_id, location_id, display_name, custom_message } = req.body;
 
         if (!email || !role_id || !regional_organization_id) return res.status(400).json('Missing fields').send();
 
@@ -242,7 +243,8 @@ const inviteCollaborator = async (req, res, next) => {
                 role_id,
                 regional_organization_id: organization.id,
                 scope: role.scope,
-                name: role.name
+                name: role.name,
+                location_id,
             }, 
             process.env.SECRET_KEY,
         );
