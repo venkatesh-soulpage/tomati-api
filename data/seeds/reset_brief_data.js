@@ -28,6 +28,43 @@ exports.seed = async (knex) => {
                         .del();
                 
                 // Remove brief brands
+                const brief_events = 
+                        await knex('brief_events')
+                                .whereIn('brief_id', briefs_ids)
+
+                // Delete all related events
+                const brief_event_ids = 
+                                brief_events.map(brief_event => brief_event.id);
+
+                        const events =
+                                await knex('events')
+                                        .whereIn('brief_event_id', brief_event_ids)
+                                
+                        const event_ids = 
+                                events.map(event => event.id);
+
+                        await knex('event_funding_logs')
+                                .whereIn('event_id', event_ids)
+                                .del();
+                        
+                        await knex('event_guests')
+                                .whereIn('event_id', event_ids)
+                                .del();
+                        
+                        await knex('event_free_drinks_conditions')
+                                .whereIn('event_id', event_ids)
+                                .del();
+                        
+                        await knex('event_products')
+                                .whereIn('event_id', event_ids)
+                                .del();
+
+                                
+                        await knex('events')
+                                .whereIn('brief_event_id', brief_event_ids)
+                                .del();
+                
+                // Remove brief brands
                 await knex('brief_events')
                         .whereIn('brief_id', briefs_ids)
                         .del();
