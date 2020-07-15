@@ -935,8 +935,10 @@ const eventDemographics = async (doc, event, top) => {
                 return is_inside_demographic;
             })
 
+        const checked_in_guests = event.guests.filter(guest => guest.check_in_time);
+
         if (demographic_guests.length < 1) return `0%`; 
-        return demographic_guests.length < 1 ? `0%` : `${Math.round(demographic_guests.length / event.guests.length * 10000) / 100}% (${demographic_guests.length})`;
+        return demographic_guests.length < 1 ? `0%` : `${Math.round(demographic_guests.length / checked_in_guests.length * 10000) / 100}% (${demographic_guests.length})`;
 
     }
 
@@ -1207,7 +1209,7 @@ const eventSales = async (doc, event, top) => {
             }
         )[0]
 
-        return `${min.name} : ${min.total_consumption} credits`;
+        return `${min ? min.name : '-'} : ${min ? min.total_consumption : '-'} credits`;
     }
 
     const most_profitable_hour = (event) => {
