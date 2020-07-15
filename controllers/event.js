@@ -245,6 +245,15 @@ const fundEvent = async (req, res, next) => {
                     account_id,
                 })
 
+        // Add the funding log
+        await models.EventFundingLogs.query()
+                .insert({
+                    account_id,
+                    event_id, 
+                    amount: Number(funding_amount),
+                    action: 'FUNDED'
+                })
+
         // Update credits left
         await models.Event.query()
                 .update({ 
@@ -892,6 +901,120 @@ const redeemFreeDrinkCode = async (req, res, next) => {
     }
 }
 
+// Get funding logs
+const getFundingLogs = async (req, res, next) => {
+    try {
+        const {event_id} = req.params;
+
+        const funding_logs = 
+                await models.EventFundingLogs.query()
+                        .withGraphFetched(`[
+                            account
+                        ]`)
+                        .where({event_id})
+                        .orderBy('created_at', 'desc');
+
+        return res.status(200).send(funding_logs);
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();  
+    }
+}
+
+// Refund logs using fifo 
+const refundFundingCredits = async (req, res, next) => {
+    try {
+
+        const {event_id} = req.params;
+
+        const event = 
+            await models.Event.query().findById(event_id);
+
+        if (event.already_refunded) return res.status(400).json('Already refunded').send();
+
+        const funding_logs = 
+            await models.EventFundingLogs.query()
+                    .where({
+                        event_id
+                    })
+                    .orderBy('created_at', 'desc')
+
+        // Refund funding orders depending on funding order
+                    
+        let credits_counter = event.credits_left;
+        for (const funding_log of funding_logs) {
+            // Validate that there are credits left to refund
+            if (credits_counter > 0) {
+                // If the log amount is smaller than the credits left refund entirely
+                if (Number(funding_log.amount) <= Number(credits_counter)) {
+                    // Create a refund log
+                    await models.EventFundingLogs.query()
+                            .insert({
+                                account_id: funding_log.account_id,
+                                event_id: funding_log.event_id,
+                                amount: funding_log.amount,
+                                action: 'REFUND',
+                            })
+                    
+                    // Add the credits to the wallet
+                    const wallet = await models.Wallet.query().where({account_id: funding_log.account_id}).first();
+
+                    await models.Wallet.query()
+                            .update({
+                                balance: Number(wallet.balance) + Number(funding_log.amount)
+                            })
+                            .where({
+                                account_id: funding_log.account_id
+                            });
+
+
+                    credits_counter = Math.round((Number(credits_counter) - Number(funding_log.amount)) * 100) / 100;
+                } else {
+                    // Refund the current balance
+                    // Create a refund log
+                    await models.EventFundingLogs.query()
+                            .insert({
+                                account_id: funding_log.account_id,
+                                event_id: funding_log.event_id,
+                                amount: credits_counter,
+                                action: 'PARTIAL REFUND',
+                            })
+                    
+                    // Add the credits to the wallet
+                    const wallet = await models.Wallet.query().where({account_id: funding_log.account_id}).first();
+
+                    await models.Wallet.query()
+                            .update({
+                                balance: Number(wallet.balance) + Number(credits_counter)
+                            })
+                            .where({
+                                account_id: funding_log.account_id
+                            });
+
+                            credits_counter = 0;
+                }
+            }
+        }
+
+        // Clear credits_left
+        await models.Event.query()
+            .update({
+                credits_left: 0,
+                already_refunded: true,
+            })
+            .where({
+                id: event_id
+            });
+
+        return res.status(200).json('Refunded successfully').send();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send(); 
+    }
+}
+
 const eventsController = {
     getEvents,
     getClientEvents,
@@ -915,7 +1038,9 @@ const eventsController = {
     updateEventProduct,
     generateFreeDrinkCode,
     redeemFreeDrinkCode,
-    fundEvent
+    fundEvent,
+    getFundingLogs,
+    refundFundingCredits
 }
 
 export default eventsController;

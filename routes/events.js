@@ -299,5 +299,35 @@ router.get(
     eventsController.getEventStats
 )
 
+// GET - Get the funding logs for an event
+router.get(
+    '/:event_id/funding-logs',
+    VerifyToken,
+    VerifyRole([
+        {scope: 'REGION', role: 'OWNER'},
+        {scope: 'REGION', role: 'MANAGER'},
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
+    eventsController.getFundingLogs
+)
+
+// POST - Refund the credits on escrow
+router.post(
+    '/:event_id/refund-credits',
+    VerifyToken,
+    VerifyRole([
+        {scope: 'REGION', role: 'OWNER'},
+        {scope: 'REGION', role: 'MANAGER'},
+        {scope: 'BRAND', role: 'OWNER'},
+        {scope: 'BRAND', role: 'MANAGER'},
+        {scope: 'AGENCY', role: 'OWNER'},
+        {scope: 'AGENCY', role: 'MANAGER'},
+    ]),
+    eventsController.refundFundingCredits
+)
+
 
 module.exports = router;

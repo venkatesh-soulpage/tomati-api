@@ -59,6 +59,14 @@ export default class Event extends Model {
             from: 'events.id',
             to: 'wallet_purchases.event_id'
           }
+        },
+        funding_logs: {
+          relation: Model.HasManyRelation,
+          modelClass: models.EventFundingLogs,
+          join: {
+            from: 'events.id',
+            to: 'event_funding_logs.event_id'
+          }
         }
       }
     }
