@@ -41,6 +41,9 @@ exports.seed = async (knex) => {
   // Create Organization Collaborators
   for (let collaborator of config.ORGANIZATION_COLLABORATORS) {
   
+    // Fetch first organization
+    const location = await knex('locations').where({name: config.ORGANIZATION_LOCATIONS[0]}).first();
+
     // Fetch role
     const role = 
             await knex('roles')
@@ -55,6 +58,7 @@ exports.seed = async (knex) => {
         // Hash Password
         const password_hash = await hashPassword(collaborator.account.password);
         collaborator.account.password_hash = password_hash;
+        collaborator.account.location_id = Number(location.id);
         delete collaborator.account.password;
 
         // Create account 
