@@ -1216,7 +1216,7 @@ const eventSales = async (doc, event, top) => {
             }
         )[0]
 
-        return `${max.name} : ${max.total_consumption} credits`;
+        return `${max.name} : ${event.brief_event.brief.client.location.currency} ${max.total_consumption} (${Math.round(max.total_consumption * event.brief_event.brief.client.location.currency_conversion * 100) / 100} Coins)`;
     }
 
     const less_profitable_demographic = (event) => {
@@ -1262,7 +1262,7 @@ const eventSales = async (doc, event, top) => {
             }
         )[0]
 
-        return `${min ? min.name : '-'} : ${min ? min.total_consumption : '-'} credits`;
+        return `${min ? min.name : '-'} : ${min ? `${event.brief_event.brief.client.location.currency} ${min.total_consumption} (${Math.round(event.brief_event.brief.client.location.currency_conversion * min.total_consumption * 100) / 100} Coins)` : '-'}`;
     }
 
     const most_profitable_hour = (event) => {
@@ -1289,9 +1289,16 @@ const eventSales = async (doc, event, top) => {
                 return sold_before_upper_range && sold_after_lower_range;
             })
 
+            const value_sold = 
+                        products_sold
+                            .reduce((acc_tx, curr_tx) => {
+                                return acc_tx + Number(curr_tx.event_product.price);
+                            }, 0)
+
+
             ranges.push({
                 time: `${low_range.format('DD/MM/YYYY LT')} - ${upper_range.format('DD/MM/YYYY LT')}`,
-                amount: products_sold.length
+                amount: value_sold
             })
         }
 
@@ -1301,7 +1308,7 @@ const eventSales = async (doc, event, top) => {
             }
           )[0];
 
-        return `${best_hour.time} : ${best_hour.amount} products sold`;
+        return `${best_hour.time} : ${event.brief_event.brief.client.location.currency} ${best_hour.amount} (${Math.round(best_hour.amount * event.brief_event.brief.client.location.currency_conversion * 100) / 100} Coins)`;
     }
     
     doc.addPage();
@@ -1324,7 +1331,7 @@ const eventSales = async (doc, event, top) => {
             .fontSize(12)
             .text(product.product.name, 50, margin_top - 15, { width: 200, align: 'left'})
             .text(product.transactions.length, 275, margin_top - 15, { width: 75, align: 'center'})
-            .text(product.price * product.transactions.length, 425, margin_top - 15, { width: 75, align: 'center'})
+            .text(`${event.brief_event.brief.client.location.currency} ${product.price * product.transactions.length} (${Math.round(product.price * product.transactions.length * event.brief_event.brief.client.location.currency_conversion * 100) / 100} Coins)`, 425, margin_top - 15, { width: 175, align: 'left'})
 
         margin_top = margin_top + 20;
         generateHr(doc, margin_top);
@@ -1547,7 +1554,9 @@ const eventReport = async (req, res, next) => {
                                     client_collaborator.[
                                         account
                                     ],
-                                    client,
+                                    client.[
+                                        location
+                                    ],
                                     agency
                                 ],
                                 orders.[
