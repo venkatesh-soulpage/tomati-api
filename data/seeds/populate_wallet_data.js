@@ -48,6 +48,7 @@ exports.seed = async (knex) => {
                     await knex('wallet_orders')
                             .insert({
                               wallet_id: Number(wallet.id),
+                              event_id: Number(event.id),
                               total_amount: Number(total_amount),
                               order_identifier: randomString(10),
                               status: 'RECEIVED',

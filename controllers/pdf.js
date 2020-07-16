@@ -615,6 +615,58 @@ const eventDescription = async (doc, event, top) => {
         return `${(actual_volume / 1000)} L`;
     }
 
+    const calculateLiqueorOrder = (orders) => {
+        const total_order = orders
+                .filter(order => order.product.product_type === 'PRODUCT' || order.product.product_type === 'COCKTAIL')
+                .reduce((acc, curr) => {
+                    // If it is only a product just sum the amount
+                    if (curr.product.product_type === 'PRODUCT' ) {
+                        return acc + Number(curr.units * curr.product.metric_amount);
+                    }
+                    // If its a cocktail only sum the liqueor amount
+                    if (curr.product.product_type === 'COCKTAIL') {
+                        const liqueor_ingredients = 
+                            curr.product.ingredients.filter(ing => ing.product.product_type === 'PRODUCT');
+
+                        const total_amount = 
+                                liqueor_ingredients
+                                    .reduce((cacc, ccurr) => {
+                                        return cacc + Number(ccurr.units * ccurr.product.metric_amount);
+                                    })
+                        
+                        return acc + Number(total_amount);
+                    }
+                    
+                }, 0)
+            
+            return `${(total_order / 1000)} L`;
+    }
+
+    const calculateLiqueourTotalVolume = (products) => {
+        const actual_volume = products
+            .filter(product => product.product.product_type === 'PRODUCT' || product.product.product_type === 'COCKTAIL')
+            .reduce((pacc, pcurr) => {
+                if (pcurr.product.product_type === 'PRODUCT') {
+                    return pacc + Number(pcurr.product.metric_amount * pcurr.transactions.length);
+                } 
+                if (pcurr.product.product_type === 'COCKTAIL') {
+                    const liqueor_ingredients = 
+                            pcurr.product.ingredients.filter(ing => ing.product.product_type === 'PRODUCT');
+
+                        const total_amount = 
+                                liqueor_ingredients
+                                    .reduce((cacc, ccurr) => {
+                                        return cacc + Number(ccurr.quantity * pcurr.transactions.length);
+                                    }, 0)
+                        
+                        return pacc + Number(total_amount);
+                }
+                
+            }, 0)
+
+        return `${(actual_volume / 1000)} L`;
+    }
+
     const checkedInGuests = (guests) => {
         return guests.filter(guest => guest.checked_in).length;
     }
@@ -624,7 +676,8 @@ const eventDescription = async (doc, event, top) => {
     generateEventTableRow(doc, margin_top + 30, 'Event Start Time', moment(event.brief_event.start_time).format('DD/MM/YYYY LT'), moment(event.started_at).format('DD/MM/YYYY LT'));
     generateEventTableRow(doc, margin_top + 60, 'Event End Time', moment(event.brief_event.end_time).format('DD/MM/YYYY LT'), moment(event.ended_at).format('DD/MM/YYYY LT'));
     generateEventTableRow(doc, margin_top + 90, 'Volume Depletion', calculateOrder(event.brief_event.brief.requisition.orders), calculateTotalVolume(event.products));
-    generateEventTableRow(doc, margin_top + 120, 'Attendance', event.brief_event.expected_guests, checkedInGuests(event.guests));
+    generateEventTableRow(doc, margin_top + 120, 'Volume Depletion (Only Liqueour)', calculateLiqueorOrder(event.brief_event.brief.requisition.orders), calculateLiqueourTotalVolume(event.products));
+    generateEventTableRow(doc, margin_top + 150, 'Attendance', event.brief_event.expected_guests, checkedInGuests(event.guests));
 
     return margin_top + 120;
 }
@@ -1505,7 +1558,9 @@ const eventReport = async (req, res, next) => {
                             ],
                             products.[
                                 product.[
-                                    ingredients
+                                    ingredients.[
+                                        product
+                                    ]
                                 ],
                                 transactions.[
                                     wallet.[
