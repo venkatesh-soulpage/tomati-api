@@ -1513,6 +1513,16 @@ const eventCollaboratorsSales = async (doc, event, top) => {
     const account_ids = event.purchases.map(purchase => purchase.scanned_by_account.id);
     const unique_accounts = [...new Set(account_ids)];
 
+    if (unique_accounts.length < 1) {
+
+            margin_top = margin_top + 25;
+
+            doc
+                .font("Helvetica")
+                .fontSize(10)
+                .text(`No credits sold`, 250, margin_top)
+
+    }
 
     for (const account_id of unique_accounts) {
         const account = event.purchases.find(purch => purch.scanned_by_account.id === account_id).scanned_by_account;
@@ -1523,11 +1533,11 @@ const eventCollaboratorsSales = async (doc, event, top) => {
         margin_top = margin_top + 25;
 
         doc
-        .font("Helvetica")
-        .fontSize(10)
-        .text(`${account.first_name} ${account.last_name}`, 50, margin_top)
-        .text(`${account.role.scope} ${account.role.name}`, 250, margin_top)
-        .text(total_tokens_approved, 400, margin_top)
+            .font("Helvetica")
+            .fontSize(10)
+            .text(`${account.first_name} ${account.last_name}`, 50, margin_top)
+            .text(`${account.role.scope} ${account.role.name}`, 250, margin_top)
+            .text(total_tokens_approved, 400, margin_top)
 
         margin_top = margin_top + 20;
         generateHr(doc, margin_top);

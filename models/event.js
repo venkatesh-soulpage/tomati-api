@@ -44,6 +44,14 @@ export default class Event extends Model {
                 to: 'event_guests.event_id'
             }
         },
+        ended_by_account: {
+            relation: Model.HasOneRelation,
+            modelClass: models.Account,
+            join: {
+                from: 'events.ended_by',
+                to: 'accounts.id'
+            }
+        },
         products: {
             relation: Model.HasManyRelation,
             modelClass: models.EventProduct,

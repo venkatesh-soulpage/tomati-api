@@ -196,6 +196,7 @@ const getEvent = async (req, res, next) => {
 const updateEventField = async (req, res, next) => {
 
     try {
+        const {account_id} = req;
         const {event_id} = req.params;
         const {field, value} = req.body;
 
@@ -204,6 +205,13 @@ const updateEventField = async (req, res, next) => {
         await models.Event.query()
                 .update({[field]: value})
                 .where('id', event_id);
+
+        // If it is a end of the day command mark the one who ended it.
+        if (field === 'ended_at') {
+            await models.Event.query()
+                    .update({ended_by: account_id})
+                    .where('id', event_id);
+        }
 
         return res.status(200).json('Successfully updated').send();
 
@@ -438,7 +446,7 @@ const getCheckinToken = async (req, res, next) => {
 
 const checkInGuest = async (req, res, next) => {
     try {
-
+        const {account_id} = req;
         const {token} = req.params;
 
         // Validate token
@@ -471,6 +479,7 @@ const checkInGuest = async (req, res, next) => {
                 .update({
                     checked_in: true, 
                     check_in_time: new Date(),
+                    checked_in_by: account_id
                 })
                 .where('id', guest.id)
         }
@@ -486,7 +495,7 @@ const checkInGuest = async (req, res, next) => {
 
 const checkOutGuest = async (req, res, next) => {
     try {
-
+        const {account_id} = req;
         const {token} = req.params;
 
         // Validate token
@@ -505,6 +514,7 @@ const checkOutGuest = async (req, res, next) => {
         await models.EventGuest.query()
                 .update({
                     check_out_time: new Date(),
+                    checked_out_by: account_id,
                 })
                 .where('id', guest.id)
 
