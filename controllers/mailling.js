@@ -102,6 +102,7 @@ const clientInviteEmail = (account_email, token, role, options) => {
             custom_message: options && options.custom_message, 
             host_name: options && options.host && `${options.host.first_name} ${options.host.last_name}`,
             host_sign: options && options.host && `- ${options.host.first_name} ${options.host.last_name}`,
+            client_name: options && options.client && options.client.name
         }
     })
     .then(/* console.log */)

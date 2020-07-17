@@ -181,7 +181,7 @@ const inviteClient = async (req, res, next) => {
 
         // send invite email
         const host = collaborator && collaborator.account ? collaborator.account : {first_name: 'Booze Boss', last_name: 'Team'};
-        await clientInviteEmail(owner_email, new_token, {scope: 'BRAND', name: 'OWNER'}, {display_name, custom_message, host});
+        await clientInviteEmail(owner_email, new_token, {scope: 'BRAND', name: 'OWNER'}, {display_name, custom_message, host, client});
 
         const query = '[locations.[location], venues, brands, warehouses.[location], client_collaborators.[account, role]]';
         
@@ -307,7 +307,7 @@ const inviteCollaborator = async (req, res, next) => {
         const host = await models.Account.query().findById(account_id);
 
         // Send invite email
-        await clientInviteEmail(email, new_token, role, {name: display_name, custom_message, host});
+        await clientInviteEmail(email, new_token, role, {name: display_name, custom_message, host, client});
 
         return res.status(201).json(`We sent an invite email to ${email}`).send();
     } catch (e) {
