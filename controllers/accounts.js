@@ -954,16 +954,24 @@ const reset = async (req, res, next) => {
         const {email, token, password} = req.body;
 
         // Get the account
-        const accounts = 
+        const account = 
             await models.Account.query()
-                .where('email', email);
+                .where('email', email)
+                .first();
 
         // Validate account
-        if (!accounts[0] || accounts.length < 1) return res.status(401).json("No account found").send();
+        if (!account) return res.status(401).json("No account found").send();
+
+        // Validate that it isn't setting the same password
+        // Compare passwords
+        const isCorrectPassword = await bcrypt.compareSync(password, account.password_hash);
+
+        // If the password is incorrect return
+        if (isCorrectPassword) return res.status(401).json("You can't set your old password as new").send();
 
         // Validate token and expiration
-        if (token !== accounts[0].password_reset_token) return res.status(401).json("Invalid token").send();
-        if (Date.now() > new Date(accounts[0].password_reset_expiration)) return res.status(401).json("Expired token").send();
+        if (token !== account.password_reset_token) return res.status(401).json("Invalid token").send();
+        if (Date.now() > new Date(account.password_reset_expiration)) return res.status(401).json("Expired token").send();
 
         // Hash password
         const salt = await bcrypt.genSalt(10);
@@ -976,7 +984,7 @@ const reset = async (req, res, next) => {
                     password_reset_token: null,
                     password_reset_expiration: null,
                 })
-                .where('email', accounts[0].email);
+                .where('email', account.email);
 
         return res.status(201).json(`Password updated!`);
 
