@@ -38,6 +38,7 @@ import RegionalOrganization from './regional_organization';
 import RegionalOrganizationLocation from './regional_organization_location';
 import Collaborator from './collaborator';
 import TransferLog from './transfer_log';
+import VerificationLog from './verification_logs';
 
 export default {
     Location,
@@ -80,4 +81,5 @@ export default {
     RegionalOrganizationLocation, 
     Collaborator,
     TransferLog,
+    VerificationLog
 };

@@ -130,10 +130,75 @@ const submitVerification = async (req, res, next) => {
 // Update verification status to 'APPROVED' or 'REJECTED'
 const updateVerificationStatus = async (req, res, next) => { 
     try {
+        const {account_id} = req;
         const {verification_account_id} = req.params; 
         const {age_verification_status} = req.body;
         
         if (age_verification_status === 'APPROVED') { 
+                    
+            // Delete verification files
+            const account = await models.Account.query().findById(verification_account_id).withGraphFetched('[verifications]');
+                
+            // If the account already has an event count the first code redemeed event to the verification limit logic
+            const event_guest =
+                    await models.EventGuest.query()
+                            .withGraphFetched(`[
+                                event.[
+                                    brief_event.[
+                                        brief.[
+                                            client.[
+                                                organization
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]`)
+                            .where({ account_id: verification_account_id })
+                            .first();
+
+            // Verify the client limit
+            if (event_guest.event.brief_event.brief.client) {
+                const verification_client = 
+                        await models.Client.query()
+                                .withGraphFetched(`[
+                                    verification_logs
+                                ]`)
+                                .where({id: event_guest.event.brief_event.brief.client.id })
+                                .first()
+                                            
+                if (!verification_client) return res.status(400).json("Can't validate client identity limit").send();
+                if (verification_client.identity_verifications_limit <= verification_client.verification_logs.length + 1) return res.status(400).json('Maximum verifications reached for this client').send();
+            }
+
+            // Check verification limits
+            if (event_guest.event.brief_event.brief.client.regional_organization_id) {
+                // Check verifications
+                const organization = 
+                    await models.RegionalOrganization.query()
+                            .withGraphFetched(`[
+                                verification_logs,
+                                clients.[
+                                    verification_logs
+                                ]
+                            ]`)
+                            .where({id: event_guest.event.brief_event.brief.client.regional_organization_id })
+                            .first();
+                
+                // Verify the organization limit 
+                if (organization.identity_verifications_limit <= organization.verification_logs.length + 1) return res.status(400).json('Maximum verifications reached for this organization').send();
+                
+            }
+
+            // Add verification log depending on the account
+            if (event_guest) {
+                await models.VerificationLog.query()
+                        .insert({
+                            verified_by: account_id,
+                            account_id: verification_account_id,
+                            client_id: event_guest.event.brief_event.brief.client.id,
+                            regional_organization_id: event_guest.event.brief_event.brief.client.regional_organization_id,
+                        })
+            }
 
             // Update user account
             await models.Account.query()
@@ -144,10 +209,10 @@ const updateVerificationStatus = async (req, res, next) => {
                     })
                     .where('id', verification_account_id);
 
-                    
-            // Delete verification files
-            const account = await models.Account.query().findById(verification_account_id).withGraphFetched('[verifications]');
-                
+            // Create Wallet
+            await models.Wallet.query()
+                .insert({account_id: verification_account_id})
+
             for (const verification of account.verifications) {
 
                 // Delete file by file
@@ -166,10 +231,6 @@ const updateVerificationStatus = async (req, res, next) => {
                         .where('id', verification.id);
                 })
             }
-
-            // Create Wallet
-            await models.Wallet.query()
-                .insert({account_id: verification_account_id})
                     
             return res.status(200).json('Profile successfully approved').send();
 

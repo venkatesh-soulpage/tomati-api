@@ -47,6 +47,10 @@ const getOrganizations = async (req, res, next) => {
                             queryBuilder.where('id', collaborator.organization.id); 
                         }
                     })
+                    .select([
+                        'regional_organizations.*',
+                        models.RegionalOrganization.relatedQuery('verification_logs').count().as('total_verifications'),
+                    ])
                     .orderBy('name', 'DESC');
 
         return res.status(201).json(organizations).send();

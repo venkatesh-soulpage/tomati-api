@@ -103,6 +103,14 @@ export default class Client extends Model {
             from: 'clients.id',
             to: 'briefs.client_id'
           }
+        },
+        verification_logs: {
+          relation: Model.HasManyRelation,
+          modelClass: models.VerificationLog,
+          join: {
+            from: 'clients.id',
+            to: 'verification_logs.client_id'
+          }
         }
       }
     }

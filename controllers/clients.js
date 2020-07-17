@@ -55,6 +55,10 @@ const getClients = async (req, res, next) => {
                     .modifyGraph('collaborator_invitations', builder => {
                         builder.where('collaborator_invitations.expiration_date', '>', new Date())
                     }) 
+                    .select([
+                        'clients.*',
+                        models.Client.relatedQuery('verification_logs').count().as('total_verifications'),
+                    ])
                     .orderBy('name', 'ASC');
         } else {
             // Get Client id by Collaborator
@@ -81,6 +85,10 @@ const getClients = async (req, res, next) => {
                         .modifyGraph('client_collaborators', builder => {
                             builder.select('id');
                         }) 
+                        .select([
+                            'clients.*',
+                            models.Client.relatedQuery('verification_logs').count().as('total_verifications'),
+                        ])
                         .orderBy('name', 'ASC');
         }   
         

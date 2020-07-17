@@ -40,6 +40,14 @@ export default class RegionalOrganization extends Model {
                 to: 'regional_organization_locations.regional_organization_id'
             }
         },
+        verification_logs: {
+          relation: Model.HasManyRelation,
+          modelClass: models.VerificationLog,
+          join: {
+            from: 'regional_organizations.id',
+            to: 'verification_logs.regional_organization_id'
+          }
+        }
       }
     }
   }
