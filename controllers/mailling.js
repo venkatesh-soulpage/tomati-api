@@ -45,7 +45,7 @@ const organizationInviteEmail = (account_email, token, role, options) => {
     const email = new Email({
         message: {
             from: process.env.SMTP_AUTH,
-            subject: 'You have been invited to join Booze Boss',
+            subject: 'Welcome to LiquidIntel',
         },
         send: true,
         transport: transporter,
@@ -79,7 +79,7 @@ const clientInviteEmail = (account_email, token, role, options) => {
     const email = new Email({
         message: {
             from: process.env.SMTP_AUTH,
-            subject: 'You have been invited to join Booze Boss',
+            subject: 'Welcome to LiquidIntel',
         },
         send: true,
         transport: transporter,
@@ -114,7 +114,7 @@ const agencyInviteEmail = (account_email, token, role, options) => {
     const email = new Email({
         message: {
             from: process.env.SMTP_AUTH,
-            subject: 'You have been invited to join Booze Boss',
+            subject: 'Welcome to LiquidIntel',
         },
         send: true,
         transport: transporter,
@@ -137,6 +137,7 @@ const agencyInviteEmail = (account_email, token, role, options) => {
             custom_message: options && options.custom_message, 
             host_name: options.host && `${options.host.first_name} ${options.host.last_name}`,
             host_sign: options.host && `- ${options.host.first_name} ${options.host.last_name}`,
+            agency_name: options && options && options.agency && options.agency.name,
         }
     })
     .then(/* console.log */)

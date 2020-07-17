@@ -225,7 +225,7 @@ const inviteAgency = async (req, res, next) => {
 
         const host = collaborator && collaborator.account ? collaborator.account : {first_name: 'Booze Boss', last_name: 'Team'};
         // TODO send invite email
-        await agencyInviteEmail(owner_email, new_token, {scope: 'AGENCY', name: 'OWNER'}, {display_name, custom_message, host});
+        await agencyInviteEmail(owner_email, new_token, {scope: 'AGENCY', name: 'OWNER'}, {display_name, custom_message, host, agency});
 
         return res.status(201).json(agency).send();
     } catch (e) {
@@ -327,7 +327,7 @@ const inviteCollaborator = async (req, res, next) => {
         const host = await models.Account.query().findById(account_id);
 
         // Send invite email
-        await agencyInviteEmail(email, new_token, role[0], {name, custom_message, host});
+        await agencyInviteEmail(email, new_token, role[0], {name, custom_message, host, agency});
 
         return res.status(201).json(`We sent an invite email to ${email}`).send();
     } catch (e) {
