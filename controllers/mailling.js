@@ -16,7 +16,7 @@ const sendConfirmationEmail = (user, token) => {
     const email = new Email({
         message: {
             from: process.env.SMTP_AUTH,
-            subject: 'Booze Boss - Confirm Email',
+            subject: 'LiquidIntel - Confirm Email',
             /* text: 'Hello ,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + process.env.HOST + ':' + process.env.PORT + '\/confirmation\/' + token.token + '.\n' */
         },
         send: true,
@@ -242,7 +242,7 @@ const sendDeliveryEmail = (delivery, account, status) => {
     const email = new Email({
         message: {
             from: process.env.SMTP_AUTH,
-            subject: 'Booze Boss - You have a delivery update',
+            subject: `Delivery update for requisition #${delivery.requisition.serial_number}`,
         },
         send: true,
         transport: transporter,
@@ -271,7 +271,7 @@ const sendInviteCode = (guest) => {
     const email = new Email({
         message: {
             from: process.env.SMTP_AUTH,
-            subject: 'You have been invited to an Event - Booze Boss',
+            subject: 'You have been invited to an Event',
         },
         send: true,
         transport: transporter,

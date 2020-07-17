@@ -1,16 +1,17 @@
 extends layout
 
 block content
-  h1 ¡Hi, #{account.first_name} #{account.last_name}!
+  h1 Hi, #{account.first_name} #{account.last_name}
   p
-    | The delivery incoming from 
+    | The status of the incoming delivery from 
     strong #{delivery.warehouse.name} 
-    | of requisition 
+    | for requisition 
     strong ##{delivery.requisition.serial_number} 
-    | has been changed to 
+    | has now changed to 
     strong #{status}
   p 
-    | Here is the content of the delivery: 
+    | Log in to your dashboard to confirm delivery or log a dispute:
+  br 
   div(display="flex", flexDirection="column")
       div(style={
         'border-width': '1px',
@@ -70,8 +71,9 @@ block content
   p
     | Thank You,
     br
-    | Booze Boss Team.
+    | LiquidIntel Support Team.
   p
-    strong P.S.
-    |  ¿Need help to start using Booze Boss? Check our 
-    a(href=supportUrl)   faq
+    |  Need help setting up and using your wallet? Check out our help 
+    a(href=supportUrl) articles 
+    | or 
+    a(href=supportUrl) FAQ
