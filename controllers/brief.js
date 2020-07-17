@@ -6,6 +6,8 @@ import fetch from 'node-fetch';
 import queryString from 'query-string';
 import AWS from 'aws-sdk';
 
+import { sendBriefToEmail } from './mailling';
+
 // Hellosign 
 const hellosign = require('hellosign-sdk')({ key: process.env.HELLOSIGN_API_KEY });
 
@@ -143,6 +145,7 @@ const createBrief = async (req, res, next) => {
                     status: 'DRAFT',
                 })
                 .withGraphFetched('[brief_events.[venue], agency]')
+
 
         // Send the clients
         return res.status(200).send(new_brief);
@@ -480,6 +483,22 @@ const updateBriefStatus = async (req, res, next) => {
         await models.Brief.query()
             .update({status})
             .where('id', brief_id);
+
+        // Send brief to agency by email
+        const agency_collaborators =
+            await models.Collaborator.query()
+                    .withGraphFetched(`[
+                        account,
+                        role
+                    ]`)
+                    .where({agency_id: brief.agency_id});
+
+        for (const collaborator of agency_collaborators) {
+            // Only send a brief if it is a owner or manager
+            if (['OWNER', 'MANAGER'].indexOf(collaborator.role.name)) {
+                sendBriefToEmail(brief, collaborator.account, status);
+            }
+        }
 
         // Send the clients
         return res.status(200).json('Brief status updated').send();

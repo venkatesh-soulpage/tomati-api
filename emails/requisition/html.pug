@@ -1,14 +1,19 @@
 extends layout
 
 block content
-  h1 ¡Hi, #{account.first_name} #{account.last_name}!
+  h1 Hi #{account.first_name} #{account.last_name},
   p
-    | The requisition ##{requisition.serial_number} has been changed to 
+    | The status of requisition ##{requisition.serial_number} has changed to 
     strong #{status}
-  if comments
+    
+  if changes_required
     p 
-      | Comments :
-      | #{comments}
+      | Please log into the app to make the required changes.
+
+  if is_approved
+    p 
+      | Log into your dashboard to download a copy of the approved requisition.
+
   p 
     | Here is a list of the events: 
   div(display="flex", flexDirection="column")
@@ -79,8 +84,9 @@ block content
   p
     | Thank You,
     br
-    | Booze Boss Team.
+    | LiquidIntel Support Team
   p
-    strong P.S.
-    |  ¿Need help to start using Booze Boss? Check our 
-    a(href=supportUrl)   faq
+    | Need help managing requisitions? Check out our help 
+    a(href=supportUrl) articles 
+    | or 
+    a(href=supportUrl) FAQ 

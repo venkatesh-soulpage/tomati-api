@@ -169,11 +169,12 @@ const sendFotgotPasswordEmail = (user, token) => {
     .catch(console.error);
 }
 
-const sendRequisitionToEmail = (requisition, account, status, options) => {
+const sendBriefToEmail = (brief, account, status, options) => {
+    
     const email = new Email({
         message: {
             from: process.env.SMTP_AUTH,
-            subject: `Booze Boss - Requisition (${requisition.serial_number})`,
+            subject: `LiquidIntel - You have a new brief`,
         },
         send: true,
         transport: transporter,
@@ -181,12 +182,50 @@ const sendRequisitionToEmail = (requisition, account, status, options) => {
 
     email
     .send({
-        template: 'approve_requisition',
+        template: 'brief',
         message: {
             to: account.email,
         },
         locals: {
             email: account.email,
+            account,
+            brief,
+            moment,
+            route: `${process.env.SCHEMA}://${process.env.FRONT_HOST}${process.env.FRONT_PORT  && `:${process.env.FRONT_PORT}`}/briefs`,
+            status,
+        }
+    })
+    .then(/* console.log */)
+    .catch(console.error);
+}
+
+const sendRequisitionToEmail = (requisition, account, status, options) => {
+
+    let subject;
+    
+    if (status === 'APPROVED') subject = `Approval for requisition #${requisition.serial_number}`;
+    if (status === 'CHANGES REQUIRED') subject = `Change requested for requisition #${requisition.serial_number}`;
+    
+
+    const email = new Email({
+        message: {
+            from: process.env.SMTP_AUTH,
+            subject: subject || `LiquidIntel - Requisition #${requisition.serial_number}`,
+        },
+        send: true,
+        transport: transporter,
+    })
+
+    email
+    .send({
+        template: 'requisition',
+        message: {
+            to: account.email,
+        },
+        locals: {
+            email: account.email,
+            is_approved: status === 'APPROVED',
+            changes_required: status === 'CHANGES REQUIRED',
             account,
             requisition,
             moment,
@@ -262,6 +301,7 @@ export {
     organizationInviteEmail,
     clientInviteEmail,
     agencyInviteEmail,
+    sendBriefToEmail,
     sendRequisitionToEmail,
     sendDeliveryEmail,
     sendInviteCode
