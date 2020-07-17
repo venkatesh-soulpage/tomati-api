@@ -498,14 +498,19 @@ const eventData = async (doc, event, top) => {
 
     doc
         .fontSize(12)
+        .font("Helvetica-Bold")
         .text("Report date:", 50, margin_top)
         .font("Helvetica")
-        .text(`${moment().format('DD/MM/YYYY LT')}`, 120, margin_top)
+        .text(`${moment().format('DD/MM/YYYY LT')}`, 130, margin_top)
+    
+    margin_top = margin_top + 30; 
+
+    doc
         .fontSize(12)
         .font("Helvetica-Bold")
-        .text("Timestamp:", 300, margin_top)
+        .text("Event Time:", 50, margin_top)
         .font("Helvetica")
-        .text(`${moment().unix()}`, 370, margin_top)
+        .text(`${moment(event.started_at).format('DD/MM/YYYY LT')} - ${moment(event.ended_at).format('DD/MM/YYYY LT')}`, 120, margin_top)
     
     margin_top = margin_top + 30; 
 
@@ -531,6 +536,14 @@ const eventData = async (doc, event, top) => {
         .text("Created by:", 50, margin_top)
         .font("Helvetica")
         .text(`${event.brief_event.brief.client_collaborator.account.first_name} ${event.brief_event.brief.client_collaborator.account.last_name}`, 120, margin_top)
+    
+    margin_top = margin_top + 30; 
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text("Ended by:", 50, margin_top)
+        .font("Helvetica")
+        .text(event.ended_by_account ? `${event.ended_by_account.first_name} ${event.ended_by_account.last_name}` : 'Automatic', 120, margin_top)
     
     margin_top = margin_top + 30; 
     doc
@@ -1490,6 +1503,7 @@ const eventStock = (doc, event, products, top) => {
 }
 
 const eventCollaboratorsSales = async (doc, event, top) => {
+    // Manage credits sold
     let margin_top = top + 40;
 
     doc
@@ -1508,7 +1522,6 @@ const eventCollaboratorsSales = async (doc, event, top) => {
 
     margin_top = margin_top + 15;
     generateHr(doc, margin_top);
-
 
     const account_ids = event.purchases.map(purchase => purchase.scanned_by_account.id);
     const unique_accounts = [...new Set(account_ids)];
@@ -1541,6 +1554,118 @@ const eventCollaboratorsSales = async (doc, event, top) => {
 
         margin_top = margin_top + 20;
         generateHr(doc, margin_top);
+    }
+
+    // Manage Check In's 
+    margin_top = margin_top + 40;
+
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text("Check-In Counter:", 50, margin_top);
+
+    margin_top = margin_top + 30;
+
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(10)
+        .text('Team Member', 50, margin_top)
+        .text('Role', 250, margin_top)
+        .text("Check In's", 400, margin_top)
+
+    margin_top = margin_top + 15;
+    generateHr(doc, margin_top);
+
+    const checked_in_account_ids = event.guests.filter(guest => guest.checked_in_by_account).map(guest => guest.checked_in_by_account.id);
+    const checked_in_unique_accounts = [...new Set(checked_in_account_ids)];
+    
+    if (checked_in_unique_accounts.length < 1) {
+
+            margin_top = margin_top + 25;
+
+            doc
+                .font("Helvetica")
+                .fontSize(10)
+                .text(`No check-in's`, 250, margin_top)
+
+    }
+
+    for (const account_id of checked_in_unique_accounts) {
+
+        const guest = event.guests.find(guest => guest.checked_in_by_account && guest.checked_in_by_account.id === account_id);
+
+        if (guest) {
+            const checked_in_guests =
+                event.guests.filter((event_guest) => event_guest.checked_in_by === guest.checked_in_by_account.id);
+
+            margin_top = margin_top + 25;
+
+            doc
+                .font("Helvetica")
+                .fontSize(10)
+                .text(`${guest.checked_in_by_account.first_name} ${guest.checked_in_by_account.last_name}`, 50, margin_top)
+                .text(`${guest.checked_in_by_account.role && guest.checked_in_by_account.role.scope} ${guest.checked_in_by_account.role && guest.checked_in_by_account.role.name}`, 250, margin_top)
+                .text(checked_in_guests.length, 400, margin_top)
+
+            margin_top = margin_top + 20;
+            generateHr(doc, margin_top);
+        }
+    }
+
+    // Manage Check Outs's 
+    margin_top = margin_top + 40;
+
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text("Check-Out Counter:", 50, margin_top);
+
+    margin_top = margin_top + 30;
+
+    doc
+        .font("Helvetica-Bold")
+        .fontSize(10)
+        .text('Team Member', 50, margin_top)
+        .text('Role', 250, margin_top)
+        .text("Check Out's", 400, margin_top)
+
+    margin_top = margin_top + 15;
+    generateHr(doc, margin_top);
+
+    const checked_out_account_ids = event.guests.filter(guest => guest.checked_out_by_account).map(guest => guest.checked_out_by_account.id);
+    const checked_out_unique_accounts = [...new Set(checked_out_account_ids)];
+    
+    if (checked_out_unique_accounts.length < 1) {
+
+            margin_top = margin_top + 25;
+
+            doc
+                .font("Helvetica")
+                .fontSize(10)
+                .text(`No check-out's`, 250, margin_top)
+
+    }
+
+    for (const account_id of checked_out_unique_accounts) {
+        
+        const guest = event.guests.find(guest => guest.checked_out_by_account && guest.checked_out_by_account.id === account_id);
+
+        if (guest) {
+            const checked_out_guests =
+                event.guests.filter((event_guest) => event_guest.checked_out_by === guest.checked_out_by_account.id);
+
+            margin_top = margin_top + 25;
+
+            doc
+                .font("Helvetica")
+                .fontSize(10)
+                .text(`${guest.checked_out_by_account.first_name} ${guest.checked_out_by_account.last_name}`, 50, margin_top)
+                .text(`${guest.checked_out_by_account.role && guest.checked_out_by_account.role.scope} ${guest.checked_out_by_account.role && guest.checked_out_by_account.role.name}`, 250, margin_top)
+                .text(checked_out_guests.length, 400, margin_top)
+
+            margin_top = margin_top + 20;
+            generateHr(doc, margin_top);
+        }
     }
 
     return top;
@@ -1589,14 +1714,21 @@ const eventReport = async (req, res, next) => {
                                 ]
                             ],
                             guests.[
-                                account
+                                account,
+                                checked_in_by_account.[
+                                    role
+                                ],
+                                checked_out_by_account.[
+                                    role
+                                ],
                             ],
                             condition,
                             purchases.[
                                 scanned_by_account.[
                                     role
                                 ]
-                            ]
+                            ],
+                            ended_by_account
                         ]`)
                         .where('id', event_id)
                         .first();
