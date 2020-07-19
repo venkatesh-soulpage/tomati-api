@@ -127,7 +127,7 @@ const createWarehouseStock = async (req, res, next) => {
     try {    
         const {account_id, scope} = req;
         const {warehouse_id} = req.params;
-        const {product_id, quantity} = req.body;
+        const {product_id, quantity, comments} = req.body;
 
         // Validate the account is a client collaborator
         const client_collaborators = 
@@ -164,7 +164,7 @@ const createWarehouseStock = async (req, res, next) => {
         // Register the transaction
         await models.WarehouseTransaction.query()
             .insert({
-                warehouse_id, product_id, account_id, quantity,
+                warehouse_id, product_id, account_id, quantity, comments,
                 action: 'ADD'
             })
 
@@ -181,7 +181,7 @@ const removeWarehouseStock = async (req, res, next) => {
     try {    
         const {account_id, scope} = req;
         const {warehouse_id} = req.params;
-        const {product_id, quantity} = req.body;
+        const {product_id, quantity, comments} = req.body;
 
         // Validate the account is a client collaborator
         const client_collaborators = 
@@ -214,7 +214,7 @@ const removeWarehouseStock = async (req, res, next) => {
         await models.WarehouseTransaction.query()
             .insert({
                 warehouse_id, product_id, account_id,
-                quantity,
+                quantity, comments,
                 action: 'REMOVE'
             })
 
