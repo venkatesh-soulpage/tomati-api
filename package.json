@@ -1,6 +1,6 @@
 {
   "name": "boozeboss-api",
-  "version": "0.1.0",
+  "version": "0.16.2",
   "private": true,
   "scripts": {
     "start": "nodemon -r esm ./bin/www",
