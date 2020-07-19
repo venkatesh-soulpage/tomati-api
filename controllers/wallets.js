@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import fetch from 'node-fetch';
 import queryString from 'query-string';
+import Wallet from '../models/wallet';
 
 const randomString = (len) => {
     var p = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -191,6 +192,13 @@ const scanOrder = async (req, res, next) => {
         const {account_id} = req;
         const {order_identifier} = req.params;
 
+        const account = 
+            await models.Account.query()
+                    .withGraphFetched(`[
+                        location
+                    ]`)
+                    .findById(account_id)
+
         const order = 
                 await models.WalletOrder.query()
                         .withGraphFetched(`[
@@ -204,7 +212,10 @@ const scanOrder = async (req, res, next) => {
 
         // Update order status 
         await models.WalletOrder.query()
-            .update({ status: 'RECEIVED', scanned_by: account_id})
+            .update({ 
+                status: 'RECEIVED', 
+                scanned_by: account_id
+            })
             .where('order_identifier', order_identifier);
         
         const updated_order = 
@@ -221,6 +232,17 @@ const scanOrder = async (req, res, next) => {
                     .where('order_identifier', order_identifier)
                     .first();
 
+        // Calculate the order and give loyalty points
+        const coin_total_amount = order.total_amount * account.location.currency_conversion;
+        const loyalty_points_to_add = Math.round(coin_total_amount * Number(process.env.LOYALTY_POINTS_FACTOR) * 100) / 100;
+
+        const user_wallet = await models.Wallet.query().findById(order.wallet_id);
+
+        await models.Wallet.query()
+                    .update({
+                        loyalty_points: Number(user_wallet.loyalty_points) + Number(loyalty_points_to_add),
+                    })
+                    .where({id: user_wallet.id });
 
         return res.status(200).json({order: updated_order, success: 'Order successfully scanned'});
 
