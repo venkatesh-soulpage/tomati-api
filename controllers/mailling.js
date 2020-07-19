@@ -148,7 +148,7 @@ const sendFotgotPasswordEmail = (user, token) => {
     const email = new Email({
         message: {
             from: process.env.SMTP_AUTH,
-            subject: 'Booze Boss - Reset Password',
+            subject: 'LiquidIntel - Password reset',
         },
         send: true,
         transport: transporter,
@@ -271,7 +271,7 @@ const sendInviteCode = (guest) => {
     const email = new Email({
         message: {
             from: process.env.SMTP_AUTH,
-            subject: 'You have been invited to an Event',
+            subject: 'You have been invited to an Event - LiquidIntel',
         },
         send: true,
         transport: transporter,

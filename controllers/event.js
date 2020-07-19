@@ -553,9 +553,12 @@ const redeemCode = async (req, res, next) => {
 
             if (!account) return res.status(400).json('Invalid Account').send();
 
-            const event_guest = await models.EventGuest.query().where({account_id}).first();
+            const event_guest = 
+                await models.EventGuest.query()
+                        .where({account_id})
+                        .first();
 
-            if (event_guest) return res.status(400).json('Already a guest').send();
+            if (event_guest.event_id === event.id) return res.status(400).json('Already a guest').send();
             
             // Create the guest 
             await models.EventGuest.query()
