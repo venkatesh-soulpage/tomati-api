@@ -62,6 +62,17 @@ router.put(
     verificationController.updateVerificationStatus
 );
 
+/* GET - GET Verification Logs */
+router.get(
+    '/organization-logs/:regional_organization_id',
+    VerifyToken, 
+    VerifyRole([
+        {scope: 'REGION', role: 'OWNER'},
+        {scope: 'REGION', role: 'MANAGER'},
+    ]),
+    verificationController.getOrganizationVerificationLogs
+);
+
 /* SMS */
 
 /* POST - Submit a verification sms */

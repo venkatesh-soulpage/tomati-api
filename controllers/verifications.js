@@ -7,6 +7,7 @@ import fetch from 'node-fetch';
 import queryString from 'query-string';
 import AWS from 'aws-sdk';
 import twilio from 'twilio';
+import moment from 'moment';
 
 const twilio_client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
@@ -329,6 +330,54 @@ const checkVerificationSMS =  async (req, res, next) => {
     }
 }
 
+// Get organization verification csv
+const getOrganizationVerificationLogs = async (req, res, next) => {
+    try {
+        const {account_id} = req;
+        const {regional_organization_id} = req.params;
+
+        const verification_logs = 
+        await models.VerificationLog.query()
+                .withGraphFetched(`[
+                    account.[
+                        events_guest.[
+                            event.[
+                                brief_event.[
+                                    brief.[
+                                        client
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                    verified_by_account,
+                ]`)
+                .where({
+                    regional_organization_id,
+                })
+                .orderBy('created_at', 'asc');
+
+                const records = [];
+                verification_logs.map((verification_log, index) => {
+                    records.push({
+                        index: index + 1,
+                        account_name: `${verification_log.account.first_name} ${verification_log.account.last_name}`,
+                        account_email: `${verification_log.account.email}`,
+                        team: verification_log.account.events_guest.length > 0 ? verification_log.account.events_guest[0].event.brief_event.brief.client.name : '-',
+                        event: verification_log.account.events_guest.length > 0 ? verification_log.account.events_guest[0].event.brief_event.name : '-',
+                        verified_at: moment(verification_log.created_at).format('DD/MM/YYYY LT'),
+                    })
+                })
+
+
+        return res.status(200).send(records);
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 
 
 const verificationController = {
@@ -338,6 +387,7 @@ const verificationController = {
     uploadVerificationProcess,
     submitVerification,
     updateVerificationStatus,
+    getOrganizationVerificationLogs,
     // SMS verifications
     getVerificationSMS,
     checkVerificationSMS,

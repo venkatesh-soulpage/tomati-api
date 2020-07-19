@@ -67,6 +67,14 @@ export default class Account extends Model {
             from: 'accounts.id',
             to: 'wallets.account_id'
           }
+        },
+        events_guest: {
+          relation: Model.HasManyRelation,
+          modelClass: models.EventGuest,
+          join: {
+            from: 'accounts.id',
+            to: 'event_guests.account_id',
+          }
         }
       }
     }
