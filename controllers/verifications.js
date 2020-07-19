@@ -378,6 +378,49 @@ const getOrganizationVerificationLogs = async (req, res, next) => {
     }
 }
 
+// Get client verification csv
+const getClientVerificationLogs = async (req, res, next) => {
+    try {
+        const {account_id} = req;
+        const {client_id} = req.params;
+
+        const verification_logs = 
+        await models.VerificationLog.query()
+                .withGraphFetched(`[
+                    account.[
+                        events_guest.[
+                            event.[
+                                brief_event
+                            ]
+                        ]
+                    ]
+                    verified_by_account,
+                ]`)
+                .where({
+                    client_id,
+                })
+                .orderBy('created_at', 'asc');
+
+                const records = [];
+                verification_logs.map((verification_log, index) => {
+                    records.push({
+                        index: index + 1,
+                        account_name: `${verification_log.account.first_name} ${verification_log.account.last_name}`,
+                        account_email: `${verification_log.account.email}`,
+                        event: verification_log.account.events_guest.length > 0 ? verification_log.account.events_guest[0].event.brief_event.name : '-',
+                        verified_at: moment(verification_log.created_at).format('DD/MM/YYYY LT'),
+                    })
+                })
+
+
+        return res.status(200).send(records);
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json(JSON.stringify(e)).send();
+    }
+}
+
 
 
 const verificationController = {
@@ -388,6 +431,7 @@ const verificationController = {
     submitVerification,
     updateVerificationStatus,
     getOrganizationVerificationLogs,
+    getClientVerificationLogs,
     // SMS verifications
     getVerificationSMS,
     checkVerificationSMS,

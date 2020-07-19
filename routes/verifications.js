@@ -73,6 +73,19 @@ router.get(
     verificationController.getOrganizationVerificationLogs
 );
 
+/* GET - GET Verification Logs */
+router.get(
+    '/client-logs/:client_id',
+    VerifyToken, 
+    VerifyRole([
+        {scope: 'REGION', role: 'OWNER'},
+        {scope: 'REGION', role: 'MANAGER'},
+        {scope: 'CLIENT', role: 'OWNER'},
+        {scope: 'CLIENT', role: 'MANAGER'},
+    ]),
+    verificationController.getClientVerificationLogs
+);
+
 /* SMS */
 
 /* POST - Submit a verification sms */
