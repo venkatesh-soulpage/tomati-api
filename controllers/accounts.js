@@ -335,7 +335,7 @@ const agencySignup = async (req, res, next) => {
 
     try { 
 
-        const {email, password, first_name, last_name, phone_number, token } = req.body;
+        const {email, password, first_name, last_name, gender, phone_number, token, date_of_birth } = req.body;
 
         // Check if the account doesn't exist
         const account = 
