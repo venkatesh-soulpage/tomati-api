@@ -22,11 +22,13 @@
     "reset_events": "knex seed:run --specific=reset_events_data.js",
     "populate_wallet": "knex seed:run --specific=populate_wallet_data.js",
     "reset_wallet": "knex seed:run --specific=reset_wallet_data.js",
+    "populate_countries": "knex seed:run --specific=initial_locations.js",
+    "populate_roles": "knex seed:run --specific=roles.js",
     "populate_all": "npm run populate_organizations && npm run populate_products && npm run populate_warehouses &&  npm run populate_briefs && npm run populate_requisitions && npm run populate_events && npm run populate_wallet",
     "reset_all": "npm run reset_wallet && npm run reset_events && npm run reset_requisitions && npm run reset_briefs && npm run reset_warehouses && npm run reset_products && npm run reset_organizations"
   },
   "engines": {
-    "node": "10.x"
+    "node": "12.x"
   },
   "dependencies": {
     "@octokit/auth-app": "^2.4.2",
@@ -38,6 +40,7 @@
     "crypto": "^1.0.1",
     "debug": "~2.6.9",
     "dotenv": "^8.2.0",
+    "dynamic-qr-code-generator": "^0.1.0",
     "email-templates": "^6.0.3",
     "esm": "^3.2.25",
     "express": "~4.16.1",
@@ -49,6 +52,7 @@
     "http-errors": "^1.6.3",
     "jade": "^1.11.0",
     "jsonwebtoken": "^8.5.1",
+    "jspdf": "^2.2.0",
     "knex": "^0.20.13",
     "moment": "^2.25.3",
     "morgan": "~1.9.1",
@@ -60,7 +64,11 @@
     "pg": "^8.0.0",
     "postgres-date": "^1.0.5",
     "pug": "^2.0.0-beta11",
+    "qr-image": "^3.2.0",
+    "qrcode": "1.x",
+    "qrcode-with-logos": "^1.0.3",
     "query-string": "^6.10.1",
+    "react-qr-code": "^1.0.3",
     "twilio": "^3.43.1"
   },
   "devDependencies": {
