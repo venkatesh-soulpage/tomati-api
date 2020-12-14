@@ -131,10 +131,13 @@ const generateQRCode = async (outlet_event_id) => {
   //
   const key = `public/qr_codes/outletevents/${outlet_event_id}.png`;
 
-  const APP_URL = `${process.env.SCHEMA}://${process.env.APP_HOST}${
-    process.env.APP_PORT &&
-    `:${process.env.APP_PORT}/outlet/?outlet_event=${outlet_event_id}`
-  }`;
+  let APP_HOST = `${process.env.SCHEMA}://${process.env.APP_HOST}`;
+
+  if (process.env.APP_PORT) {
+    APP_HOST += process.env.APP_PORT;
+  }
+
+  const APP_URL = APP_HOST + `/outlet/?outlet_event=${outlet_event_id}`;
 
   const url = await QRCode.toDataURL(`URL: ${APP_URL}`, { width: 1000 });
   const buf = Buffer.from(

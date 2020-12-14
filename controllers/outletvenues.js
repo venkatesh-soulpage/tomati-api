@@ -121,11 +121,13 @@ const createVenue = async (req, res, next) => {
 const generateQRCode = async (outlet_venue_id) => {
   const key = `public/qr_codes/outletvenues/${outlet_venue_id}.png`;
 
-  const APP_URL = `${process.env.SCHEMA}://${process.env.APP_HOST}${
-    process.env.APP_PORT &&
-    `:${process.env.APP_PORT}/outlet/?outlet_venue=${outlet_venue_id}`
-  }`;
+  let APP_HOST = `${process.env.SCHEMA}://${process.env.APP_HOST}`;
 
+  if (process.env.APP_PORT) {
+    APP_HOST += process.env.APP_PORT;
+  }
+
+  const APP_URL = APP_HOST + `/outlet/?outlet_venue=${outlet_venue_id}`;
   const url = await QRCode.toDataURL(`URL: ${APP_URL}`, { width: 1000 });
   const buf = Buffer.from(
     url.replace(/^data:image\/\w+;base64,/, ""),
