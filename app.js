@@ -30,6 +30,7 @@ var analyticsRoute = require("./routes/analytics");
 var outleteventsRoute = require("./routes/outletevents");
 var outletVenuesRoute = require("./routes/outletvenues");
 var outletLocationsRoute = require("./routes/outletlocations");
+var cartRoute = require("./routes/cart");
 
 var app = express();
 
@@ -76,6 +77,7 @@ app.use("/api/analytics", analyticsRoute);
 app.use("/api/outletevents", outleteventsRoute);
 app.use("/api/outletvenues", outletVenuesRoute);
 app.use("/api/outletlocations", outletLocationsRoute);
+app.use("/api/cart", cartRoute);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

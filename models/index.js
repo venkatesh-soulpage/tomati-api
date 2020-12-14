@@ -43,6 +43,8 @@ import OutletEvent from "./outletevent";
 import OutletVenue from "./outletvenue";
 import OutletVenueMenu from "./outletvenuemenu";
 import OutletEventMenu from "./outleteventmenu";
+import Cart from "./cart";
+import CartItem from "./cart_item";
 
 export default {
   Location,
@@ -90,4 +92,6 @@ export default {
   OutletVenue,
   OutletVenueMenu,
   OutletEventMenu,
+  Cart,
+  CartItem,
 };

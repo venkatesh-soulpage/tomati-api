@@ -16,7 +16,7 @@ router.get(
 );
 
 router.get(
-  "/:venue_id",
+  "/:outlet_venue_id",
   VerifyToken,
   VerifyRole([
     { scope: "OUTLET", role: "MANAGER" },
