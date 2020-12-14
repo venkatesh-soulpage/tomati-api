@@ -689,7 +689,7 @@ const eventDescription = async (doc, event, top) => {
     generateEventTableRow(doc, margin_top + 30, 'Event Start Time', moment(event.brief_event.start_time).format('DD/MM/YYYY LT'), moment(event.started_at).format('DD/MM/YYYY LT'));
     generateEventTableRow(doc, margin_top + 60, 'Event End Time', moment(event.brief_event.end_time).format('DD/MM/YYYY LT'), moment(event.ended_at).format('DD/MM/YYYY LT'));
     generateEventTableRow(doc, margin_top + 90, 'Volume Depletion', calculateOrder(event.brief_event.brief.requisition.orders), calculateTotalVolume(event.products));
-    generateEventTableRow(doc, margin_top + 120, 'Volume Depletion (Only Liqueour)', calculateLiqueorOrder(event.brief_event.brief.requisition.orders), calculateLiqueourTotalVolume(event.products));
+    generateEventTableRow(doc, margin_top + 120, 'Volume Depletion (Only liquor)', calculateLiqueorOrder(event.brief_event.brief.requisition.orders), calculateLiqueourTotalVolume(event.products));
     generateEventTableRow(doc, margin_top + 150, 'Attendance', event.brief_event.expected_guests, checkedInGuests(event.guests));
 
     return margin_top + 120;
