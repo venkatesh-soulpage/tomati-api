@@ -39,6 +39,72 @@ const getUser = async (req, res, next) => {
   }
 };
 
+const verifyEmailOrPhone = async (req, res, next) => {
+  const { email, phone_number } = req.body;
+  if (email) {
+    try {
+      // Check if the account doesn't exist
+      const account = await models.Account.query()
+        .where("email", email)
+        .first();
+
+      if (!account) return res.status(404).json("Email Doesn't Exist").send();
+      // Search for Region Owner Role
+      const role = await models.Role.query()
+        .where("scope", "GUEST")
+        .where("name", "REGULAR")
+        .first();
+
+      const jwt_token = await jwt.sign(
+        {
+          id: account.id,
+          email: account.email,
+          scope: role.scope,
+          role: role.name,
+        },
+        process.env.SECRET_KEY,
+        { expiresIn: "3h" }
+      );
+
+      return res.status(201).json({ jwt_token }).send();
+    } catch (e) {
+      return res.status(500).json(JSON.stringify(e)).send();
+    }
+  } else if (phone_number) {
+    try {
+      // Check if the account doesn't exist
+      const account = await models.Account.query()
+        .where("phone_number", phone_number)
+        .first();
+
+      console.log(account);
+      if (!account)
+        return res.status(404).json("Phone Number Doesn't Exist").send();
+
+      // Search for Region Owner Role
+      const role = await models.Role.query()
+        .where("scope", "GUEST")
+        .where("name", "REGULAR")
+        .first();
+
+      const jwt_token = await jwt.sign(
+        {
+          id: account.id,
+          email: account.email,
+          scope: role.scope,
+          role: role.name,
+        },
+        process.env.SECRET_KEY,
+        { expiresIn: "3h" }
+      );
+
+      return res.status(201).json({ jwt_token }).send();
+    } catch (e) {
+      return res.status(500).json(JSON.stringify(e)).send();
+    }
+  }
+};
+
 // POST - Signup
 const signup = async (req, res, next) => {
   const { email, password, first_name, last_name } = req.body;
@@ -658,16 +724,7 @@ const guestSignup = async (req, res, next) => {
       date_of_birth,
     } = req.body;
 
-    if (
-      !email ||
-      !first_name ||
-      !last_name ||
-      !phone_number ||
-      !code ||
-      !password ||
-      !gender ||
-      !date_of_birth
-    )
+    if (!email || !first_name || !last_name || !phone_number || !password)
       return res.status(400).json("Missing fields").send();
 
     // Check if the account doesn't exist
@@ -678,83 +735,83 @@ const guestSignup = async (req, res, next) => {
       return res.status(400).json("This email already exists");
 
     // If the code doesn't exist return an error
-    if (!code) return res.status(400).json("Invalid invite code");
+    // if (!code) return res.status(400).json("Invalid invite code");
 
     // Search for the token and email
     let guest;
 
     // Check if there is an existing personal code for this guest.
-    guest = await models.EventGuest.query()
-      .withGraphFetched(
-        `[
-                    role,
-                    event.[
-                        brief.[
-                            client
-                        ]
-                    ]
-                ]`
-      )
-      .where("code", code)
-      .first();
+    // guest = await models.EventGuest.query()
+    //   .withGraphFetched(
+    //     `[
+    //                 role,
+    //                 event.[
+    //                     brief.[
+    //                         client
+    //                     ]
+    //                 ]
+    //             ]`
+    //   )
+    //   .where("code", code)
+    //   .first();
 
     // If there isnt' a personal code try to get a master code
-    if (!guest) {
-      const event = await models.Event.query()
-        .where({ master_code: code })
-        .first();
+    // if (!guest) {
+    //   const event = await models.Event.query()
+    //     .where({ master_code: code })
+    //     .first();
 
-      // If there is an event with this code create an event guest.
-      if (event) {
-        // Find the regular role guest
-        const role = await models.Role.query()
-          .where({ scope: "GUEST", name: "REGULAR" })
-          .first();
+    //   // If there is an event with this code create an event guest.
+    //   if (event) {
+    //     // Find the regular role guest
+    //     const role = await models.Role.query()
+    //       .where({ scope: "GUEST", name: "REGULAR" })
+    //       .first();
 
-        await models.EventGuest.query()
-          .insert({
-            email,
-            first_name,
-            last_name,
-            role_id: role.id,
-            event_id: event.id,
-            phone_number,
-            code: `${code}_MASTERCODE`,
-            code_redeemed: true,
-          })
-          .returning("id");
+    //     await models.EventGuest.query()
+    //       .insert({
+    //         email,
+    //         first_name,
+    //         last_name,
+    //         role_id: role.id,
+    //         event_id: event.id,
+    //         phone_number,
+    //         code: `${code}_MASTERCODE`,
+    //         code_redeemed: true,
+    //       })
+    //       .returning("id");
 
-        // Fetch the guest
-        guest = await models.EventGuest.query()
-          .withGraphFetched(
-            `[
-                            role,
-                            event.[
-                                brief.[
-                                    client
-                                ]
-                            ]
-                        ]`
-          )
-          .where({
-            email,
-            event_id: event.id,
-          })
-          .first();
-      }
-    }
+    //     // Fetch the guest
+    //     guest = await models.EventGuest.query()
+    //       .withGraphFetched(
+    //         `[
+    //                         role,
+    //                         event.[
+    //                             brief.[
+    //                                 client
+    //                             ]
+    //                         ]
+    //                     ]`
+    //       )
+    //       .where({
+    //         email,
+    //         event_id: event.id,
+    //       })
+    //       .first();
+    //   }
+    // }
 
-    if (!guest) return res.status(400).json("Invalid invite code");
+    // if (!guest) return res.status(400).json("Invalid invite code");
 
     // Validate email
-    if (guest.email && guest.email !== email)
-      return res
-        .status(400)
-        .json("The code doesn't match with the provided email");
+    // if (guest.email && guest.email !== email)
+    //   return res
+    //     .status(400)
+    //     .json("The code doesn't match with the provided email");
 
     // If the guest doesn't have a email verification send an email but if the guest already has been validated by the platform
     // log him in inmediatly
-    if (guest.email === email) {
+    if (guest && guest.email === email) {
       // Hash password
       const salt = await bcrypt.genSalt(10);
       const password_hash = await bcrypt.hash(password, salt);
@@ -824,16 +881,28 @@ const guestSignup = async (req, res, next) => {
       });
 
       // Update event guest
-      await models.EventGuest.query()
-        .update({
-          account_id: new_account.id,
-          first_name,
-          last_name,
-          email,
-          phone_number,
-          code_redeemed: true,
-        })
-        .where("id", guest.id);
+      // await models.EventGuest.query()
+      //   .update({
+      //     account_id: new_account.id,
+      //     first_name,
+      //     last_name,
+      //     email,
+      //     phone_number,
+      //     code_redeemed: true,
+      //   })
+      //   .where("id", guest.id);
+
+      const jwt_token = await jwt.sign(
+        {
+          id: new_account.id,
+          email: new_account.email,
+          scope: "GUEST",
+          role: "REGULAR",
+          is_age_verified: false,
+        },
+        process.env.SECRET_KEY,
+        { expiresIn: "31d" }
+      );
 
       // Send signup email
       await sendConfirmationEmail(new_account, new_token);
@@ -842,8 +911,9 @@ const guestSignup = async (req, res, next) => {
       return res
         .status(201)
         .json({
-          login: false,
+          login: true,
           message: `We sent you an email to ${email} to confirm your account`,
+          jwt_token,
         })
         .send();
     }
@@ -1395,6 +1465,7 @@ const userController = {
   // OAuth
   authWithFacebook,
   inviteOutletManager,
+  verifyEmailOrPhone,
 };
 
 export default userController;

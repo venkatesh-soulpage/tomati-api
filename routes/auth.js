@@ -10,6 +10,9 @@ router.get("/confirmation/:token", accountController.confirmation);
 /* POST Create new user. */
 router.post("/signup", accountController.signup);
 
+/* POST Verify Email/Phone */
+router.post("/verify", accountController.verifyEmailOrPhone);
+
 /* POST Create new user. */
 router.post("/outlet-signup", accountController.outletSignup);
 

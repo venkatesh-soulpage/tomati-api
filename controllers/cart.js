@@ -29,7 +29,29 @@ const addCartItem = async (req, res, next) => {
   try {
     const { account_id, scope } = req;
 
-    const new_venue = await models.CartItem.query().insertGraph(req.body);
+    const cart = await models.Cart.query().where({ account_id }).first();
+
+    const { currentoutlet, cartItems } = req.body;
+
+    const data = [];
+
+    Object.entries(obj).forEach(([key, value]) => {
+      if (currentoutlet === "outletevent") {
+        data.push({
+          cart_id: cart.id,
+          outleteventmenu_id: key,
+          quantity: value,
+        });
+      } else if (currentoutlet === "outletvenue") {
+        data.push({
+          cart_id: cart.id,
+          outletvenuemenu_id: key,
+          quantity: value,
+        });
+      }
+    });
+
+    const new_venue = await models.CartItem.query().insertGraph(data);
 
     // Send the clients
     return res.status(201).json("CartItems Created Successfully").send();
