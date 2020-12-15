@@ -43,7 +43,7 @@ const getVenue = async (req, res, next) => {
     if (!outlet_venue_id) return res.status(400).json("Invalid ID").send();
 
     const venue = await models.OutletVenue.query()
-      .withGraphFetched(`[menu]`)
+      .withGraphFetched(`[menu, location]`)
       .findById(outlet_venue_id);
 
     return res.status(200).json(venue).send();

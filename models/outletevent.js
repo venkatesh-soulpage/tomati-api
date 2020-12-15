@@ -16,6 +16,14 @@ export default class OutletEvent extends Model {
           to: "outletevents.id",
         },
       },
+      location: {
+        relation: Model.HasOneRelation,
+        modelClass: models.Location,
+        join: {
+          from: "locations.id",
+          to: "outletevents.location_id",
+        },
+      },
     };
   }
 }

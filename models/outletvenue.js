@@ -15,6 +15,14 @@ export default class OutletVenue extends Model {
           to: "outletvenues.id",
         },
       },
+      location: {
+        relation: Model.HasOneRelation,
+        modelClass: models.Location,
+        join: {
+          from: "locations.id",
+          to: "outletvenues.location_id",
+        },
+      },
     };
   }
 }

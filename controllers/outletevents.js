@@ -46,7 +46,7 @@ const getEvent = async (req, res, next) => {
     if (!outlet_event_id) return res.status(400).json("Invalid ID").send();
 
     const event = await models.OutletEvent.query()
-      .withGraphFetched(`[menu]`)
+      .withGraphFetched(`[menu, location]`)
       .findById(outlet_event_id);
 
     return res.status(200).json(event).send();
