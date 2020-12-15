@@ -8,10 +8,13 @@ import queryString from "query-string";
 import { sendInviteCode } from "./mailling";
 import AWS from "aws-sdk";
 
+import _ from "lodash";
+
 import { jsPDF } from "jspdf";
 
 const QRCode = require("qrcode");
 var fs = require("fs");
+const isBase64 = require("is-base64");
 
 // Inititialize AWS
 const s3 = new AWS.S3({
@@ -93,7 +96,7 @@ const createEvent = async (req, res, next) => {
     if (req.files) {
       cover_image = req.files.cover_image;
       buf = cover_image.data;
-    } else {
+    } else if (req.body.cover_image) {
       cover_image = req.body.cover_image;
       buf = Buffer.from(
         cover_image.data.replace(/^data:image\/\w+;base64,/, ""),
@@ -121,6 +124,102 @@ const createEvent = async (req, res, next) => {
 
     // Send the clients
     return res.status(201).json("Event Created Successfully").send();
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e)).send();
+  }
+};
+
+const updateEvent = async (req, res, next) => {
+  try {
+    const { account_id, scope } = req;
+
+    const { outlet_event_id } = req.params;
+
+    const outletevent = await models.OutletEvent.query().findById(
+      outlet_event_id
+    );
+
+    if (!outlet_event_id || !outletevent)
+      return res.status(400).json("Invalid ID").send();
+
+    if (_.size(req.body) < 1)
+      return res.status(400).json("No Data to update").send();
+
+    const {
+      name,
+      description,
+      address,
+      location_id,
+      start_time,
+      end_time,
+      expected_guests,
+      expected_hourly_guests,
+      comments,
+    } = req.body;
+
+    let buf, cover_image;
+
+    if (req.files) {
+      cover_image = req.files.cover_image;
+      buf = cover_image.data;
+    } else if (req.body.cover_image) {
+      cover_image = req.body.cover_image;
+      if (isBase64(cover_image.data, { mimeRequired: true }))
+        buf = Buffer.from(
+          cover_image.data.replace(/^data:image\/\w+;base64,/, ""),
+          "base64"
+        );
+    }
+    if (buf && cover_image) {
+      const key = `public/cover_images/outletevents/${cover_image.name}`;
+      uploadImage({ key, buf });
+      await models.OutletEvent.query()
+        .update({
+          cover_image: `https://s3.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
+        })
+        .where("id", outlet_event_id);
+    }
+
+    await models.OutletEvent.query()
+      .update({
+        name,
+        description,
+        address,
+        location_id,
+        start_time,
+        end_time,
+        expected_guests,
+        expected_hourly_guests,
+        comments,
+        account_id,
+      })
+      .where("id", outlet_event_id);
+    return res.status(200).json("Event Updated Successfully").send();
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e)).send();
+  }
+};
+
+const deleteEvent = async (req, res, next) => {
+  try {
+    const { outlet_event_id } = req.params;
+
+    const outletevent = await models.OutletEvent.query().findById(
+      outlet_event_id
+    );
+
+    if (!outlet_event_id || !outletevent)
+      return res.status(400).json("Invalid ID").send();
+
+    await models.OutletEventMenu.query()
+      .where("outlet_event_id", outlet_event_id)
+      .delete();
+
+    await models.OutletEvent.query().deleteById(outlet_event_id);
+
+    return res.status(200).json("Succesfully Deleted");
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e)).send();
@@ -190,6 +289,8 @@ const eventsController = {
   getEvent,
   createEvent,
   createEventMenu,
+  updateEvent,
+  deleteEvent,
 };
 
 export default eventsController;

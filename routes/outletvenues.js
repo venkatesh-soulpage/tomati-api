@@ -26,6 +26,26 @@ router.get(
   venuesController.getVenue
 );
 
+router.put(
+  "/:outlet_venue_id",
+  VerifyToken,
+  VerifyRole([
+    { scope: "OUTLET", role: "MANAGER" },
+    { scope: "OUTLET", role: "OWNER" },
+  ]),
+  venuesController.updateVenue
+);
+
+router.delete(
+  "/:outlet_venue_id",
+  VerifyToken,
+  VerifyRole([
+    { scope: "OUTLET", role: "MANAGER" },
+    { scope: "OUTLET", role: "OWNER" },
+  ]),
+  venuesController.deleteVenue
+);
+
 router.post(
   "/",
   VerifyToken,
@@ -45,28 +65,5 @@ router.post(
   ]),
   venuesController.createVenueMenu
 );
-// /* PATCH - Update a field of an event */
-// router.patch(
-//   "/:event_id",
-//   VerifyToken,
-//   VerifyRole([{ scope: "OUTLET", role: "MANAGER" }]),
-//   eventsController.updateEventField
-// );
-
-// /* POST - Invite a new user*/
-// router.post(
-//   "/invite-guest",
-//   VerifyToken,
-//   VerifyRole([{ scope: "OUTLET", role: "MANAGER" }]),
-//   eventsController.inviteGuest
-// );
-
-// // POST - Add a new product to the menu
-// router.delete(
-//   "/:event_id/delete-product/:event_product_id",
-//   VerifyToken,
-//   VerifyRole([{ scope: "OUTLET", role: "MANAGER" }]),
-//   eventsController.removeEventProduct
-// );
 
 module.exports = router;

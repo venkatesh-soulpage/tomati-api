@@ -45,28 +45,24 @@ router.get(
   eventsController.getEvent
 );
 
-// /* PATCH - Update a field of an event */
-// router.patch(
-//   "/:event_id",
-//   VerifyToken,
-//   VerifyRole([{ scope: "OUTLET", role: "MANAGER" }]),
-//   eventsController.updateEventField
-// );
+router.put(
+  "/:outlet_event_id",
+  VerifyToken,
+  VerifyRole([
+    { scope: "OUTLET", role: "MANAGER" },
+    { scope: "OUTLET", role: "OWNER" },
+  ]),
+  eventsController.updateEvent
+);
 
-// /* POST - Invite a new user*/
-// router.post(
-//   "/invite-guest",
-//   VerifyToken,
-//   VerifyRole([{ scope: "OUTLET", role: "MANAGER" }]),
-//   eventsController.inviteGuest
-// );
-
-// // POST - Add a new product to the menu
-// router.delete(
-//   "/:event_id/delete-product/:event_product_id",
-//   VerifyToken,
-//   VerifyRole([{ scope: "OUTLET", role: "MANAGER" }]),
-//   eventsController.removeEventProduct
-// );
+router.delete(
+  "/:outlet_event_id",
+  VerifyToken,
+  VerifyRole([
+    { scope: "OUTLET", role: "MANAGER" },
+    { scope: "OUTLET", role: "OWNER" },
+  ]),
+  eventsController.deleteEvent
+);
 
 module.exports = router;

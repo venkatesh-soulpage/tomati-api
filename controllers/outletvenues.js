@@ -8,7 +8,10 @@ import queryString from "query-string";
 import { sendInviteCode } from "./mailling";
 import AWS from "aws-sdk";
 
+import _ from "lodash";
+
 const QRCode = require("qrcode");
+const isBase64 = require("is-base64");
 
 // Inititialize AWS
 const s3 = new AWS.S3({
@@ -87,7 +90,7 @@ const createVenue = async (req, res, next) => {
     if (req.files) {
       cover_image = req.files.cover_image;
       buf = cover_image.data;
-    } else {
+    } else if (req.body.cover_image) {
       cover_image = req.body.cover_image;
       buf = Buffer.from(
         cover_image.data.replace(/^data:image\/\w+;base64,/, ""),
@@ -112,6 +115,96 @@ const createVenue = async (req, res, next) => {
 
     // Send the clients
     return res.status(201).json("Venue Created Successfully").send();
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e)).send();
+  }
+};
+
+const updateVenue = async (req, res, next) => {
+  try {
+    const { account_id, scope } = req;
+
+    const { outlet_venue_id } = req.params;
+
+    const outletvenue = await models.OutletVenue.query().findById(
+      outlet_venue_id
+    );
+
+    if (!outlet_venue_id || !outletvenue)
+      return res.status(400).json("Invalid ID").send();
+
+    if (_.size(req.body) < 1)
+      return res.status(400).json("No Data to update").send();
+
+    const {
+      name,
+      description,
+      address,
+      location_id,
+      latitude,
+      longitude,
+    } = req.body;
+
+    let buf, cover_image;
+
+    if (req.files) {
+      cover_image = req.files.cover_image;
+      buf = cover_image.data;
+    } else if (req.body.cover_image) {
+      cover_image = req.body.cover_image;
+      if (isBase64(cover_image.data, { mimeRequired: true }))
+        buf = Buffer.from(
+          cover_image.data.replace(/^data:image\/\w+;base64,/, ""),
+          "base64"
+        );
+    }
+    if (buf && cover_image) {
+      const key = `public/cover_images/outletvenues/${cover_image.name}`;
+      uploadImage({ key, buf });
+      await models.OutletVenue.query()
+        .update({
+          cover_image: `https://s3.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
+        })
+        .where("id", outlet_venue_id);
+    }
+
+    await models.OutletVenue.query()
+      .update({
+        name,
+        description,
+        address,
+        location_id,
+        latitude,
+        longitude,
+        account_id,
+      })
+      .where("id", outlet_venue_id);
+    return res.status(200).json("Venue Updated Successfully").send();
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e)).send();
+  }
+};
+
+const deleteVenue = async (req, res, next) => {
+  try {
+    const { outlet_venue_id } = req.params;
+
+    const outletvenue = await models.OutletVenue.query().findById(
+      outlet_venue_id
+    );
+
+    if (!outlet_venue_id || !outletvenue)
+      return res.status(400).json("Invalid ID").send();
+
+    await models.OutletVenueMenu.query()
+      .where("outlet_venue_id", outlet_venue_id)
+      .delete();
+
+    await models.OutletVenue.query().deleteById(outlet_venue_id);
+
+    return res.status(200).json("Succesfully Deleted");
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e)).send();
@@ -178,6 +271,8 @@ const venuesController = {
   getVenue,
   createVenue,
   createVenueMenu,
+  updateVenue,
+  deleteVenue,
 };
 
 export default venuesController;

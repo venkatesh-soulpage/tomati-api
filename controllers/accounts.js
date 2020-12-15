@@ -127,7 +127,7 @@ const signup = async (req, res, next) => {
       first_name,
       last_name,
       password_hash,
-      is_admin: false,
+      is_admin: true,
       is_email_verified: false,
       is_age_verified: false,
     });

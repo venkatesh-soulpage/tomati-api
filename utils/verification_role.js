@@ -9,8 +9,6 @@ const verification_role = (allowed_roles) => {
       (role) => role.scope === req.scope && role.role === req.role
     );
 
-    console.log(allowed_roles, req.role, req.scope);
-
     // Verify Scope
     /*if (scopes.indexOf(req.scope) < 0 ) return res.status(403).json(`${JSON.stringify(scopes)} scopes required`).send();
 
