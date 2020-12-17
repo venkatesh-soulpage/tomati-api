@@ -12,4 +12,6 @@ router.post("/", VerifyToken, cartController.addCartItem);
 
 router.delete("/", VerifyToken, cartController.removeCartItem);
 
+router.get("/:account_id", VerifyToken, cartController.getUserCart);
+
 module.exports = router;

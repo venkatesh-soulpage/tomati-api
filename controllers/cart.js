@@ -66,10 +66,34 @@ const removeCartItem = async (req, res, next) => {
   }
 };
 
+const getUserCart = async (req, res, next) => {
+  try {
+    const { account_id } = req.params;
+    console.log(account_id);
+    // Get brief
+    const cart = await models.Cart.query()
+      .where({ account_id })
+      .withGraphFetched("[items(ordered ) ]")
+      .modifiers({
+        ordered: (builder) => {
+          builder.where("ordered", false);
+        },
+      })
+      .first();
+
+    // Send the clientss
+    return res.status(200).send(cart);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e)).send();
+  }
+};
+
 const cartController = {
   getCart,
   addCartItem,
   removeCartItem,
+  getUserCart,
 };
 
 export default cartController;
