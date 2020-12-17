@@ -357,6 +357,48 @@ const checkVerificationSMS = async (req, res, next) => {
   }
 };
 
+// EMAIL Verifications
+const getVerificationEMAIL = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    const verification = await twilio_client.verify
+      .services(process.env.TWILIO_VERIFY_SERVICE_SID)
+      .verifications.create({ to: `${email}`, channel: "email" })
+      .then((verification) => verification);
+
+    if (verification.status === "pending") {
+      return res.status(200).json("EMAIL successful").send();
+    } else {
+      return res.status(400).json("Error sending to this email").send();
+    }
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e)).send();
+  }
+};
+
+const checkVerificationEMAIL = async (req, res, next) => {
+  try {
+    const { account_id } = req;
+    const { code, email } = req.body;
+
+    const verification = await twilio_client.verify
+      .services(process.env.TWILIO_VERIFY_SERVICE_SID)
+      .verificationChecks.create({ to: `${email}`, code })
+      .then((verification_check) => verification_check);
+
+    if (verification && verification.status === "approved") {
+      return res.status(200).json("Success!").send();
+    } else {
+      return res.status(400).json("Invalid code").send();
+    }
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e)).send();
+  }
+};
+
 // Get organization verification csv
 const getOrganizationVerificationLogs = async (req, res, next) => {
   try {
@@ -472,6 +514,9 @@ const verificationController = {
   // SMS verifications
   getVerificationSMS,
   checkVerificationSMS,
+  // Email verifications
+  getVerificationEMAIL,
+  checkVerificationEMAIL,
 };
 
 export default verificationController;

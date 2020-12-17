@@ -13,8 +13,6 @@ exports.up = async (knex) => {
     table.integer("outleteventmenu_id").references("outleteventmenus.id");
     table.integer("quantity").defaultTo(0);
     table.boolean("ordered").defaultTo(false);
-    table.unique(["outletvenuemenu_id", "cart_id"]);
-    table.unique(["outleteventmenu_id", "cart_id"]);
     table.timestamp("created_at").defaultTo(knex.fn.now()).notNullable();
     table.timestamp("updated_at").defaultTo(knex.fn.now()).notNullable();
   });

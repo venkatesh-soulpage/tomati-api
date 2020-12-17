@@ -13,11 +13,10 @@ const getCart = async (req, res, next) => {
     // Get brief
     let cart = await models.Cart.query()
       .where({ account_id })
-      .withGraphFetched(`[items, user]`)
-      .orderBy("created_at", "desc");
+      .withGraphFetched(`[items]`)
+      .first();
 
-    if (cart.length === 0)
-      cart = await models.Cart.query().insert({ account_id });
+    if (!cart) cart = await models.Cart.query().insert({ account_id });
 
     // Send the clientss
     return res.status(200).send(cart);
@@ -31,29 +30,17 @@ const addCartItem = async (req, res, next) => {
   try {
     const { account_id, scope } = req;
 
-    const cart = await models.Cart.query().where({ account_id }).first();
+    let cart = await models.Cart.query().where({ account_id }).first();
 
-    const { currentoutlet, cartItems } = req.body;
+    if (!cart) {
+      cart = await models.Cart.query().insert({ account_id });
+    }
 
-    const data = [];
+    for (let item of req.body) {
+      item.cart_id = cart.id;
+    }
 
-    Object.entries(obj).forEach(([key, value]) => {
-      if (currentoutlet === "outletevent") {
-        data.push({
-          cart_id: cart.id,
-          outleteventmenu_id: key,
-          quantity: value,
-        });
-      } else if (currentoutlet === "outletvenue") {
-        data.push({
-          cart_id: cart.id,
-          outletvenuemenu_id: key,
-          quantity: value,
-        });
-      }
-    });
-
-    const new_venue = await models.CartItem.query().insertGraph(data);
+    const new_venue = await models.CartItem.query().insertGraph(req.body);
 
     // Send the clients
     return res.status(201).json("CartItems Created Successfully").send();

@@ -98,4 +98,18 @@ router.post(
   verificationController.checkVerificationSMS
 );
 
+/* POST - Submit a verification sms */
+router.post(
+  "/email/get-code",
+  // VerifyToken,
+  verificationController.getVerificationEMAIL
+);
+
+/* POST - Submit a verification sms */
+router.post(
+  "/email/check-code",
+  VerifyToken,
+  verificationController.checkVerificationEMAIL
+);
+
 module.exports = router;
