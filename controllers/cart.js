@@ -69,18 +69,19 @@ const removeCartItem = async (req, res, next) => {
 const getUserCart = async (req, res, next) => {
   try {
     const { account_id } = req.params;
-    console.log(account_id);
     // Get brief
-    const cart = await models.Cart.query()
-      .where({ account_id })
-      .withGraphFetched("[items(ordered ) ]")
-      .modifiers({
-        ordered: (builder) => {
-          builder.where("ordered", false);
-        },
-      })
-      .first();
+    const cart = await models.Cart.query().where({ account_id }).first();
 
+    const cart_items = await models.CartItem.query()
+      .withGraphFetched("[eventproduct, venueproduct]")
+      .where({
+        cart_id: cart.id,
+      });
+    const data = _.map(cart_items, (i) =>
+      _.pick(i, "quantity", "eventproduct", "venueproduct")
+    );
+
+    cart.items = data;
     // Send the clientss
     return res.status(200).send(cart);
   } catch (e) {

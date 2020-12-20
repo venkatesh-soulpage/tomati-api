@@ -16,14 +16,6 @@ export default class Cart extends Model {
           to: "carts.id",
         },
       },
-      user: {
-        relation: Model.HasOneRelation,
-        modelClass: models.Account,
-        join: {
-          from: "accounts.id",
-          to: "carts.account_id",
-        },
-      },
     };
   }
 }
