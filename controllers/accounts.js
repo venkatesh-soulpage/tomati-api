@@ -127,7 +127,7 @@ const signup = async (req, res, next) => {
       first_name,
       last_name,
       password_hash,
-      is_admin: true,
+      is_admin: false,
       is_email_verified: false,
       is_age_verified: false,
     });
@@ -230,6 +230,101 @@ const outletSignup = async (req, res, next) => {
       role_id: role.id,
       account_id: new_account.id,
     });
+
+    // Generate the login token
+    const jwt_token = await jwt.sign(
+      {
+        id: new_account.id,
+        email: new_account.email,
+        scope: role.scope,
+        role: role.name,
+      },
+      process.env.SECRET_KEY,
+      { expiresIn: "3h" }
+    );
+
+    // Send signup email
+    // await sendConfirmationEmail(new_account, new_token);
+
+    // Return the account
+    return res.status(201).json({ token: jwt_token, refresh_token }).send();
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e)).send();
+  }
+};
+
+const waiterSignup = async (req, res, next) => {
+  try {
+    const {
+      email,
+      password,
+      first_name,
+      last_name,
+      phone_number,
+      gender,
+      date_of_birth,
+    } = req.body;
+
+    const { venue_id, event_id } = req.params;
+
+    // Check if the account doesn't exist
+    const account = await models.Account.query().where("email", email);
+
+    // If the account exist, return message
+    if (account && account.length > 0)
+      return res.status(400).json("This email already exists");
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const password_hash = await bcrypt.hash(password, salt);
+
+    // Generate a refresh token
+    const refresh_token = await crypto.randomBytes(16).toString("hex");
+
+    // Add new account
+    const new_account = await models.Account.query().insert({
+      email,
+      first_name,
+      last_name,
+      phone_number,
+      password_hash,
+      is_admin: false,
+      is_email_verified: true,
+      is_age_verified: true,
+      refresh_token,
+      gender,
+      date_of_birth,
+    });
+
+    // Add a new wallet for the organization collaborator
+    await models.Wallet.query().insert({
+      account_id: new_account.id,
+    });
+
+    // Search for Region Owner Role
+    const role = await models.Role.query()
+      .where("scope", "OUTLET")
+      .where("name", "WAITER")
+      .first();
+
+    // Add a client collaborator
+    await models.Collaborator.query().insert({
+      role_id: role.id,
+      account_id: new_account.id,
+    });
+
+    if (venue_id) {
+      await models.OutletWaiter.query().insert({
+        account_id: new_account.id,
+        outletvenue_id: venue_id,
+      });
+    } else if (event_id) {
+      await models.OutletWaiter.query().insert({
+        account_id: new_account.id,
+        outletevent_id: event_id,
+      });
+    }
 
     // Generate the login token
     const jwt_token = await jwt.sign(
@@ -1466,6 +1561,7 @@ const userController = {
   authWithFacebook,
   inviteOutletManager,
   verifyEmailOrPhone,
+  waiterSignup,
 };
 
 export default userController;

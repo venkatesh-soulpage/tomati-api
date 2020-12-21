@@ -45,6 +45,7 @@ import OutletVenueMenu from "./outletvenuemenu";
 import OutletEventMenu from "./outleteventmenu";
 import Cart from "./cart";
 import CartItem from "./cart_item";
+import OutletWaiter from "./outletwaiters";
 
 export default {
   Location,
@@ -94,4 +95,5 @@ export default {
   OutletEventMenu,
   Cart,
   CartItem,
+  OutletWaiter,
 };

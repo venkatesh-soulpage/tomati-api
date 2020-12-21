@@ -14,4 +14,9 @@ router.delete("/", VerifyToken, cartController.removeCartItem);
 
 router.get("/:account_id", VerifyToken, cartController.getUserCart);
 
+router.post("/:cart_item", VerifyToken, cartController.updateCartItems);
+
+router.get("/:account_id/close-bill", VerifyToken, cartController.closeBill);
+router.put("/:account_id/close-bill", VerifyToken, cartController.updateBill);
+
 module.exports = router;

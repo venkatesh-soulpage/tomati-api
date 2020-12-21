@@ -16,6 +16,18 @@ router.post("/verify", accountController.verifyEmailOrPhone);
 /* POST Create new user. */
 router.post("/outlet-signup", accountController.outletSignup);
 
+/* POST Create new user. */
+router.post(
+  "/outlet-venue/:venue_id/waiter-signup",
+  accountController.waiterSignup
+);
+
+/* POST Create new user. */
+router.post(
+  "/outlet-event/:event_id/waiter-signup",
+  accountController.waiterSignup
+);
+
 /* POST Create new client */
 router.post("/organization-signup", accountController.organizationSignup);
 

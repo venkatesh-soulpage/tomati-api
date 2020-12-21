@@ -17,6 +17,7 @@ exports.seed = function (knex) {
         { scope: "GUEST", name: "VIP" },
         { scope: "GUEST", name: "REGULAR" },
         { scope: "OUTLET", name: "MANAGER" },
+        { scope: "OUTLET", name: "WAITER" },
       ]);
     });
 };
