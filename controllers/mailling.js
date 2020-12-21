@@ -378,6 +378,60 @@ const outletInviteEmail = (account_email, token, role, options) => {
     .catch(console.error);
 };
 
+const outletInviteWaiterEmail = (
+  account_email,
+  token,
+  role,
+  options,
+  outlet_venue,
+  outlet_event
+) => {
+  const email = new Email({
+    message: {
+      from: process.env.SMTP_AUTH,
+      subject: "Welcome to LiquidIntel",
+    },
+    send: true,
+    transport: transporter,
+  });
+
+  const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
+  email
+    .send({
+      template: "invite_waiter",
+      message: {
+        to: account_email,
+      },
+      locals: {
+        email: options && options.name ? options.name : account_email,
+        role: `${capitalizeFirstLetter(role.scope)} ${capitalizeFirstLetter(
+          role.name
+        )}`,
+        signupUrl: `${process.env.SCHEMA}://${process.env.FRONT_HOST}:${
+          process.env.FRONT_PORT
+        }/waiter-signup?email=${account_email}&token=${token.token}&${
+          outlet_event
+            ? `outlet_event=${outlet_event}`
+            : `outlet_venue=${outlet_venue}`
+        }`,
+        custom_message: options && options.custom_message,
+        host_name:
+          options &&
+          options.host &&
+          `${options.host.first_name} ${options.host.last_name}`,
+        host_sign:
+          options &&
+          options.host &&
+          `- ${options.host.first_name} ${options.host.last_name}`,
+      },
+    })
+    .then(/* console.log */)
+    .catch(console.error);
+};
+
 export {
   sendConfirmationEmail,
   sendFotgotPasswordEmail,
@@ -389,4 +443,5 @@ export {
   sendDeliveryEmail,
   sendInviteCode,
   outletInviteEmail,
+  outletInviteWaiterEmail,
 };

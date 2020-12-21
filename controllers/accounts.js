@@ -14,6 +14,7 @@ import {
   clientInviteEmail,
   agencyInviteEmail,
   outletInviteEmail,
+  outletInviteWaiterEmail,
 } from "./mailling";
 
 // GET - Get user profile
@@ -264,6 +265,7 @@ const waiterSignup = async (req, res, next) => {
       phone_number,
       gender,
       date_of_birth,
+      token,
     } = req.body;
 
     const { venue_id, event_id } = req.params;
@@ -277,6 +279,29 @@ const waiterSignup = async (req, res, next) => {
     // If the account exist, return message
     if (account && account.length > 0)
       return res.status(400).json("This email already exists");
+
+    // Validate expiration time on cient invitation
+    const invitation = await models.CollaboratorInvitation.query()
+      .where("email", email)
+      .orderBy("created_at", "DESC")
+      .first();
+
+    if (new Date(invitation.expiration_date).getTime() <= new Date().getTime())
+      return res.status(400).json("Invitation already expired").send();
+
+    // Validate the token signature
+    const decoded = await jwt.verify(token, process.env.SECRET_KEY);
+    if (!decoded)
+      return res.status(400).json({ msg: "The email or token are invalid" });
+
+    // Check if the token sent is on the database
+    const tokens = await models.Token.query()
+      .where("token", token)
+      .where("email", email);
+
+    // If there aren't tokens return error
+    if (!tokens || tokens.length < 1)
+      return res.status(400).json({ msg: "The email or token are invalid" });
 
     // Hash password
     const salt = await bcrypt.genSalt(10);
@@ -525,12 +550,84 @@ const inviteOutletManager = async (req, res, next) => {
     });
 
     // send invite email
-    const host = { first_name: "Booze Boss", last_name: "Team" };
+    const host = { first_name: "LiquidIntel", last_name: "Team" };
     await outletInviteEmail(
       owner_email,
       new_token,
       { scope: "OUTLET", name: "MANAGER" },
       { name: display_name, custom_message, host }
+    );
+
+    // Add collaborator invitation
+    let invitation_expiration_date = new Date();
+    invitation_expiration_date.setHours(
+      invitation_expiration_date.getHours() + 1
+    ); // Default expiration time to 1 hour.
+    await models.CollaboratorInvitation.query().insert({
+      role_id: role.id,
+      email: owner_email,
+      expiration_date: invitation_expiration_date,
+    });
+
+    return res.status(201).json("Invitation successfull").send();
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e)).send();
+  }
+};
+
+// POST - Invite a new regional organization
+const inviteOutletWaiter = async (req, res, next) => {
+  try {
+    /* Todo add client organization logic */
+    const {
+      owner_email,
+      display_name,
+      custom_message,
+      outlet_venue,
+      outlet_event,
+    } = req.body;
+
+    // Validate that the client hasn't been registered on the platform
+    const client_account = await models.Account.query()
+      .where("email", owner_email)
+      .first();
+    if (client_account)
+      return res
+        .status(400)
+        .json("An account already exists with this email address")
+        .send();
+
+    // Create new token to validate owner email
+    const role = await models.Role.query()
+      .where("scope", "OUTLET")
+      .where("name", "WAITER")
+      .first();
+
+    // Sign jwt
+    const token = await jwt.sign(
+      {
+        role_id: role.id,
+        scope: role.scope,
+        name: role.name,
+      },
+      process.env.SECRET_KEY
+    );
+
+    const new_token = await models.Token.query().insert({
+      email: owner_email,
+      token,
+    });
+
+    // send invite email
+    const host = { first_name: "LiquidIntel", last_name: "Team" };
+    await outletInviteWaiterEmail(
+      owner_email,
+      new_token,
+      { scope: "OUTLET", name: "WAITER" },
+      { name: display_name, custom_message, host },
+      outlet_venue,
+      outlet_event
     );
 
     // Add collaborator invitation
@@ -1454,7 +1551,7 @@ const authWithFacebook = async (req, res, next) => {
     if (age_range && age_range.min < 18)
       return res
         .status(403)
-        .json("You need to be +18 to use Booze Boss")
+        .json("You need to be +18 to use LiquidIntel")
         .send();
 
     // Check if login or signup
@@ -1565,6 +1662,7 @@ const userController = {
   inviteOutletManager,
   verifyEmailOrPhone,
   waiterSignup,
+  inviteOutletWaiter,
 };
 
 export default userController;
