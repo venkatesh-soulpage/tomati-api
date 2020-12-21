@@ -22,6 +22,7 @@ router.get(
     { scope: "GUEST", role: "VIP" },
     { scope: "GUEST", role: "VVIP" },
     { scope: "OUTLET", role: "MANAGER" },
+    { scope: "OUTLET", role: "WAITER" },
   ]),
   accountsController.getUser
 );

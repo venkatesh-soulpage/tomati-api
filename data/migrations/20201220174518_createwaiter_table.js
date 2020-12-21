@@ -1,5 +1,6 @@
 exports.up = async (knex) => {
   await knex.schema.createTable("outlet_waiters", (table) => {
+    table.increments("id").primary();
     table.integer("account_id").references("accounts.id");
     table
       .integer("outletevent_id")

@@ -268,6 +268,9 @@ const waiterSignup = async (req, res, next) => {
 
     const { venue_id, event_id } = req.params;
 
+    if (!email || !password || !first_name || !last_name)
+      return res.status(400).json("Missing required fields");
+
     // Check if the account doesn't exist
     const account = await models.Account.query().where("email", email);
 
