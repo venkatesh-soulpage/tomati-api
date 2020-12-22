@@ -33,6 +33,13 @@ const getUser = async (req, res, next) => {
 
     if (!account) return res.status(400).json("Invalid account").send();
 
+    const outlet = await models.OutletWaiter.query()
+      .where({ account_id })
+      .first();
+    const { outletevent_id, outletvenue_id } = outlet;
+
+    account["outlet"] = { outletevent_id, outletvenue_id };
+
     return res.status(200).send(account);
   } catch (e) {
     console.log(e);
