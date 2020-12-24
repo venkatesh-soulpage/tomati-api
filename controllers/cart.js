@@ -28,7 +28,7 @@ const getCart = async (req, res, next) => {
 
 const addCartItem = async (req, res, next) => {
   try {
-    const { account_id, scope } = req;
+    const { account_id } = req.params;
 
     let cart = await models.Cart.query().where({ account_id }).first();
 
@@ -38,9 +38,10 @@ const addCartItem = async (req, res, next) => {
 
     for (let item of req.body) {
       item.cart_id = cart.id;
+      item.ordered = true;
     }
 
-    const new_venue = await models.CartItem.query().insertGraph(req.body);
+    await models.CartItem.query().insertGraph(req.body);
 
     // Send the clients
     return res.status(201).json("CartItems Created Successfully").send();
@@ -56,7 +57,7 @@ const removeCartItem = async (req, res, next) => {
 
     const { cart_item_id } = req.params;
 
-    const new_venue = await models.CartItem.query().deleteById(cart_item_id);
+    await models.CartItem.query().deleteById(cart_item_id);
 
     // Send the clients
     return res.status(201).json("CartItems Deleted Successfully").send();
@@ -76,9 +77,10 @@ const getUserCart = async (req, res, next) => {
       .withGraphFetched("[eventproduct, venueproduct]")
       .where({
         cart_id: cart.id,
+        ordered: true,
       });
     const data = _.map(cart_items, (i) =>
-      _.pick(i, "quantity", "eventproduct", "venueproduct")
+      _.pick(i, "quantity", "eventproduct", "venueproduct", "data")
     );
 
     cart.items = data;
@@ -90,7 +92,7 @@ const getUserCart = async (req, res, next) => {
   }
 };
 
-const closeBill = async (req, res, next) => {
+const getOrdersSummary = async (req, res, next) => {
   try {
     const { account_id } = req.params;
 
@@ -105,7 +107,14 @@ const closeBill = async (req, res, next) => {
         billed: false,
       });
     const data = _.map(cart_items, (i) =>
-      _.pick(i, "quantity", "eventproduct", "venueproduct")
+      _.pick(
+        i,
+        "quantity",
+        "eventproduct",
+        "venueproduct",
+        "data",
+        "payment_type"
+      )
     );
 
     cart.items = data;
@@ -144,7 +153,7 @@ const updateBill = async (req, res, next) => {
     const cart = await models.Cart.query().where({ account_id }).first();
     const cart_items = await models.CartItem.query()
       .update({ billed: true, payment_type: payment_type })
-      .where("cart_id", cart.id);
+      .where({ cart_id: cart.id, ordered: true });
 
     // Send the clientss
     return res.status(200).json("Updated Successfully").send();
@@ -159,7 +168,7 @@ const cartController = {
   addCartItem,
   removeCartItem,
   getUserCart,
-  closeBill,
+  getOrdersSummary,
   updateCartItems,
   updateBill,
 };

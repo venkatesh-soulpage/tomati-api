@@ -233,7 +233,7 @@ const generateQRCode = async (outlet_event_id) => {
   let APP_HOST = `${process.env.SCHEMA}://${process.env.APP_HOST}`;
 
   if (process.env.APP_PORT) {
-    APP_HOST += process.env.APP_PORT;
+    APP_HOST += ":" + process.env.APP_PORT;
   }
 
   const APP_URL = APP_HOST + `/outlet/?outlet_event=${outlet_event_id}`;
