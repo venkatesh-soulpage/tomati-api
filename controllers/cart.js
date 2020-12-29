@@ -97,7 +97,9 @@ const getOrdersSummary = async (req, res, next) => {
     const { account_id } = req.params;
 
     // Get brief
-    const cart = await models.Cart.query().where({ account_id }).first();
+    let cart = await models.Cart.query().where({ account_id }).first();
+
+    if (!cart) cart = await models.Cart.query().insert({ account_id });
 
     const cart_items = await models.CartItem.query()
       .withGraphFetched("[eventproduct, venueproduct]")
