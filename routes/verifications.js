@@ -108,7 +108,7 @@ router.post(
 /* POST - Submit a verification sms */
 router.post(
   "/email/check-code",
-  VerifyToken,
+  // VerifyToken,
   verificationController.checkVerificationEMAIL
 );
 
