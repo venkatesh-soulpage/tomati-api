@@ -24,7 +24,7 @@ const transporter = {
 const sendConfirmationEmail = (user, token) => {
   const email = new Email({
     message: {
-      from: process.env.SMTP_AUTH,
+      from: process.env.FROM_EMAIL,
       subject: "LiquidIntel - Confirm Email",
       /* text: 'Hello ,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + process.env.HOST + ':' + process.env.PORT + '\/confirmation\/' + token.token + '.\n' */
     },
@@ -55,7 +55,7 @@ const sendConfirmationEmail = (user, token) => {
 const organizationInviteEmail = (account_email, token, role, options) => {
   const email = new Email({
     message: {
-      from: process.env.SMTP_AUTH,
+      from: process.env.FROM_EMAIL,
       subject: "Welcome to LiquidIntel",
     },
     send: true,
@@ -96,7 +96,7 @@ const organizationInviteEmail = (account_email, token, role, options) => {
 const clientInviteEmail = (account_email, token, role, options) => {
   const email = new Email({
     message: {
-      from: process.env.SMTP_AUTH,
+      from: process.env.FROM_EMAIL,
       subject: "Welcome to LiquidIntel",
     },
     send: true,
@@ -138,7 +138,7 @@ const clientInviteEmail = (account_email, token, role, options) => {
 const agencyInviteEmail = (account_email, token, role, options) => {
   const email = new Email({
     message: {
-      from: process.env.SMTP_AUTH,
+      from: process.env.FROM_EMAIL,
       subject: "Welcome to LiquidIntel",
     },
     send: true,
@@ -179,7 +179,7 @@ const agencyInviteEmail = (account_email, token, role, options) => {
 const sendFotgotPasswordEmail = (user, token) => {
   const email = new Email({
     message: {
-      from: process.env.SMTP_AUTH,
+      from: process.env.FROM_EMAIL,
       subject: "LiquidIntel - Password reset",
     },
     send: true,
@@ -204,7 +204,7 @@ const sendFotgotPasswordEmail = (user, token) => {
 const sendBriefToEmail = (brief, account, status, options) => {
   const email = new Email({
     message: {
-      from: process.env.SMTP_AUTH,
+      from: process.env.FROM_EMAIL,
       subject: `LiquidIntel - You have a new brief`,
     },
     send: true,
@@ -242,7 +242,7 @@ const sendRequisitionToEmail = (requisition, account, status, options) => {
 
   const email = new Email({
     message: {
-      from: process.env.SMTP_AUTH,
+      from: process.env.FROM_EMAIL,
       subject:
         subject || `LiquidIntel - Requisition #${requisition.serial_number}`,
     },
@@ -277,7 +277,7 @@ const sendRequisitionToEmail = (requisition, account, status, options) => {
 const sendDeliveryEmail = (delivery, account, status) => {
   const email = new Email({
     message: {
-      from: process.env.SMTP_AUTH,
+      from: process.env.FROM_EMAIL,
       subject: `Delivery update for requisition #${delivery.requisition.serial_number}`,
     },
     send: true,
@@ -308,7 +308,7 @@ const sendDeliveryEmail = (delivery, account, status) => {
 const sendInviteCode = (guest) => {
   const email = new Email({
     message: {
-      from: process.env.SMTP_AUTH,
+      from: process.env.FROM_EMAIL,
       subject: "You have been invited to an Event - LiquidIntel",
     },
     send: true,
@@ -340,7 +340,7 @@ const sendInviteCode = (guest) => {
 const outletInviteEmail = (account_email, token, role, options) => {
   const email = new Email({
     message: {
-      from: process.env.SMTP_AUTH,
+      from: process.env.FROM_EMAIL,
       subject: "Welcome to LiquidIntel",
     },
     send: true,
@@ -388,7 +388,7 @@ const outletInviteWaiterEmail = (
 ) => {
   const email = new Email({
     message: {
-      from: process.env.SMTP_AUTH,
+      from: process.env.FROM_EMAIL,
       subject: "Welcome to LiquidIntel",
     },
     send: true,
