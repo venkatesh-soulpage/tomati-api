@@ -49,6 +49,20 @@ const getEvent = async (req, res, next) => {
       .withGraphFetched(`[menu, location]`)
       .findById(outlet_event_id);
 
+    const record = await models.Statistics.query().where(
+      "outletevent_id",
+      outlet_event_id
+    );
+
+    record.length === 0
+      ? await models.Statistics.query().insert({
+          outletevent_id: outlet_event_id,
+          count: 1,
+        })
+      : await models.Statistics.query()
+          .where("outletevent_id", outlet_event_id)
+          .update({ count: record[0].count + 1 });
+
     return res.status(200).json(event).send();
   } catch (error) {
     console.log(error);

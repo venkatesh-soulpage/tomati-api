@@ -31,6 +31,8 @@ var outleteventsRoute = require("./routes/outletevents");
 var outletVenuesRoute = require("./routes/outletvenues");
 var outletLocationsRoute = require("./routes/outletlocations");
 var cartRoute = require("./routes/cart");
+var orderInfo = require("./routes/order_info");
+var statistics = require("./routes/statistics");
 
 var app = express();
 
@@ -78,6 +80,8 @@ app.use("/api/outletevents", outleteventsRoute);
 app.use("/api/outletvenues", outletVenuesRoute);
 app.use("/api/outletlocations", outletLocationsRoute);
 app.use("/api/cart", cartRoute);
+app.use("/api/orderinfo", orderInfo);
+app.use("/api/statistics", statistics);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
