@@ -95,6 +95,7 @@ const createEvent = async (req, res, next) => {
     const { account_id, scope } = req;
     const {
       name,
+      phone_number,
       start_time,
       end_time,
       expected_guests,
@@ -124,6 +125,7 @@ const createEvent = async (req, res, next) => {
 
     const new_outlet_event = await models.OutletEvent.query().insert({
       name,
+      phone_number,
       start_time,
       end_time,
       expected_guests,
@@ -162,6 +164,7 @@ const updateEvent = async (req, res, next) => {
 
     const {
       name,
+      phone_number,
       description,
       address,
       location_id,
@@ -198,6 +201,7 @@ const updateEvent = async (req, res, next) => {
     await models.OutletEvent.query()
       .update({
         name,
+        phone_number,
         description,
         address,
         location_id,
