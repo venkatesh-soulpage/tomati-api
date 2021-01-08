@@ -92,6 +92,7 @@ const createVenue = async (req, res, next) => {
     const { account_id, scope } = req;
     const {
       name,
+      phone_number,
       address,
       latitude,
       longitude,
@@ -118,6 +119,7 @@ const createVenue = async (req, res, next) => {
 
     const new_venue = await models.OutletVenue.query().insert({
       name,
+      phone_number,
       address,
       latitude,
       longitude,
@@ -153,6 +155,7 @@ const updateVenue = async (req, res, next) => {
 
     const {
       name,
+      phone_number,
       description,
       address,
       location_id,
@@ -186,6 +189,7 @@ const updateVenue = async (req, res, next) => {
     await models.OutletVenue.query()
       .update({
         name,
+        phone_number,
         description,
         address,
         location_id,

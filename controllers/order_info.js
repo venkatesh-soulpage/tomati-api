@@ -10,11 +10,11 @@ import _ from "lodash";
 const postOrderInfo = async (req, res, next) => {
   try {
     const body = req.body.data;
-    const usertoken = req.headers.authorization;
-    const token = usertoken.split(" ");
-    const decoded = jwt.verify(token[1], process.env.SECRET_KEY);
+    const customer_name = req.body.customer_name;
+    const { account_id } = req;
     for (let info of body) {
-      info.updated_by = decoded.id;
+      info.customer_name = customer_name;
+      info.updated_by = account_id;
     }
     const response = await models.OrderInfo.query().insert(body);
     return res.status(200).send({ Status: true, insertedData: response });
@@ -27,11 +27,9 @@ const postOrderInfo = async (req, res, next) => {
 const getOrderInfo = async (req, res, next) => {
   try {
     const { IDS } = req.body;
-    console.log(IDS, "IDS FROM FRONEND");
     const response = await models.OrderInfo.query()
       .withGraphFetched("[ordered_venue_product_id, ordered_event_product_id]")
       .whereIn("id", IDS);
-    console.log(response, "RESPONSE FROM API");
     return res.status(200).send({ Status: true, orders: response });
   } catch (e) {
     console.log(e);
