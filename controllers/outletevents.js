@@ -56,17 +56,17 @@ const getEvent = async (req, res, next) => {
       outlet_event_id
     );
 
-    record.length === 0
-      ? await models.Statistics.query().insert({
-          outletevent_id: outlet_event_id,
-          count: { data: [countObject] },
-        })
-      : console.log();
-    const data = record[0].count.data;
-    data.push(countObject);
-    await models.Statistics.query()
-      .where("outletevent_id", outlet_event_id)
-      .update({ count: { data } });
+    // record.length === 0
+    //   ? await models.Statistics.query().insert({
+    //       outletevent_id: outlet_event_id,
+    //       count: { data: [countObject] },
+    //     })
+    //   : console.log();
+    // const data = record[0].count.data;
+    // data.push(countObject);
+    // await models.Statistics.query()
+    //   .where("outletevent_id", outlet_event_id)
+    //   .update({ count: { data } });
 
     return res.status(200).json(event).send();
   } catch (error) {
