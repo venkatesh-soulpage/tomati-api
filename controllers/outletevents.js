@@ -42,6 +42,8 @@ const getEvents = async (req, res, next) => {
 const getEvent = async (req, res, next) => {
   try {
     const { outlet_event_id } = req.params;
+    const ipAddress = req.connection.remoteAddress;
+    const countObject = { ip: ipAddress, time: +new Date() };
 
     if (!outlet_event_id) return res.status(400).json("Invalid ID").send();
 
@@ -57,11 +59,14 @@ const getEvent = async (req, res, next) => {
     record.length === 0
       ? await models.Statistics.query().insert({
           outletevent_id: outlet_event_id,
-          count: 1,
+          count: { data: [countObject] },
         })
-      : await models.Statistics.query()
-          .where("outletevent_id", outlet_event_id)
-          .update({ count: record[0].count + 1 });
+      : console.log();
+    const data = record[0].count.data;
+    data.push(countObject);
+    await models.Statistics.query()
+      .where("outletevent_id", outlet_event_id)
+      .update({ count: { data } });
 
     return res.status(200).json(event).send();
   } catch (error) {

@@ -39,6 +39,8 @@ const getVenues = async (req, res, next) => {
 const getVenue = async (req, res, next) => {
   try {
     const { outlet_venue_id } = req.params;
+    const ipAddress = req.connection.remoteAddress;
+    const countObject = { ip: ipAddress, time: +new Date() };
 
     if (!outlet_venue_id) return res.status(400).json("Invalid ID").send();
 
@@ -50,15 +52,19 @@ const getVenue = async (req, res, next) => {
       "outletvenue_id",
       outlet_venue_id
     );
-
     record.length === 0
       ? await models.Statistics.query().insert({
           outletvenue_id: outlet_venue_id,
-          count: 1,
+          count: { data: [countObject] },
         })
-      : await models.Statistics.query()
-          .where("outletvenue_id", outlet_venue_id)
-          .update({ count: record[0].count + 1 });
+      : console.log();
+    const data = record[0].count.data;
+    data.push(countObject);
+    await models.Statistics.query()
+      .where("outletvenue_id", outlet_venue_id)
+      .update({
+        count: { data },
+      });
 
     return res.status(200).json(venue).send();
   } catch (error) {
