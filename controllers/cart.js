@@ -29,22 +29,17 @@ const getCart = async (req, res, next) => {
 const addCartItem = async (req, res, next) => {
   try {
     const { account_id } = req.params;
-
     let cart = await models.Cart.query().where({ account_id }).first();
-
     if (!cart) {
       cart = await models.Cart.query().insert({ account_id });
     }
-
     for (let item of req.body) {
       item.cart_id = cart.id;
       item.ordered = true;
     }
-
-    await models.CartItem.query().insertGraph(req.body);
-
+    const response = await models.CartItem.query().insertGraph(req.body);
     // Send the clients
-    return res.status(201).json("CartItems Created Successfully").send();
+    return res.status(200).send({ Status: true, insertedData: response });
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e)).send();
