@@ -23,4 +23,6 @@ router.get(
 );
 router.put("/:account_id/close-bill", VerifyToken, cartController.updateBill);
 
+router.put("/put-cart-update", VerifyToken, cartController.putCartUpdate);
+
 module.exports = router;

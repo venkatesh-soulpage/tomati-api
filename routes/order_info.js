@@ -11,4 +11,6 @@ router.post(
   orderInfoController.getOrderInfo
 );
 
+router.put("/put-order-info", VerifyToken, orderInfoController.putOrderInfo);
+
 module.exports = router;
