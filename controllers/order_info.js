@@ -15,6 +15,7 @@ const postOrderInfo = async (req, res, next) => {
     for (let info of body) {
       info.customer_name = customer_name;
       info.updated_by = account_id;
+      info.ordered = true;
     }
     const response = await models.OrderInfo.query().insert(body);
     return res.status(200).send({ Status: true, insertedData: response });
