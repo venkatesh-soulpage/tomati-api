@@ -37,9 +37,24 @@ const getOrderInfo = async (req, res, next) => {
   }
 };
 
+const putOrderInfo = async (req, res, next) => {
+  try {
+    const { ids, payment_type } = req.body;
+    const { account_id } = req;
+    const response = await models.OrderInfo.query()
+      .whereIn("id", ids)
+      .update({ billed: true, payment_type: payment_type });
+    return res.status(200).send({ Status: true, insertedData: response });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).send({ Status: false, error: JSON.stringify(e) });
+  }
+};
+
 const orderInfoController = {
   postOrderInfo,
   getOrderInfo,
+  putOrderInfo,
 };
 
 export default orderInfoController;

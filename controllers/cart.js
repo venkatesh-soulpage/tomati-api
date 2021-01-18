@@ -165,6 +165,22 @@ const updateBill = async (req, res, next) => {
   }
 };
 
+const putCartUpdate = async (req, res, next) => {
+  try {
+    const { ids, customer_id, payment_type } = req.body;
+    const { account_id } = req;
+    const response = await models.CartItem.query().whereIn("id", ids).update({
+      billed: true,
+      payment_type: payment_type,
+      updated_by: account_id,
+    });
+    return res.status(200).send({ Status: true, insertedData: response });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).send({ Status: false, error: JSON.stringify(e) });
+  }
+};
+
 const cartController = {
   getCart,
   addCartItem,
@@ -173,6 +189,7 @@ const cartController = {
   getOrdersSummary,
   updateCartItems,
   updateBill,
+  putCartUpdate,
 };
 
 export default cartController;
