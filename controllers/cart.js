@@ -22,7 +22,7 @@ const getCart = async (req, res, next) => {
     return res.status(200).send(cart);
   } catch (e) {
     console.log(e);
-    return res.status(500).json(JSON.stringify(e)).send();
+    return res.status(500).json(JSON.stringify(e));
   }
 };
 
@@ -42,7 +42,7 @@ const addCartItem = async (req, res, next) => {
     return res.status(200).send({ Status: true, insertedData: response });
   } catch (e) {
     console.log(e);
-    return res.status(500).json(JSON.stringify(e)).send();
+    return res.status(500).json(JSON.stringify(e));
   }
 };
 
@@ -55,10 +55,10 @@ const removeCartItem = async (req, res, next) => {
     await models.CartItem.query().deleteById(cart_item_id);
 
     // Send the clients
-    return res.status(201).json("CartItems Deleted Successfully").send();
+    return res.status(201).json("CartItems Deleted Successfully");
   } catch (e) {
     console.log(e);
-    return res.status(500).json(JSON.stringify(e)).send();
+    return res.status(500).json(JSON.stringify(e));
   }
 };
 
@@ -83,7 +83,7 @@ const getUserCart = async (req, res, next) => {
     return res.status(200).send(cart);
   } catch (e) {
     console.log(e);
-    return res.status(500).json(JSON.stringify(e)).send();
+    return res.status(500).json(JSON.stringify(e));
   }
 };
 
@@ -119,7 +119,7 @@ const getOrdersSummary = async (req, res, next) => {
     return res.status(200).send(cart);
   } catch (e) {
     console.log(e);
-    return res.status(500).json(JSON.stringify(e)).send();
+    return res.status(500).json(JSON.stringify(e));
   }
 };
 
@@ -133,10 +133,10 @@ const updateCartItems = async (req, res, next) => {
       .where("id", cart_item);
 
     // Send the clientss
-    return res.status(200).json("Updated Successfully").send();
+    return res.status(200).json("Updated Successfully");
   } catch (e) {
     console.log(e);
-    return res.status(500).json(JSON.stringify(e)).send();
+    return res.status(500).json(JSON.stringify(e));
   }
 };
 
@@ -153,10 +153,10 @@ const updateBill = async (req, res, next) => {
       .where({ cart_id: cart.id, ordered: true });
 
     // Send the clientss
-    return res.status(200).json("Updated Successfully").send();
+    return res.status(200).json("Updated Successfully");
   } catch (e) {
     console.log(e);
-    return res.status(500).json(JSON.stringify(e)).send();
+    return res.status(500).json(JSON.stringify(e));
   }
 };
 

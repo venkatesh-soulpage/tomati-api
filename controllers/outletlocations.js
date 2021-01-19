@@ -16,7 +16,7 @@ const getLocations = async (req, res, next) => {
     return res.status(200).send(locations);
   } catch (e) {
     console.log(e);
-    return res.status(500).json(JSON.stringify(e)).send();
+    return res.status(500).json(JSON.stringify(e));
   }
 };
 

@@ -34,7 +34,7 @@ const getEvents = async (req, res, next) => {
     return res.status(200).send(events);
   } catch (e) {
     console.log(e);
-    return res.status(500).json(JSON.stringify(e)).send();
+    return res.status(500).json(JSON.stringify(e));
   }
 };
 
@@ -45,7 +45,7 @@ const getEvent = async (req, res, next) => {
     const ipAddress = req.connection.remoteAddress;
     const countObject = { ip: ipAddress, time: +new Date() };
 
-    if (!outlet_event_id) return res.status(400).json("Invalid ID").send();
+    if (!outlet_event_id) return res.status(400).json("Invalid ID");
 
     const event = await models.OutletEvent.query()
       .withGraphFetched(`[menu, location]`)
@@ -68,10 +68,10 @@ const getEvent = async (req, res, next) => {
     //   .where("outletevent_id", outlet_event_id)
     //   .update({ count: { data } });
 
-    return res.status(200).json(event).send();
+    return res.status(200).json(event);
   } catch (error) {
     console.log(error);
-    return res.status(500).json(JSON.stringify(error)).send();
+    return res.status(500).json(JSON.stringify(error));
   }
 };
 
@@ -144,10 +144,10 @@ const createEvent = async (req, res, next) => {
     });
 
     // Send the clients
-    return res.status(201).json("Event Created Successfully").send();
+    return res.status(201).json("Event Created Successfully");
   } catch (e) {
     console.log(e);
-    return res.status(500).json(JSON.stringify(e)).send();
+    return res.status(500).json(JSON.stringify(e));
   }
 };
 
@@ -162,10 +162,9 @@ const updateEvent = async (req, res, next) => {
     );
 
     if (!outlet_event_id || !outletevent)
-      return res.status(400).json("Invalid ID").send();
+      return res.status(400).json("Invalid ID");
 
-    if (_.size(req.body) < 1)
-      return res.status(400).json("No Data to update").send();
+    if (_.size(req.body) < 1) return res.status(400).json("No Data to update");
 
     const {
       name,
@@ -218,10 +217,10 @@ const updateEvent = async (req, res, next) => {
         account_id,
       })
       .where("id", outlet_event_id);
-    return res.status(200).json("Event Updated Successfully").send();
+    return res.status(200).json("Event Updated Successfully");
   } catch (e) {
     console.log(e);
-    return res.status(500).json(JSON.stringify(e)).send();
+    return res.status(500).json(JSON.stringify(e));
   }
 };
 
@@ -234,7 +233,7 @@ const deleteEvent = async (req, res, next) => {
     );
 
     if (!outlet_event_id || !outletevent)
-      return res.status(400).json("Invalid ID").send();
+      return res.status(400).json("Invalid ID");
 
     await models.OutletEventMenu.query()
       .where("outlet_event_id", outlet_event_id)
@@ -245,7 +244,7 @@ const deleteEvent = async (req, res, next) => {
     return res.status(200).json("Succesfully Deleted");
   } catch (e) {
     console.log(e);
-    return res.status(500).json(JSON.stringify(e)).send();
+    return res.status(500).json(JSON.stringify(e));
   }
 };
 
@@ -300,10 +299,10 @@ const createEventMenu = async (req, res, next) => {
 
     // "EventMenu Created Successfully"
     // Send the clients
-    return res.status(201).json("EventMenu Created Successfully").send();
+    return res.status(201).json("EventMenu Created Successfully");
   } catch (e) {
     console.log(e);
-    return res.status(500).json(JSON.stringify(e)).send();
+    return res.status(500).json(JSON.stringify(e));
   }
 };
 
