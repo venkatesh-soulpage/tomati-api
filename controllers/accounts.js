@@ -936,7 +936,7 @@ const guestSignup = async (req, res, next) => {
 
     // If the account exist, return message
     if (account && account.length > 0)
-      return res.status(201).json("This email already exists");
+      return res.status(400).json("This email already exists");
 
     // Check if the accountphonenumber doesn't exist
     const accountphonenumber = await models.Account.query().where(
