@@ -280,8 +280,7 @@ const generateQRCode = async (outlet_venue_id) => {
     APP_HOST += ":" + process.env.APP_PORT;
   }
 
-  const APP_URL =
-    APP_HOST + `/outlet/?outlet_venue=${outlet_venue_id}/?scanned=true`;
+  const APP_URL = APP_HOST + `/outlet/scanned/?outlet_venue=${outlet_venue_id}`;
   const url = await QRCode.toDataURL(`URL: ${APP_URL}`, { width: 1000 });
   const buf = Buffer.from(
     url.replace(/^data:image\/\w+;base64,/, ""),
