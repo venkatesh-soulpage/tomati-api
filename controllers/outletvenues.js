@@ -73,6 +73,43 @@ const getVenue = async (req, res, next) => {
   }
 };
 
+const getScannedVenue = async (req, res, next) => {
+  try {
+    const { outlet_venue_id } = req.params;
+    const ipAddress = req.connection.remoteAddress;
+    const countObject = { ip: ipAddress, time: +new Date() };
+
+    if (!outlet_venue_id) return res.status(400).json("Invalid ID");
+
+    const venue = await models.OutletVenue.query()
+      .withGraphFetched(`[menu, location]`)
+      .findById(outlet_venue_id);
+
+    const record = await models.Statistics.query().where(
+      "outletvenue_id",
+      outlet_venue_id
+    );
+    record.length === 0
+      ? await models.Statistics.query().insert({
+          outletvenue_id: outlet_venue_id,
+          count: { data: [countObject] },
+        })
+      : console.log();
+    const data = record[0].count.data;
+    data.push(countObject);
+    await models.Statistics.query()
+      .where("outletvenue_id", outlet_venue_id)
+      .update({
+        count: { data },
+      });
+
+    return res.status(200).json(venue);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(JSON.stringify(error));
+  }
+};
+
 const uploadImage = async (file_data) => {
   const { key, buf } = file_data;
 
@@ -243,7 +280,8 @@ const generateQRCode = async (outlet_venue_id) => {
     APP_HOST += ":" + process.env.APP_PORT;
   }
 
-  const APP_URL = APP_HOST + `/outlet/?outlet_venue=${outlet_venue_id}`;
+  const APP_URL =
+    APP_HOST + `/outlet/?outlet_venue=${outlet_venue_id}/?scanned=true`;
   const url = await QRCode.toDataURL(`URL: ${APP_URL}`, { width: 1000 });
   const buf = Buffer.from(
     url.replace(/^data:image\/\w+;base64,/, ""),
@@ -296,6 +334,7 @@ const venuesController = {
   createVenueMenu,
   updateVenue,
   deleteVenue,
+  getScannedVenue,
 };
 
 export default venuesController;
