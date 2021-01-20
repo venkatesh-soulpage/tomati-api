@@ -936,7 +936,17 @@ const guestSignup = async (req, res, next) => {
 
     // If the account exist, return message
     if (account && account.length > 0)
-      return res.status(400).json("This email already exists");
+      return res.status(201).json("This email already exists");
+
+    // Check if the accountphonenumber doesn't exist
+    const accountphonenumber = await models.Account.query().where(
+      "phone_number",
+      phone_number
+    );
+
+    // If the accountphonenumber exist, return message
+    if (accountphonenumber && accountphonenumber.length > 0)
+      return res.status(400).json("This phone number already exists");
 
     // If the code doesn't exist return an error
     // if (!code) return res.status(400).json("Invalid invite code");
