@@ -26,17 +26,6 @@ router.get(
   venuesController.getVenue
 );
 
-router.get(
-  "/scanned/:outlet_venue_id",
-  // VerifyToken,
-  // VerifyRole([
-  //   { scope: "OUTLET", role: "MANAGER" },
-  //   { scope: "OUTLET", role: "OWNER" },
-  //   { Scope: "GUEST", role: "REGULAR" },
-  // ]),
-  venuesController.getScannedVenue
-);
-
 router.put(
   "/:outlet_venue_id",
   VerifyToken,
