@@ -51,6 +51,8 @@ const getEvent = async (req, res, next) => {
       .withGraphFetched(`[menu, location]`)
       .findById(outlet_event_id);
 
+    if (!event) return res.status(400).json("Invalid ID");
+
     const record = await models.Statistics.query().where(
       "outletevent_id",
       outlet_event_id

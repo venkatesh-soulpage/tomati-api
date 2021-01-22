@@ -48,6 +48,8 @@ const getVenue = async (req, res, next) => {
       .withGraphFetched(`[menu, location]`)
       .findById(outlet_venue_id);
 
+    if (!venue) return res.status(400).json("Invalid ID");
+
     const record = await models.Statistics.query().where(
       "outletvenue_id",
       outlet_venue_id
