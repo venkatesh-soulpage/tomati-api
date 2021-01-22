@@ -52,19 +52,20 @@ const getVenue = async (req, res, next) => {
       "outletvenue_id",
       outlet_venue_id
     );
-    // record.length === 0
-    //   ? await models.Statistics.query().insert({
-    //       outletvenue_id: outlet_venue_id,
-    //       count: { data: [countObject] },
-    //     })
-    //   : console.log();
-    // const data = record[0].count.data;
-    // data.push(countObject);
-    // await models.Statistics.query()
-    //   .where("outletvenue_id", outlet_venue_id)
-    //   .update({
-    //     count: { data },
-    //   });
+    if (record.length === 0) {
+      await models.Statistics.query().insert({
+        outletvenue_id: outlet_venue_id,
+        count: { data: [countObject] },
+      });
+    } else {
+      const data = record[0].count.data;
+      data.push(countObject);
+      await models.Statistics.query()
+        .where("outletvenue_id", outlet_venue_id)
+        .update({
+          count: { data },
+        });
+    }
 
     return res.status(200).json(venue);
   } catch (error) {
