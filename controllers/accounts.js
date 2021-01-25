@@ -913,7 +913,36 @@ const agencySignup = async (req, res, next) => {
     return res.status(500).json(JSON.stringify(e)).send();
   }
 };
-
+// Verify Credentials Exists
+const verifyCredentals = async (req, res, next) => {
+  try {
+    const { phone_number, email } = req.body;
+    const to_search_item = phone_number || email;
+    let to_search_field = "";
+    let message_field = "";
+    if (phone_number) {
+      to_search_field = "phone_number";
+      message_field = "Phone Number";
+    } else {
+      to_search_field = "email";
+      message_field = "Email";
+    }
+    const account = await models.Account.query().where(
+      to_search_field,
+      to_search_item
+    );
+    if (account.length === 0) {
+      res.status(200).json({ Message: `This ${message_field} is available` });
+    } else {
+      res
+        .status(200)
+        .json({ Message: `This ${message_field} is already taken` });
+    }
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e)).send();
+  }
+};
 // Signup for event guests
 const guestSignup = async (req, res, next) => {
   try {
@@ -1676,6 +1705,7 @@ const userController = {
   resendInvitation,
   forgot,
   reset,
+  verifyCredentals,
   // OAuth
   authWithFacebook,
   inviteOutletManager,
