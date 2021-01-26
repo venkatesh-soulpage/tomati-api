@@ -21,7 +21,7 @@ const getCounInfo = async (req, res, next) => {
         venueObject.outletvenue_id = res.outletvenue_id;
         venueObject.venueName = res.venue_id[0].name;
         venueObject.address = res.venue_id[0].address;
-        venueObject.scannedCount = res.count.data.length;
+        venueObject.scannedCount = res.count;
         venueData.push(venueObject);
       } else {
         const eventObject = {};
@@ -30,7 +30,7 @@ const getCounInfo = async (req, res, next) => {
         eventObject.eventName = res.event_id[0].name;
         eventObject.startTime = res.event_id[0].start_time;
         eventObject.guestsExpected = res.event_id[0].expected_guests;
-        eventObject.scannedCount = res.count.data.length;
+        eventObject.scannedCount = res.count;
         eventsData.push(eventObject);
       }
     }
