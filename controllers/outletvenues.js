@@ -54,7 +54,7 @@ const getVenue = async (req, res, next) => {
       "outletvenue_id",
       outlet_venue_id
     );
-    if (record.length === 0) {
+    if (record.length === 0 || (record.length > 0 && !record[0].count)) {
       await models.Statistics.query().insert({
         outletvenue_id: outlet_venue_id,
         count: { data: [countObject] },
