@@ -932,11 +932,16 @@ const verifyCredentals = async (req, res, next) => {
       to_search_item
     );
     if (account.length === 0) {
-      res.status(200).json({ Message: `This ${message_field} is available` });
+      res
+        .status(200)
+        .json({ Status: true, Message: `This ${message_field} is available` });
     } else {
       res
         .status(400)
-        .json({ Message: `This ${message_field} is already taken` });
+        .json({
+          Status: false,
+          Message: `This ${message_field} is already taken`,
+        });
     }
   } catch (e) {
     console.log(e);
