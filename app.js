@@ -33,6 +33,7 @@ var outletLocationsRoute = require("./routes/outletlocations");
 var cartRoute = require("./routes/cart");
 var orderInfo = require("./routes/order_info");
 var statistics = require("./routes/statistics");
+var tomatiRegistrationsRoute = require("./routes/tempTomatiRegistrations");
 
 var app = express();
 
@@ -82,7 +83,7 @@ app.use("/api/outletlocations", outletLocationsRoute);
 app.use("/api/cart", cartRoute);
 app.use("/api/orderinfo", orderInfo);
 app.use("/api/statistics", statistics);
-
+app.use("/api/tomati/registrations", tomatiRegistrationsRoute);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));

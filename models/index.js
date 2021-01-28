@@ -48,6 +48,7 @@ import CartItem from "./cart_item";
 import OutletWaiter from "./outletwaiters";
 import OrderInfo from "./order_info";
 import Statistics from "./statistics";
+import tempOutletRegistrations from "./temp_registrations";
 
 export default {
   Location,
@@ -100,4 +101,5 @@ export default {
   OutletWaiter,
   OrderInfo,
   Statistics,
+  tempOutletRegistrations,
 };
