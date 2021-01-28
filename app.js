@@ -33,7 +33,7 @@ var outletLocationsRoute = require("./routes/outletlocations");
 var cartRoute = require("./routes/cart");
 var orderInfo = require("./routes/order_info");
 var statistics = require("./routes/statistics");
-var tomatiRegistrationsRoute = require("./routes/tempTomatiRegistrations");
+var tomatiRegistrationsRoute = require("./routes/TomatiRegistrations.js");
 
 var app = express();
 

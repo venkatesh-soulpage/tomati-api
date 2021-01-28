@@ -3,7 +3,7 @@ var router = express.Router();
 import VerifyToken from "../utils/verification";
 import VerifyRole from "../utils/verification_role";
 
-import tomatiRegistrationsController from "../controllers/tempTomatiRegistrations";
+import tomatiRegistrationsController from "../controllers/TomatiRegistrations.js";
 
 router.post("/register", tomatiRegistrationsController.postRegistrations);
 router.put(
