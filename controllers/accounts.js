@@ -935,7 +935,7 @@ const verifyCredentals = async (req, res, next) => {
       res.status(200).json({ Message: `This ${message_field} is available` });
     } else {
       res
-        .status(200)
+        .status(400)
         .json({ Message: `This ${message_field} is already taken` });
     }
   } catch (e) {
