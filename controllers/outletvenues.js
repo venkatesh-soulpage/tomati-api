@@ -1,14 +1,10 @@
 import models from "../models";
-import bcrypt from "bcrypt";
-import crypto from "crypto";
-import jwt from "jsonwebtoken";
-import fetch from "node-fetch";
-import queryString from "query-string";
 
-import { sendInviteCode } from "./mailling";
 import AWS from "aws-sdk";
 
 import _ from "lodash";
+
+var requestIp = require("request-ip");
 
 const QRCode = require("qrcode");
 const isBase64 = require("is-base64");
@@ -39,7 +35,8 @@ const getVenues = async (req, res, next) => {
 const getVenue = async (req, res, next) => {
   try {
     const { outlet_venue_id } = req.params;
-    const ipAddress = req.connection.remoteAddress;
+    const clientIp = requestIp.getClientIp(req);
+    const ipAddress = clientIp.split("::ffff:").slice(-1).pop();
     const countObject = { ip: ipAddress, time: +new Date() };
 
     if (!outlet_venue_id) return res.status(400).json("Invalid ID");
@@ -50,23 +47,17 @@ const getVenue = async (req, res, next) => {
 
     if (!venue) return res.status(400).json("Invalid ID");
 
-    const record = await models.Statistics.query().where(
-      "outletvenue_id",
-      outlet_venue_id
-    );
-    if (record.length === 0) {
-      await models.Statistics.query().insert({
-        outletvenue_id: outlet_venue_id,
-        count: { data: [countObject] },
-      });
-    } else {
-      const data = record[0].count.data;
+    const { stats } = venue;
+    if (stats && stats.data && stats.data.length > 0) {
+      const { data } = stats;
       data.push(countObject);
-      await models.Statistics.query()
-        .where("outletvenue_id", outlet_venue_id)
-        .update({
-          count: { data },
-        });
+      await models.OutletVenue.query()
+        .update({ stats: { data } })
+        .findById(outlet_venue_id);
+    } else {
+      await models.OutletVenue.query()
+        .update({ stats: { data: [countObject] } })
+        .findById(outlet_venue_id);
     }
 
     return res.status(200).json(venue);
