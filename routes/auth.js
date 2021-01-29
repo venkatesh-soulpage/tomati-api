@@ -75,4 +75,7 @@ router.post("/reset", accountController.reset);
 /* POST Facebook OAuth */
 router.post("/facebook-oauth", accountController.authWithFacebook);
 
+/* Verify Email and Password */
+router.post("/verify-credentials", accountController.verifyCredentals);
+
 module.exports = router;
