@@ -113,7 +113,7 @@ const createEvent = async (req, res, next) => {
       "account_id",
       account_id
     );
-    if (venues_of_account_holder.length >= account[0].plan[0].outlet_limit) {
+    if (venues_of_account_holder.length >= account[0].plan[0].event_limit) {
       return res
         .status(400)
         .json(
