@@ -49,6 +49,7 @@ import OutletWaiter from "./outletwaiters";
 import OrderInfo from "./order_info";
 import Statistics from "./statistics";
 import tempOutletRegistrations from "./temp_registrations";
+import Plan from "./plans";
 
 export default {
   Location,
@@ -102,4 +103,5 @@ export default {
   OrderInfo,
   Statistics,
   tempOutletRegistrations,
+  Plan,
 };
