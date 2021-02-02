@@ -7,11 +7,11 @@ import VerifyRole from "../utils/verification_role";
 /* GET - Get a list of client organizations */
 router.get(
   "/",
-  VerifyToken,
-  VerifyRole([
-    { scope: "OUTLET", role: "MANAGER" },
-    { scope: "OUTLET", role: "OWNER" },
-  ]),
+  // VerifyToken,
+  // VerifyRole([
+  //   { scope: "OUTLET", role: "MANAGER" },
+  //   { scope: "OUTLET", role: "OWNER" },
+  // ]),
   locationsController.getLocations
 );
 
