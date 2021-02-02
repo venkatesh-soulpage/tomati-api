@@ -7,14 +7,14 @@ import VerifyRole from "../utils/verification_role";
 /* GET - Get a list of venues */
 router.get(
   "/",
-  // VerifyToken,
-  // VerifyRole([
-  //     {scope: 'ADMIN', role: 'ADMIN'},
-  //     {scope: 'REGION', role: 'OWNER'},
-  //     {scope: 'REGION', role: 'MANAGER'},
-  //     {scope: 'BRAND', role: 'OWNER'},
-  //     {scope: 'BRAND', role: 'MANAGER'},
-  // ]),
+  VerifyToken,
+  VerifyRole([
+    { scope: "ADMIN", role: "ADMIN" },
+    { scope: "REGION", role: "OWNER" },
+    { scope: "REGION", role: "MANAGER" },
+    { scope: "BRAND", role: "OWNER" },
+    { scope: "BRAND", role: "MANAGER" },
+  ]),
   locationsController.getLocations
 );
 
