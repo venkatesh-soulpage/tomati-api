@@ -101,7 +101,23 @@ const createVenue = async (req, res, next) => {
     } = req.body;
 
     let buf, cover_image;
-
+    const account = await models.Account.query()
+      .withGraphFetched(`[plan]`)
+      .where("id", account_id);
+    const venues_of_account_holder = await models.OutletVenue.query().where(
+      "account_id",
+      account_id
+    );
+    if (
+      account[0].plan[0] !== undefined &&
+      venues_of_account_holder.length >= account[0].plan[0].outlet_limit
+    ) {
+      return res
+        .status(400)
+        .json(
+          "Failed to create venue.Upgrade to Preminum to create more venues"
+        );
+    }
     if (req.files) {
       cover_image = req.files.cover_image;
       buf = cover_image.data;

@@ -16,7 +16,7 @@ const postRegistrations = async (req, res, next) => {
       password_hash,
       location,
       street_address,
-      plan,
+      plan_id,
       no_of_outlets,
       no_of_qrcodes,
       registration_type,
@@ -25,6 +25,14 @@ const postRegistrations = async (req, res, next) => {
       payment_type,
       transaction_id,
     } = req.body;
+
+    if (plan_id === 1 && no_of_outlets > 1) {
+      return res
+        .status(400)
+        .json(
+          "Failed to register.Upgrade to premium to register more than one outlet or event"
+        );
+    }
 
     // Hash password
     const salt = await bcrypt.genSalt(10);
@@ -51,24 +59,22 @@ const postRegistrations = async (req, res, next) => {
         is_admin: false,
         is_email_verified: true,
         is_age_verified: false,
+        no_of_outlets,
+        no_of_qrcodes,
+        plan_id,
+        transaction_id,
       });
       const account_id = new_account.id;
       if (registration_type === "outlet") {
         const new_venue = await models.OutletVenue.query().insert({
           name: company_name,
           address: street_address,
-          no_of_outlets,
-          no_of_qrcodes,
-          plan,
           account_id,
-          transaction_id,
           location_id: location,
         });
       } else if (registration_type === "event") {
         const new_outlet_event = await models.OutletEvent.query().insert({
           name: company_name,
-          plan,
-          transaction_id,
           account_id,
           location_id: location,
           address: street_address,
@@ -89,7 +95,7 @@ const postRegistrations = async (req, res, next) => {
         password_hash,
         location,
         street_address,
-        plan,
+        plan_id,
         no_of_outlets,
         no_of_qrcodes,
         registration_type,
@@ -129,7 +135,7 @@ const approveRegistration = async (req, res, next) => {
       password_hash,
       location,
       street_address,
-      plan,
+      plan_id,
       no_of_outlets,
       no_of_qrcodes,
       registration_type,
@@ -153,22 +159,22 @@ const approveRegistration = async (req, res, next) => {
       is_admin: false,
       is_email_verified: true,
       is_age_verified: false,
+      no_of_outlets,
+      no_of_qrcodes,
+      plan_id,
+      transaction_id,
     });
     const account_id = new_account.id;
     if (registration_type === "outlet") {
       const new_venue = await models.OutletVenue.query().insert({
         name: company_name,
         address: street_address,
-        no_of_outlets,
-        no_of_qrcodes,
-        plan,
         account_id,
         location_id: location,
       });
     } else if (registration_type === "event") {
       const new_outlet_event = await models.OutletEvent.query().insert({
         name: company_name,
-        plan,
         account_id,
         location_id: location,
         address: street_address,

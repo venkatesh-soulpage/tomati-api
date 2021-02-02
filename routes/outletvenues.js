@@ -49,10 +49,10 @@ router.delete(
 router.post(
   "/",
   VerifyToken,
-  VerifyRole([
-    { scope: "OUTLET", role: "MANAGER" },
-    { scope: "OUTLET", role: "OWNER" },
-  ]),
+  // VerifyRole([
+  //   { scope: "OUTLET", role: "MANAGER" },
+  //   { scope: "OUTLET", role: "OWNER" },
+  // ]),
   venuesController.createVenue
 );
 

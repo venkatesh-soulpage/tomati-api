@@ -27,6 +27,7 @@ const getUser = async (req, res, next) => {
         `[
                         wallet, 
                         location,
+                        plan
                     ]`
       )
       .findById(account_id);
@@ -936,12 +937,10 @@ const verifyCredentals = async (req, res, next) => {
         .status(200)
         .json({ Status: true, Message: `This ${message_field} is available` });
     } else {
-      res
-        .status(400)
-        .json({
-          Status: false,
-          Message: `This ${message_field} is already taken`,
-        });
+      res.status(400).json({
+        Status: false,
+        Message: `This ${message_field} is already taken`,
+      });
     }
   } catch (e) {
     console.log(e);
