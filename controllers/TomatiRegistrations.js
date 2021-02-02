@@ -45,10 +45,7 @@ const postRegistrations = async (req, res, next) => {
     if (account.length > 0) {
       return res.status(400).json("Email already exists");
     }
-
-    if (payment_type === "online") {
-      // is_approved = true;
-
+    if (plan_id === 1) {
       // Add new user
       const new_account = await models.Account.query().insert({
         email: email,
@@ -86,29 +83,71 @@ const postRegistrations = async (req, res, next) => {
         Status: true,
         Message: "Registered succesfully",
       });
-    } else if (payment_type === "offline") {
-      // Add new Temperory oultet or event
-      const newOutlet = await models.tempOutletRegistrations.query().insert({
-        full_name,
-        company_name,
-        email,
-        password_hash,
-        location,
-        street_address,
-        plan_id,
-        no_of_outlets,
-        no_of_qrcodes,
-        registration_type,
-        is_billed,
-        is_privacy_agreed,
-        payment_type,
-      });
-      res.status(200).send({
-        Status: true,
-        Message: "Registered succesfully please wait for the approval",
-      });
     } else {
-      return res.status(400).json("Please enter valid payment type");
+      if (payment_type === "online") {
+        // is_approved = true;
+
+        // Add new user
+        const new_account = await models.Account.query().insert({
+          email: email,
+          first_name: full_name,
+          last_name: full_name,
+          location,
+          password_hash: password_hash,
+          is_admin: false,
+          is_email_verified: true,
+          is_age_verified: false,
+          no_of_outlets,
+          no_of_qrcodes,
+          plan_id,
+          transaction_id,
+        });
+        const account_id = new_account.id;
+        if (registration_type === "outlet") {
+          const new_venue = await models.OutletVenue.query().insert({
+            name: company_name,
+            address: street_address,
+            account_id,
+            location_id: location,
+          });
+        } else if (registration_type === "event") {
+          const new_outlet_event = await models.OutletEvent.query().insert({
+            name: company_name,
+            account_id,
+            location_id: location,
+            address: street_address,
+          });
+        } else {
+          return res.status(400).json("Please enter valid registration type");
+        }
+        res.status(200).send({
+          Status: true,
+          Message: "Registered succesfully",
+        });
+      } else if (payment_type === "offline") {
+        // Add new Temperory oultet or event
+        const newOutlet = await models.tempOutletRegistrations.query().insert({
+          full_name,
+          company_name,
+          email,
+          password_hash,
+          location,
+          street_address,
+          plan: plan_id,
+          no_of_outlets,
+          no_of_qrcodes,
+          registration_type,
+          is_billed,
+          is_privacy_agreed,
+          payment_type,
+        });
+        res.status(200).send({
+          Status: true,
+          Message: "Registered succesfully please wait for the approval",
+        });
+      } else {
+        return res.status(400).json("Please enter valid payment type");
+      }
     }
   } catch (e) {
     console.log(e);
