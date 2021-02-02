@@ -6,5 +6,6 @@ import VerifyRole from "../utils/verification_role";
 
 /* GET - Get a list of client organizations */
 router.get("/", planController.getplans);
+router.post("/post-plans", planController.postPlans);
 
 module.exports = router;
