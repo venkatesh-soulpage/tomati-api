@@ -33,7 +33,9 @@ const getUser = async (req, res, next) => {
         `[
                         wallet, 
                         location,
-                        plan
+                        plan,
+                        outlets,
+                        events
                     ]`
       )
       .findById(account_id);
