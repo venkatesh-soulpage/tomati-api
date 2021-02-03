@@ -78,4 +78,7 @@ router.post("/facebook-oauth", accountController.authWithFacebook);
 /* Verify Email and Password */
 router.post("/verify-credentials", accountController.verifyCredentals);
 
+/* Tomati User Signup */
+router.post("/user-signup", accountController.userSignup);
+
 module.exports = router;
