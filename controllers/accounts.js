@@ -133,6 +133,7 @@ const userSignup = async (req, res, next) => {
       password_hash,
       plan_id,
       code,
+      registration_type,
     } = req.body;
 
     const verification = await twilio_client.verify
@@ -154,18 +155,54 @@ const userSignup = async (req, res, next) => {
         is_age_verified: false,
         plan_id,
       });
-      const jwt_token = await jwt.sign(
-        {
-          id: new_account.id,
-          email: new_account.email,
-        },
-        process.env.SECRET_KEY,
-        { expiresIn: "3h" }
-      );
-      return res
-        .status(200)
-        .json({ Status: true, Message: "Success", jwt_token })
-        .send();
+
+      if (registration_type === "outlet") {
+        const new_venue = await models.OutletVenue.query().insert({
+          name: company_name,
+          account_id,
+        });
+        const account_id = new_account.id;
+        const jwt_token = await jwt.sign(
+          {
+            id: new_account.id,
+            email: new_account.email,
+          },
+          process.env.SECRET_KEY,
+          { expiresIn: "3h" }
+        );
+        const refresh_token = await crypto.randomBytes(16).toString("hex");
+        await models.Account.query()
+          .where("id", new_account.id)
+          .update({ refresh_token });
+        return res
+          .status(200)
+          .json({ Status: true, Message: "Success", jwt_token, refresh_token })
+          .send();
+      } else if (registration_type === "event") {
+        const account_id = new_account.id;
+        const jwt_token = await jwt.sign(
+          {
+            id: new_account.id,
+            email: new_account.email,
+          },
+          process.env.SECRET_KEY,
+          { expiresIn: "3h" }
+        );
+        const refresh_token = await crypto.randomBytes(16).toString("hex");
+        await models.Account.query()
+          .where("id", new_account.id)
+          .update({ refresh_token });
+        const new_outlet_event = await models.OutletEvent.query().insert({
+          name: company_name,
+          account_id,
+        });
+        return res
+          .status(200)
+          .json({ Status: true, Message: "Success", jwt_token, refresh_token })
+          .send();
+      } else {
+        return res.status(400).json("Please enter valid registration type");
+      }
     } else {
       return res
         .status(400)
