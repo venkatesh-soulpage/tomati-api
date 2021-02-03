@@ -84,6 +84,22 @@ export default class Account extends Model {
           to: "plans.id",
         },
       },
+      outlets: {
+        relation: Model.HasManyRelation,
+        modelClass: models.OutletVenue,
+        join: {
+          from: "accounts.id",
+          to: "outletvenues.account_id",
+        },
+      },
+      events: {
+        relation: Model.HasManyRelation,
+        modelClass: models.OutletEvent,
+        join: {
+          from: "accounts.id",
+          to: "outletevents.account_id",
+        },
+      },
     };
   }
 }
