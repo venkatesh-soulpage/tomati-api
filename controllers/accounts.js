@@ -155,13 +155,14 @@ const userSignup = async (req, res, next) => {
         is_age_verified: false,
         plan_id,
       });
+      const account_id = new_account.id;
 
       if (registration_type === "outlet") {
         const new_venue = await models.OutletVenue.query().insert({
           name: company_name,
           account_id,
         });
-        const account_id = new_account.id;
+
         const jwt_token = await jwt.sign(
           {
             id: new_account.id,
@@ -179,7 +180,6 @@ const userSignup = async (req, res, next) => {
           .json({ Status: true, Message: "Success", jwt_token, refresh_token })
           .send();
       } else if (registration_type === "event") {
-        const account_id = new_account.id;
         const jwt_token = await jwt.sign(
           {
             id: new_account.id,
