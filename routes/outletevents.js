@@ -8,36 +8,36 @@ import VerifyRole from "../utils/verification_role";
 router.get(
   "/",
   VerifyToken,
-  VerifyRole([
-    { scope: "OUTLET", role: "MANAGER" },
-    { scope: "OUTLET", role: "OWNER" },
-  ]),
+  // VerifyRole([
+  //   { scope: "OUTLET", role: "MANAGER" },
+  //   { scope: "OUTLET", role: "OWNER" },
+  // ]),
   eventsController.getEvents
 );
 
 router.post(
   "/",
   VerifyToken,
-  VerifyRole([
-    { scope: "OUTLET", role: "MANAGER" },
-    { scope: "OUTLET", role: "OWNER" },
-  ]),
+  // VerifyRole([
+  //   { scope: "OUTLET", role: "MANAGER" },
+  //   { scope: "OUTLET", role: "OWNER" },
+  // ]),
   eventsController.createEvent
 );
 
 router.post(
   "/:outlet_event_id/menu",
   VerifyToken,
-  VerifyRole([
-    { scope: "OUTLET", role: "MANAGER" },
-    { scope: "OUTLET", role: "OWNER" },
-  ]),
+  // VerifyRole([
+  //   { scope: "OUTLET", role: "MANAGER" },
+  //   { scope: "OUTLET", role: "OWNER" },
+  // ]),
   eventsController.createEventMenu
 );
 
 router.get(
   "/:outlet_event_id",
-  // VerifyToken,
+  VerifyToken,
   // VerifyRole([
   //   { scope: "OUTLET", role: "MANAGER" },
   //   { scope: "OUTLET", role: "OWNER" },
@@ -48,20 +48,20 @@ router.get(
 router.put(
   "/:outlet_event_id",
   VerifyToken,
-  VerifyRole([
-    { scope: "OUTLET", role: "MANAGER" },
-    { scope: "OUTLET", role: "OWNER" },
-  ]),
+  // VerifyRole([
+  //   { scope: "OUTLET", role: "MANAGER" },
+  //   { scope: "OUTLET", role: "OWNER" },
+  // ]),
   eventsController.updateEvent
 );
 
 router.delete(
   "/:outlet_event_id",
   VerifyToken,
-  VerifyRole([
-    { scope: "OUTLET", role: "MANAGER" },
-    { scope: "OUTLET", role: "OWNER" },
-  ]),
+  // VerifyRole([
+  //   { scope: "OUTLET", role: "MANAGER" },
+  //   { scope: "OUTLET", role: "OWNER" },
+  // ]),
   eventsController.deleteEvent
 );
 

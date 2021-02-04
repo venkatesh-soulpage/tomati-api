@@ -109,7 +109,7 @@ const createEvent = async (req, res, next) => {
     const account = await models.Account.query()
       .withGraphFetched(`[plan]`)
       .where("id", account_id);
-    const venues_of_account_holder = await models.OutletVenue.query().where(
+    const venues_of_account_holder = await models.OutletEvent.query().where(
       "account_id",
       account_id
     );
