@@ -1,0 +1,74 @@
+[
+  {
+    "name": "Angola",
+    "is_country": true,
+    "parent_location": null,
+    "currency": "AOA"
+  },
+  {
+    "name": "Brazil",
+    "is_country": true,
+    "parent_location": null,
+    "currency": "BRL"
+  },
+  {
+    "name": "Colombia",
+    "is_country": true,
+    "parent_location": null,
+    "currency": "COP"
+  },
+  {
+    "name": "France",
+    "is_country": true,
+    "parent_location": null,
+    "currency": "EUR"
+  },
+  {
+    "name": "Ghana",
+    "is_country": true,
+    "parent_location": null,
+    "currency": "GHS"
+  },
+  {
+    "name": "Kenya",
+    "is_country": true,
+    "parent_location": null,
+    "currency": "KES"
+  },
+  {
+    "name": "Nigeria",
+    "is_country": true,
+    "parent_location": null,
+    "currency": "NGN"
+  },
+  {
+    "name": "Poland",
+    "is_country": true,
+    "parent_location": null,
+    "currency": "PLN"
+  },
+  {
+    "name": "South Africa",
+    "is_country": true,
+    "parent_location": null,
+    "currency": "ZAR"
+  },
+  {
+    "name": "Spain",
+    "is_country": true,
+    "parent_location": null,
+    "currency": "EUR"
+  },
+  {
+    "name": "United Arab Emirates",
+    "is_country": true,
+    "parent_location": null,
+    "currency": "AED"
+  },
+  {
+    "name": "United Kingdom",
+    "is_country": true,
+    "parent_location": null,
+    "currency": "GBP"
+  }
+]

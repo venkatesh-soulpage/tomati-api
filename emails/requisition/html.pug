@@ -1,0 +1,92 @@
+extends layout
+
+block content
+  h1 Hi #{account.first_name} #{account.last_name},
+  p
+    | The status of requisition ##{requisition.serial_number} has changed to 
+    strong #{status}
+    
+  if changes_required
+    p 
+      | Please log into the app to make the required changes.
+
+  if is_approved
+    p 
+      | Log into your dashboard to download a copy of the approved requisition.
+
+  p 
+    | Here is a list of the events: 
+  div(display="flex", flexDirection="column")
+    each event in requisition.brief.brief_events
+      div(style={
+        'border-width': '1px',
+        'border-color': 'gray',
+        'border-style': 'solid',
+        'padding': '0.5em',
+        'margin': '1em 0 1em 0',
+      })
+        div(style={
+            'display': 'flex', 
+            'flex-direction': 'row',
+            'justify-content': 'space-between',
+            'border-bottom-width': '1px',
+            'border-bottom-style': 'solid',
+            'border-bottom-color': 'gray',
+            'padding': '0.5em 0 1em 0',
+            'margin': '1em 0 1em 0',
+          }
+        )
+          b 
+            | #{event.name}
+          b
+            | From #{moment(event.start_time).format('DD/MM/YYYY HH:mm')} to #{moment(event.end_time).format('DD/MM/YYYY hh:mm')}
+        div(style={
+            'display': 'flex',
+            'flex-direction': 'row',
+            'justify-content': 'space-between',
+          })
+            b(style={'display': 'flex', 'flex': '2'})
+              | Product
+            b(style={'display': 'flex', 'flex': '1'})
+              | Units
+            b(style={'display': 'flex', 'flex': '1'})
+              | Price
+            b(style={'display': 'flex', 'flex': '1'})
+              | Display
+        each order in event.orders
+          div(style={
+            'display': 'flex',
+            'flex-direction': 'row',
+            'justify-content': 'space-between',
+          })
+            p(style={'display': 'flex', 'flex': '2'})
+              | #{order.product.name} #{order.product.metric_amount}#{order.product.metric}
+            p(style={'display': 'flex', 'flex': '1'}) 
+              | #{order.units}
+            p(style={'display': 'flex', 'flex': '1'})
+              | $#{order.price} 
+            p(style={'display': 'flex', 'flex': '1'})
+              | #{order.is_display || 'No'} 
+
+  table.body-action(align='center', width='100%', cellpadding='0', cellspacing='0', role='presentation')
+    tbody
+      tr
+        td(align='center')
+          //
+            Border based button
+            https://litmus.com/blog/a-guide-to-bulletproof-buttons-in-email-design
+          table(width='100%', border='0', cellspacing='0', cellpadding='0', role='presentation')
+            tbody
+              tr
+                td(align='center')
+                  a.f-fallback.button(href=route, target='_blank') Go to Requisitions
+
+  p
+    | Thank You,
+    br
+    | LiquidIntel Support Team
+  p
+    | Need help managing requisitions? Check out our help 
+    a(href=supportUrl) articles 
+    | or 
+    a(href=supportUrl) FAQ 

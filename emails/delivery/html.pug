@@ -1,0 +1,79 @@
+extends layout
+
+block content
+  h1 Hi, #{account.first_name} #{account.last_name}
+  p
+    | The status of the incoming delivery from 
+    strong #{delivery.warehouse.name} 
+    | for requisition 
+    strong ##{delivery.requisition.serial_number} 
+    | has now changed to 
+    strong #{status}
+  p 
+    | Log in to your dashboard to confirm delivery or log a dispute:
+  br 
+  div(display="flex", flexDirection="column")
+      div(style={
+        'border-width': '1px',
+        'border-color': 'gray',
+        'border-style': 'solid',
+        'padding': '0.5em',
+        'margin': '1em 0 1em 0',
+      })
+        div(style={
+            'display': 'flex', 
+            'flex-direction': 'row',
+            'justify-content': 'space-between',
+            'border-bottom-width': '1px',
+            'border-bottom-style': 'solid',
+            'border-bottom-color': 'gray',
+            'padding': '0.5em 0 1em 0',
+            'margin': '1em 0 1em 0',
+          }
+        )
+          b 
+            | Waybill: #{delivery.waybill}
+          b
+            | Created at #{moment(delivery.created_at).format('DD/MM/YYYY HH:mm')}
+        div(style={
+            'display': 'flex',
+            'flex-direction': 'row',
+            'justify-content': 'space-between',
+          })
+            b(style={'display': 'flex', 'flex': '2'})
+              | Product
+            b(style={'display': 'flex', 'flex': '1'})
+              | Units
+        each delivery_product in delivery.products
+          div(style={
+            'display': 'flex',
+            'flex-direction': 'row',
+            'justify-content': 'space-between',
+          })
+            p(style={'display': 'flex', 'flex': '2'})
+              | #{delivery_product.product.name} #{delivery_product.product.metric_amount}#{delivery_product.product.metric}
+            p(style={'display': 'flex', 'flex': '1'}) 
+              | #{delivery_product.units}
+
+  table.body-action(align='center', width='100%', cellpadding='0', cellspacing='0', role='presentation')
+    tbody
+      tr
+        td(align='center')
+          //
+            Border based button
+            https://litmus.com/blog/a-guide-to-bulletproof-buttons-in-email-design
+          table(width='100%', border='0', cellspacing='0', cellpadding='0', role='presentation')
+            tbody
+              tr
+                td(align='center')
+                  a.f-fallback.button(href=route, target='_blank') Go to Requisitions
+
+  p
+    | Thank You,
+    br
+    | LiquidIntel Support Team.
+  p
+    |  Need help setting up and using your wallet? Check out our help 
+    a(href=supportUrl) articles 
+    | or 
+    a(href=supportUrl) FAQ

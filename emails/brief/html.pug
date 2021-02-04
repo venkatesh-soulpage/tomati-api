@@ -1,0 +1,30 @@
+extends layout
+
+block content
+  h1 Hi #{account.first_name} #{account.last_name},
+  p
+    | You have a new brief submission:  
+    strong #{brief.name}
+    
+  table.body-action(align='center', width='100%', cellpadding='0', cellspacing='0', role='presentation')
+    tbody
+      tr
+        td(align='center')
+          //
+            Border based button
+            https://litmus.com/blog/a-guide-to-bulletproof-buttons-in-email-design
+          table(width='100%', border='0', cellspacing='0', cellpadding='0', role='presentation')
+            tbody
+              tr
+                td(align='center')
+                  a.f-fallback.button(href=route, target='_blank') Go to Briefs
+
+  p
+    | Thank You,
+    br
+    | LiquidIntel Support Team
+  p
+    | Need help managing requisitions? Check out our help 
+    a(href=supportUrl) articles 
+    | or 
+    a(href=supportUrl) FAQ 
