@@ -8,16 +8,16 @@ import VerifyRole from "../utils/verification_role";
 router.get(
   "/",
   VerifyToken,
-  VerifyRole([
-    { scope: "OUTLET", role: "MANAGER" },
-    { scope: "OUTLET", role: "OWNER" },
-  ]),
+  // VerifyRole([
+  //   { scope: "OUTLET", role: "MANAGER" },
+  //   { scope: "OUTLET", role: "OWNER" },
+  // ]),
   venuesController.getVenues
 );
 
 router.get(
   "/:outlet_venue_id",
-  // VerifyToken,
+  VerifyToken,
   // VerifyRole([
   //   { scope: "OUTLET", role: "MANAGER" },
   //   { scope: "OUTLET", role: "OWNER" },
@@ -29,20 +29,20 @@ router.get(
 router.put(
   "/:outlet_venue_id",
   VerifyToken,
-  VerifyRole([
-    { scope: "OUTLET", role: "MANAGER" },
-    { scope: "OUTLET", role: "OWNER" },
-  ]),
+  // VerifyRole([
+  //   { scope: "OUTLET", role: "MANAGER" },
+  //   { scope: "OUTLET", role: "OWNER" },
+  // ]),
   venuesController.updateVenue
 );
 
 router.delete(
   "/:outlet_venue_id",
   VerifyToken,
-  VerifyRole([
-    { scope: "OUTLET", role: "MANAGER" },
-    { scope: "OUTLET", role: "OWNER" },
-  ]),
+  // VerifyRole([
+  //   { scope: "OUTLET", role: "MANAGER" },
+  //   { scope: "OUTLET", role: "OWNER" },
+  // ]),
   venuesController.deleteVenue
 );
 
@@ -59,10 +59,10 @@ router.post(
 router.post(
   "/:outlet_venue_id/menu",
   VerifyToken,
-  VerifyRole([
-    { scope: "OUTLET", role: "MANAGER" },
-    { scope: "OUTLET", role: "OWNER" },
-  ]),
+  // VerifyRole([
+  //   { scope: "OUTLET", role: "MANAGER" },
+  //   { scope: "OUTLET", role: "OWNER" },
+  // ]),
   venuesController.createVenueMenu
 );
 
