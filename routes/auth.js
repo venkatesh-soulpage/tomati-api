@@ -69,6 +69,9 @@ router.post("/refresh-token", accountController.refreshToken);
 /* POST Resend the verification email */
 router.post("/forgot", accountController.forgot);
 
+/* POST Resend the verification email */
+router.post("/tomati-forgot", accountController.tomatiforgot);
+
 /* POST Reset Password */
 router.post("/reset", accountController.reset);
 
