@@ -16,6 +16,7 @@ import {
   agencyInviteEmail,
   outletInviteEmail,
   outletInviteWaiterEmail,
+  sendFotgotPasswordEmailTomati,
 } from "./mailling";
 
 const twilio_client = twilio(
