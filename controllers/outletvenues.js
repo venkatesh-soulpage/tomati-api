@@ -146,7 +146,13 @@ const createVenue = async (req, res, next) => {
     });
 
     // Send the clients
-    return res.status(201).json("Venue Created Successfully");
+    return res
+      .status(201)
+      .json({
+        Status: true,
+        Venue: new_venue,
+        Message: "Venue Created Successfully",
+      });
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e));

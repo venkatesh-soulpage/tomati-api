@@ -310,7 +310,13 @@ const createEventMenu = async (req, res, next) => {
 
     // "EventMenu Created Successfully"
     // Send the clients
-    return res.status(201).json("EventMenu Created Successfully");
+    return res
+      .status(201)
+      .json({
+        Status: true,
+        event: new_event,
+        Message: "Event Created Successfully",
+      });
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e));
