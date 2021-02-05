@@ -201,6 +201,31 @@ const sendFotgotPasswordEmail = (user, token) => {
     .catch(console.error);
 };
 
+const sendFotgotPasswordEmailTomati = (user, token) => {
+  const email = new Email({
+    message: {
+      from: process.env.FROM_EMAIL,
+      subject: "LiquidIntel - Password reset",
+    },
+    send: true,
+    transport: transporter,
+  });
+
+  email
+    .send({
+      template: "forgot",
+      message: {
+        to: user.email,
+      },
+      locals: {
+        email: user.email,
+        resetUrl: `${process.env.SCHEMA}://${process.env.FRONT_HOST}:${process.env.APP_PORT}/reset?email=${user.email}&token=${token}`,
+      },
+    })
+    .then(/* console.log */)
+    .catch(console.error);
+};
+
 const sendBriefToEmail = (brief, account, status, options) => {
   const email = new Email({
     message: {
@@ -444,4 +469,5 @@ export {
   sendInviteCode,
   outletInviteEmail,
   outletInviteWaiterEmail,
+  sendFotgotPasswordEmailTomati,
 };
