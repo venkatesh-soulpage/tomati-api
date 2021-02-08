@@ -136,51 +136,38 @@ const userSignup = async (req, res, next) => {
       password_hash,
       plan_id,
       location_id,
-      code,
     } = req.body;
 
-    const verification = await twilio_client.verify
-      .services(process.env.TWILIO_VERIFY_SERVICE_SID)
-      .verificationChecks.create({ to: `${email}`, code })
-      .then((verification_check) => verification_check);
-
-    if (verification && verification.status === "approved") {
-      // Hash password
-      const salt = await bcrypt.genSalt(10);
-      password_hash = await bcrypt.hash(password_hash, salt);
-      const new_account = await models.Account.query().insert({
-        email: email,
-        first_name: full_name,
-        last_name: company_name,
-        password_hash: password_hash,
-        is_admin: false,
-        is_email_verified: true,
-        is_age_verified: false,
-        plan_id,
-        location_id,
-      });
-      const jwt_token = await jwt.sign(
-        {
-          id: new_account.id,
-          email: new_account.email,
-        },
-        process.env.SECRET_KEY,
-        { expiresIn: "3h" }
-      );
-      const refresh_token = await crypto.randomBytes(16).toString("hex");
-      await models.Account.query()
-        .where("id", new_account.id)
-        .update({ refresh_token });
-      return res
-        .status(200)
-        .json({ Status: true, Message: "Success", jwt_token, refresh_token })
-        .send();
-    } else {
-      return res
-        .status(400)
-        .json({ Status: false, Message: "Invalid OTP" })
-        .send();
-    }
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    password_hash = await bcrypt.hash(password_hash, salt);
+    const new_account = await models.Account.query().insert({
+      email: email,
+      first_name: full_name,
+      last_name: company_name,
+      password_hash: password_hash,
+      is_admin: false,
+      is_email_verified: true,
+      is_age_verified: false,
+      plan_id,
+      location_id,
+    });
+    const jwt_token = await jwt.sign(
+      {
+        id: new_account.id,
+        email: new_account.email,
+      },
+      process.env.SECRET_KEY,
+      { expiresIn: "3h" }
+    );
+    const refresh_token = await crypto.randomBytes(16).toString("hex");
+    await models.Account.query()
+      .where("id", new_account.id)
+      .update({ refresh_token });
+    return res
+      .status(200)
+      .json({ Status: true, Message: "Success", jwt_token, refresh_token })
+      .send();
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e)).send();
