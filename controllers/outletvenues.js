@@ -143,6 +143,7 @@ const createVenue = async (req, res, next) => {
     const key2 = `public/cover_images/outletvenues/${logo_image.name}`;
 
     uploadImage({ key, buf });
+    uploadImage({ key: key2, buf: logobuf });
 
     const new_venue = await models.OutletVenue.query().insert({
       name,
@@ -221,7 +222,7 @@ const updateVenue = async (req, res, next) => {
     }
     if (logobuf && logo_image) {
       const key = `public/cover_images/outletvenues/${logo_image.name}`;
-      uploadImage({ key, buf });
+      uploadImage({ key, buf: logobuf });
       await models.OutletVenue.query()
         .update({
           logo_img: `https://s3.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
