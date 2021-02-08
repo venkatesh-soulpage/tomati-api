@@ -146,7 +146,7 @@ const createEvent = async (req, res, next) => {
     }
 
     const key = `public/cover_images/outletevents/${cover_image.name}`;
-    const key2 = `public/cover_images/outletvenues/${logo_image.name}`;
+    const key2 = `public/cover_images/outletevents/${logo_image.name}`;
 
     uploadImage({ key, buf });
     uploadImage({ key: key2, buf: logobuf });
@@ -233,7 +233,7 @@ const updateEvent = async (req, res, next) => {
         );
     }
     if (logobuf && logo_image) {
-      const key = `public/cover_images/outletvenues/${logo_image.name}`;
+      const key = `public/cover_images/outletevents/${logo_image.name}`;
       uploadImage({ key, buf: logobuf });
       await models.OutletVenue.query()
         .update({
