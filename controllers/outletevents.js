@@ -170,7 +170,7 @@ const createEvent = async (req, res, next) => {
     // Send the clients
     return res.status(201).json({
       Status: true,
-      Venue: new_outlet_event,
+      Event: new_outlet_event,
       Message: "Event Created Successfully",
     });
   } catch (e) {
