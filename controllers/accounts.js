@@ -135,6 +135,7 @@ const userSignup = async (req, res, next) => {
       email,
       password_hash,
       plan_id,
+      location_id,
       code,
     } = req.body;
 
@@ -156,6 +157,7 @@ const userSignup = async (req, res, next) => {
         is_email_verified: true,
         is_age_verified: false,
         plan_id,
+        location_id,
       });
       const jwt_token = await jwt.sign(
         {
