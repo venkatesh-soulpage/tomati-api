@@ -105,6 +105,7 @@ const createEvent = async (req, res, next) => {
     } = req.body;
 
     let buf, cover_image;
+    let logobuf, logo_image;
     const account = await models.Account.query()
       .withGraphFetched(`[plan]`)
       .where("id", account_id);
@@ -126,17 +127,28 @@ const createEvent = async (req, res, next) => {
     if (req.files) {
       cover_image = req.files.cover_image;
       buf = cover_image.data;
+      logo_image = req.files.logo_img;
+      logobuf = logo_image.data;
     } else if (req.body.cover_image) {
       cover_image = req.body.cover_image;
       buf = Buffer.from(
         cover_image.data.replace(/^data:image\/\w+;base64,/, ""),
         "base64"
       );
+    } else if (req.body.logo_img) {
+      logo_image = req.files.logo_image;
+      if (isBase64(logo_image.data, { mimeRequired: true }))
+        logobuf = Buffer.from(
+          logo_image.data.replace(/^data:image\/\w+;base64,/, ""),
+          "base64"
+        );
     }
 
     const key = `public/cover_images/outletevents/${cover_image.name}`;
+    const key2 = `public/cover_images/outletevents/${logo_image.name}`;
 
     uploadImage({ key, buf });
+    uploadImage({ key: key2, buf: logobuf });
 
     const new_outlet_event = await models.OutletEvent.query().insert({
       name,
@@ -151,10 +163,15 @@ const createEvent = async (req, res, next) => {
       address,
       description,
       cover_image: `https://s3.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
+      logo_img: `https://s3.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key2}`,
     });
 
     // Send the clients
-    return res.status(201).json("Event Created Successfully");
+    return res.status(201).json({
+      Status: true,
+      Event: new_outlet_event,
+      Message: "Event Created Successfully",
+    });
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e));
@@ -174,7 +191,7 @@ const updateEvent = async (req, res, next) => {
     if (!outlet_event_id || !outletevent)
       return res.status(400).json("Invalid ID");
 
-    if (_.size(req.body) < 1) return res.status(400).json("No Data to update");
+    // if (_.size(req.body) < 1) return res.status(400).json("No Data to update");
 
     const {
       name,
@@ -190,10 +207,15 @@ const updateEvent = async (req, res, next) => {
     } = req.body;
 
     let buf, cover_image;
-
+    let logobuf, logo_image;
     if (req.files) {
-      cover_image = req.files.cover_image;
-      buf = cover_image.data;
+      if (req.files.cover_image) {
+        cover_image = req.files.cover_image;
+        buf = cover_image.data;
+      } else {
+        logo_image = req.files.logo_img;
+        logobuf = logo_image.data;
+      }
     } else if (req.body.cover_image) {
       cover_image = req.body.cover_image;
       if (isBase64(cover_image.data, { mimeRequired: true }))
@@ -201,6 +223,22 @@ const updateEvent = async (req, res, next) => {
           cover_image.data.replace(/^data:image\/\w+;base64,/, ""),
           "base64"
         );
+    } else if (req.body.logo_img) {
+      logo_image = req.files.logo_image;
+      if (isBase64(logo_image.data, { mimeRequired: true }))
+        logobuf = Buffer.from(
+          logo_image.data.replace(/^data:image\/\w+;base64,/, ""),
+          "base64"
+        );
+    }
+    if (logobuf && logo_image) {
+      const key = `public/cover_images/outletevents/${logo_image.name}`;
+      uploadImage({ key, buf: logobuf });
+      await models.OutletVenue.query()
+        .update({
+          logo_img: `https://s3.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
+        })
+        .where("id", outlet_event_id);
     }
     if (buf && cover_image) {
       const key = `public/cover_images/outletevents/${cover_image.name}`;
@@ -309,7 +347,11 @@ const createEventMenu = async (req, res, next) => {
 
     // "EventMenu Created Successfully"
     // Send the clients
-    return res.status(201).json("EventMenu Created Successfully");
+    return res.status(201).json({
+      Status: true,
+      event: new_event,
+      Message: "Event Created Successfully",
+    });
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e));

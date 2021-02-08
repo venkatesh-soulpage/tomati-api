@@ -100,6 +100,7 @@ const createVenue = async (req, res, next) => {
     } = req.body;
 
     let buf, cover_image;
+    let logobuf, logo_image;
     const account = await models.Account.query()
       .withGraphFetched(`[plan]`)
       .where("id", account_id);
@@ -120,17 +121,28 @@ const createVenue = async (req, res, next) => {
     if (req.files) {
       cover_image = req.files.cover_image;
       buf = cover_image.data;
+      logo_image = req.files.logo_img;
+      logobuf = logo_image.data;
     } else if (req.body.cover_image) {
       cover_image = req.body.cover_image;
       buf = Buffer.from(
         cover_image.data.replace(/^data:image\/\w+;base64,/, ""),
         "base64"
       );
+    } else if (req.body.logo_img) {
+      logo_image = req.files.logo_image;
+      if (isBase64(logo_image.data, { mimeRequired: true }))
+        logobuf = Buffer.from(
+          logo_image.data.replace(/^data:image\/\w+;base64,/, ""),
+          "base64"
+        );
     }
 
     const key = `public/cover_images/outletvenues/${cover_image.name}`;
+    const key2 = `public/cover_images/outletvenues/${logo_image.name}`;
 
     uploadImage({ key, buf });
+    uploadImage({ key: key2, buf: logobuf });
 
     const new_venue = await models.OutletVenue.query().insert({
       name,
@@ -142,10 +154,15 @@ const createVenue = async (req, res, next) => {
       location_id,
       description,
       cover_image: `https://s3.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
+      logo_img: `https://s3.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key2}`,
     });
 
     // Send the clients
-    return res.status(201).json("Venue Created Successfully");
+    return res.status(201).json({
+      Status: true,
+      Venue: new_venue,
+      Message: "Venue Created Successfully",
+    });
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e));
@@ -165,7 +182,7 @@ const updateVenue = async (req, res, next) => {
     if (!outlet_venue_id || !outletvenue)
       return res.status(400).json("Invalid ID");
 
-    if (_.size(req.body) < 1) return res.status(400).json("No Data to update");
+    // if (_.size(req.body) < 1) return res.status(400).json("No Data to update");
 
     const {
       name,
@@ -178,10 +195,15 @@ const updateVenue = async (req, res, next) => {
     } = req.body;
 
     let buf, cover_image;
-
+    let logobuf, logo_image;
     if (req.files) {
-      cover_image = req.files.cover_image;
-      buf = cover_image.data;
+      if (req.files.cover_image) {
+        cover_image = req.files.cover_image;
+        buf = cover_image.data;
+      } else {
+        logo_image = req.files.logo_img;
+        logobuf = logo_image.data;
+      }
     } else if (req.body.cover_image) {
       cover_image = req.body.cover_image;
       if (isBase64(cover_image.data, { mimeRequired: true }))
@@ -189,6 +211,22 @@ const updateVenue = async (req, res, next) => {
           cover_image.data.replace(/^data:image\/\w+;base64,/, ""),
           "base64"
         );
+    } else if (req.body.logo_img) {
+      logo_image = req.files.logo_image;
+      if (isBase64(logo_image.data, { mimeRequired: true }))
+        logobuf = Buffer.from(
+          logo_image.data.replace(/^data:image\/\w+;base64,/, ""),
+          "base64"
+        );
+    }
+    if (logobuf && logo_image) {
+      const key = `public/cover_images/outletvenues/${logo_image.name}`;
+      uploadImage({ key, buf: logobuf });
+      await models.OutletVenue.query()
+        .update({
+          logo_img: `https://s3.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
+        })
+        .where("id", outlet_venue_id);
     }
     if (buf && cover_image) {
       const key = `public/cover_images/outletvenues/${cover_image.name}`;
@@ -199,7 +237,6 @@ const updateVenue = async (req, res, next) => {
         })
         .where("id", outlet_venue_id);
     }
-
     await models.OutletVenue.query()
       .update({
         name,

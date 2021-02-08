@@ -16,6 +16,7 @@ import {
   agencyInviteEmail,
   outletInviteEmail,
   outletInviteWaiterEmail,
+  sendFotgotPasswordEmailTomati,
 } from "./mailling";
 
 const twilio_client = twilio(
@@ -134,6 +135,7 @@ const userSignup = async (req, res, next) => {
       email,
       password_hash,
       plan_id,
+      location_id,
       code,
     } = req.body;
 
@@ -155,6 +157,7 @@ const userSignup = async (req, res, next) => {
         is_email_verified: true,
         is_age_verified: false,
         plan_id,
+        location_id,
       });
       const jwt_token = await jwt.sign(
         {
@@ -1595,6 +1598,40 @@ const forgot = async (req, res, next) => {
   }
 };
 
+// POST - Set the reset token and send an email with the url
+const tomatiforgot = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    // Get the account
+    const accounts = await models.Account.query().where("email", email);
+
+    // Validate account
+    if (!accounts[0] || accounts.length < 1)
+      return res.status(401).json("No account found").send();
+
+    // Generate a new password reset token and expiration
+    const password_reset_token = await crypto.randomBytes(16).toString("hex");
+    const password_reset_expiration = new Date(Date.now() + 3600000);
+
+    // Set the token password_reset_token and expiration
+    const updated_account = await models.Account.query()
+      .patch({ password_reset_token, password_reset_expiration })
+      .where("email", accounts[0].email);
+
+    // Send an email with recovery instructions
+    await sendFotgotPasswordEmailTomati(accounts[0], password_reset_token);
+
+    return res
+      .status(201)
+      .json(
+        `An email was sent to ${accounts[0].email} with further instructions.`
+      );
+  } catch (e) {
+    return res.status(500).json(JSON.stringify(e)).send();
+  }
+};
+
 // POST - Set the new password comparing the token
 const reset = async (req, res, next) => {
   try {
@@ -1784,6 +1821,7 @@ const userController = {
   verifyEmailOrPhone,
   waiterSignup,
   inviteOutletWaiter,
+  tomatiforgot,
 };
 
 export default userController;
