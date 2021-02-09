@@ -30,6 +30,24 @@ const getVenues = async (req, res, next) => {
   }
 };
 
+const getUserVenues = async (req, res, next) => {
+  try {
+    const { account_id } = req;
+    console.log(account_id, "ACCOUNT ID");
+    // Get brief
+    const venues = await models.OutletVenue.query()
+      .withGraphFetched(`[menu]`)
+      .orderBy("created_at", "desc")
+      .where("account_id", account_id);
+
+    // Send the clientss
+    return res.status(200).send(venues);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
+
 // GET - Get an specific event with an id
 const getVenue = async (req, res, next) => {
   try {
@@ -334,6 +352,7 @@ const createVenueMenu = async (req, res, next) => {
 
 const venuesController = {
   getVenues,
+  getUserVenues,
   getVenue,
   createVenue,
   createVenueMenu,

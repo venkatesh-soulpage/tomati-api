@@ -32,6 +32,23 @@ const getEvents = async (req, res, next) => {
   }
 };
 
+const getUserEvents = async (req, res, next) => {
+  try {
+    const { account_id } = req;
+    // Get brief
+    const events = await models.OutletEvent.query()
+      .withGraphFetched(`[menu]`)
+      .orderBy("created_at", "desc")
+      .where("account_id", account_id);
+
+    // Send the clientss
+    return res.status(200).send(events);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
+
 // GET - Get an specific event with an id
 const getEvent = async (req, res, next) => {
   try {
@@ -358,6 +375,7 @@ const createEventMenu = async (req, res, next) => {
 
 const eventsController = {
   getEvents,
+  getUserEvents,
   getEvent,
   createEvent,
   createEventMenu,

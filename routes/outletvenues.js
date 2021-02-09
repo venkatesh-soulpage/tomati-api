@@ -16,6 +16,16 @@ router.get(
 );
 
 router.get(
+  "/user-venues",
+  VerifyToken,
+  // VerifyRole([
+  //   { scope: "OUTLET", role: "MANAGER" },
+  //   { scope: "OUTLET", role: "OWNER" },
+  // ]),
+  venuesController.getUserVenues
+);
+
+router.get(
   "/:outlet_venue_id",
   VerifyToken,
   // VerifyRole([
