@@ -1,5 +1,4 @@
 import models from "../models";
-
 import AWS from "aws-sdk";
 
 import _ from "lodash";
