@@ -132,17 +132,15 @@ const createEvent = async (req, res, next) => {
       logobuf = logo_image.data;
     } else if (req.body.cover_image) {
       cover_image = req.body.cover_image;
+      logo_image = req.body.logo_img;
       buf = Buffer.from(
         cover_image.data.replace(/^data:image\/\w+;base64,/, ""),
         "base64"
       );
-    } else if (req.body.logo_img) {
-      logo_image = req.files.logo_image;
-      if (isBase64(logo_image.data, { mimeRequired: true }))
-        logobuf = Buffer.from(
-          logo_image.data.replace(/^data:image\/\w+;base64,/, ""),
-          "base64"
-        );
+      logobuf = Buffer.from(
+        logo_image.data.replace(/^data:image\/\w+;base64,/, ""),
+        "base64"
+      );
     }
 
     const key = `public/cover_images/outletevents/${cover_image.name}`;
