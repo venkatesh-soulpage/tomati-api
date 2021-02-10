@@ -23,6 +23,25 @@ const twilio_client = twilio(
   process.env.TWILIO_ACCOUNT_SID,
   process.env.TWILIO_AUTH_TOKEN
 );
+const uploadImage = async (file_data) => {
+  const { key, buf } = file_data;
+
+  var data = {
+    Key: key,
+    Bucket: process.env.BUCKETEER_BUCKET_NAME,
+    Body: buf,
+    ContentEncoding: "base64",
+    ContentType: "image/png",
+  };
+  await s3.putObject(data, function (err, data) {
+    if (err) {
+      console.log(err);
+      console.log("Error uploading data: ", data);
+    } else {
+      console.log("successfully uploaded the image!", data);
+    }
+  });
+};
 
 // GET - Get user profile
 const getUser = async (req, res, next) => {
@@ -1782,6 +1801,81 @@ const authWithFacebook = async (req, res, next) => {
     return res.status(500).json(JSON.stringify(e)).send();
   }
 };
+const updateProfile = async (req, res, next) => {
+  try {
+    const { account_id } = req;
+    const {
+      email,
+      first_name,
+      last_name,
+      current_password,
+      new_password,
+    } = req.body;
+    // Get the account
+    const account = await models.Account.query()
+      .where("id", account_id)
+      .first();
+
+    // Validate account
+    if (!account) return res.status(401).json("No account found").send();
+
+    if (current_password && new_password) {
+      const isCorrectPassword = await bcrypt.compareSync(
+        current_password,
+        account.password_hash
+      );
+
+      if (isCorrectPassword) {
+        // Hash password
+        const salt = await bcrypt.genSalt(10);
+        const password_hash = await bcrypt.hash(new_password, salt);
+        await models.Account.query()
+          .update({
+            password_hash,
+          })
+          .where("id", account_id);
+      } else {
+        return res
+          .status(401)
+          .json("Please Enter Valid Current Password")
+          .send();
+      }
+    }
+    let buf, profile_image;
+    if (req.files) {
+      profile_image = req.files.profile_image;
+      buf = profile_image.data;
+    } else if (req.body.profile_image) {
+      profile_image = req.body.profile_image;
+      logobuf = Buffer.from(
+        profile_image.data.replace(/^data:image\/\w+;base64,/, ""),
+        "base64"
+      );
+    }
+    if (buf && profile_image) {
+      const key = `public/cover_images/outletvenues/${profile_image.name}`;
+      uploadImage({ key, buf });
+      await models.Account.query()
+        .update({
+          profile_img: `https://s3.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
+        })
+        .where("id", account_id);
+    }
+
+    await models.Account.query()
+      .update({
+        first_name,
+        last_name,
+        email,
+      })
+      .where("id", account_id);
+
+    return res.status(200).json("Profile Updated Successfully");
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
 
 const userController = {
   // User
@@ -1802,6 +1896,7 @@ const userController = {
   reset,
   verifyCredentals,
   userSignup,
+  updateProfile,
   // OAuth
   authWithFacebook,
   inviteOutletManager,
