@@ -403,7 +403,7 @@ const waiterSignup = async (req, res, next) => {
       last_name,
       phone_number,
       password_hash,
-      is_admin: false,
+      is_admin: true,
       is_email_verified: true,
       is_age_verified: true,
       refresh_token,
@@ -1810,6 +1810,7 @@ const updateProfile = async (req, res, next) => {
       last_name,
       current_password,
       new_password,
+      plan_id,
     } = req.body;
     // Get the account
     const account = await models.Account.query()
@@ -1847,7 +1848,7 @@ const updateProfile = async (req, res, next) => {
       buf = profile_image.data;
     } else if (req.body.profile_image) {
       profile_image = req.body.profile_image;
-      logobuf = Buffer.from(
+      buf = Buffer.from(
         profile_image.data.replace(/^data:image\/\w+;base64,/, ""),
         "base64"
       );
@@ -1867,6 +1868,7 @@ const updateProfile = async (req, res, next) => {
         first_name,
         last_name,
         email,
+        plan_id,
       })
       .where("id", account_id);
 
