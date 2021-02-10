@@ -30,6 +30,24 @@ const getVenues = async (req, res, next) => {
   }
 };
 
+const getUserVenues = async (req, res, next) => {
+  try {
+    const { account_id } = req;
+    console.log(account_id, "ACCOUNT ID");
+    // Get brief
+    const venues = await models.OutletVenue.query()
+      .withGraphFetched(`[menu]`)
+      .orderBy("created_at", "desc")
+      .where("account_id", account_id);
+
+    // Send the clientss
+    return res.status(200).send(venues);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
+
 // GET - Get an specific event with an id
 const getVenue = async (req, res, next) => {
   try {
@@ -125,19 +143,16 @@ const createVenue = async (req, res, next) => {
       logobuf = logo_image.data;
     } else if (req.body.cover_image) {
       cover_image = req.body.cover_image;
+      logo_image = req.body.logo_img;
       buf = Buffer.from(
         cover_image.data.replace(/^data:image\/\w+;base64,/, ""),
         "base64"
       );
-    } else if (req.body.logo_img) {
-      logo_image = req.files.logo_image;
-      if (isBase64(logo_image.data, { mimeRequired: true }))
-        logobuf = Buffer.from(
-          logo_image.data.replace(/^data:image\/\w+;base64,/, ""),
-          "base64"
-        );
+      logobuf = Buffer.from(
+        logo_image.data.replace(/^data:image\/\w+;base64,/, ""),
+        "base64"
+      );
     }
-
     const key = `public/cover_images/outletvenues/${cover_image.name}`;
     const key2 = `public/cover_images/outletvenues/${logo_image.name}`;
 
@@ -197,27 +212,22 @@ const updateVenue = async (req, res, next) => {
     let buf, cover_image;
     let logobuf, logo_image;
     if (req.files) {
-      if (req.files.cover_image) {
-        cover_image = req.files.cover_image;
-        buf = cover_image.data;
-      } else {
-        logo_image = req.files.logo_img;
-        logobuf = logo_image.data;
-      }
+      cover_image = req.files.cover_image;
+      buf = cover_image.data;
+      logo_image = req.files.logo_img;
+      logobuf = logo_image.data;
+    } else if (req.body.logo_img) {
+      logo_image = req.body.logo_img;
+      logobuf = Buffer.from(
+        logo_image.data.replace(/^data:image\/\w+;base64,/, ""),
+        "base64"
+      );
     } else if (req.body.cover_image) {
       cover_image = req.body.cover_image;
-      if (isBase64(cover_image.data, { mimeRequired: true }))
-        buf = Buffer.from(
-          cover_image.data.replace(/^data:image\/\w+;base64,/, ""),
-          "base64"
-        );
-    } else if (req.body.logo_img) {
-      logo_image = req.files.logo_image;
-      if (isBase64(logo_image.data, { mimeRequired: true }))
-        logobuf = Buffer.from(
-          logo_image.data.replace(/^data:image\/\w+;base64,/, ""),
-          "base64"
-        );
+      buf = Buffer.from(
+        cover_image.data.replace(/^data:image\/\w+;base64,/, ""),
+        "base64"
+      );
     }
     if (logobuf && logo_image) {
       const key = `public/cover_images/outletvenues/${logo_image.name}`;
@@ -337,6 +347,7 @@ const createVenueMenu = async (req, res, next) => {
 
 const venuesController = {
   getVenues,
+  getUserVenues,
   getVenue,
   createVenue,
   createVenueMenu,

@@ -32,6 +32,23 @@ const getEvents = async (req, res, next) => {
   }
 };
 
+const getUserEvents = async (req, res, next) => {
+  try {
+    const { account_id } = req;
+    // Get brief
+    const events = await models.OutletEvent.query()
+      .withGraphFetched(`[menu]`)
+      .orderBy("created_at", "desc")
+      .where("account_id", account_id);
+
+    // Send the clientss
+    return res.status(200).send(events);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
+
 // GET - Get an specific event with an id
 const getEvent = async (req, res, next) => {
   try {
@@ -131,17 +148,15 @@ const createEvent = async (req, res, next) => {
       logobuf = logo_image.data;
     } else if (req.body.cover_image) {
       cover_image = req.body.cover_image;
+      logo_image = req.body.logo_img;
       buf = Buffer.from(
         cover_image.data.replace(/^data:image\/\w+;base64,/, ""),
         "base64"
       );
-    } else if (req.body.logo_img) {
-      logo_image = req.files.logo_image;
-      if (isBase64(logo_image.data, { mimeRequired: true }))
-        logobuf = Buffer.from(
-          logo_image.data.replace(/^data:image\/\w+;base64,/, ""),
-          "base64"
-        );
+      logobuf = Buffer.from(
+        logo_image.data.replace(/^data:image\/\w+;base64,/, ""),
+        "base64"
+      );
     }
 
     const key = `public/cover_images/outletevents/${cover_image.name}`;
@@ -209,27 +224,22 @@ const updateEvent = async (req, res, next) => {
     let buf, cover_image;
     let logobuf, logo_image;
     if (req.files) {
-      if (req.files.cover_image) {
-        cover_image = req.files.cover_image;
-        buf = cover_image.data;
-      } else {
-        logo_image = req.files.logo_img;
-        logobuf = logo_image.data;
-      }
+      cover_image = req.files.cover_image;
+      buf = cover_image.data;
+      logo_image = req.files.logo_img;
+      logobuf = logo_image.data;
+    } else if (req.body.logo_img) {
+      logo_image = req.body.logo_img;
+      logobuf = Buffer.from(
+        logo_image.data.replace(/^data:image\/\w+;base64,/, ""),
+        "base64"
+      );
     } else if (req.body.cover_image) {
       cover_image = req.body.cover_image;
-      if (isBase64(cover_image.data, { mimeRequired: true }))
-        buf = Buffer.from(
-          cover_image.data.replace(/^data:image\/\w+;base64,/, ""),
-          "base64"
-        );
-    } else if (req.body.logo_img) {
-      logo_image = req.files.logo_image;
-      if (isBase64(logo_image.data, { mimeRequired: true }))
-        logobuf = Buffer.from(
-          logo_image.data.replace(/^data:image\/\w+;base64,/, ""),
-          "base64"
-        );
+      buf = Buffer.from(
+        cover_image.data.replace(/^data:image\/\w+;base64,/, ""),
+        "base64"
+      );
     }
     if (logobuf && logo_image) {
       const key = `public/cover_images/outletevents/${logo_image.name}`;
@@ -360,6 +370,7 @@ const createEventMenu = async (req, res, next) => {
 
 const eventsController = {
   getEvents,
+  getUserEvents,
   getEvent,
   createEvent,
   createEventMenu,

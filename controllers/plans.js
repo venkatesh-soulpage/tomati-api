@@ -10,7 +10,7 @@ import _ from "lodash";
 const getplans = async (req, res, next) => {
   try {
     // Get brief
-    const plans = await models.Plan.query();
+    const plans = await models.Plan.query().orderBy("id", "asc");
 
     if (plans.length === 0) return res.status(400).send("No Plans Created Yet");
 

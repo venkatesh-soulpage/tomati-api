@@ -15,6 +15,16 @@ router.get(
   eventsController.getEvents
 );
 
+router.get(
+  "/user-events",
+  VerifyToken,
+  // VerifyRole([
+  //   { scope: "OUTLET", role: "MANAGER" },
+  //   { scope: "OUTLET", role: "OWNER" },
+  // ]),
+  eventsController.getUserEvents
+);
+
 router.post(
   "/",
   VerifyToken,

@@ -23,6 +23,25 @@ const twilio_client = twilio(
   process.env.TWILIO_ACCOUNT_SID,
   process.env.TWILIO_AUTH_TOKEN
 );
+const uploadImage = async (file_data) => {
+  const { key, buf } = file_data;
+
+  var data = {
+    Key: key,
+    Bucket: process.env.BUCKETEER_BUCKET_NAME,
+    Body: buf,
+    ContentEncoding: "base64",
+    ContentType: "image/png",
+  };
+  await s3.putObject(data, function (err, data) {
+    if (err) {
+      console.log(err);
+      console.log("Error uploading data: ", data);
+    } else {
+      console.log("successfully uploaded the image!", data);
+    }
+  });
+};
 
 // GET - Get user profile
 const getUser = async (req, res, next) => {
@@ -136,51 +155,38 @@ const userSignup = async (req, res, next) => {
       password_hash,
       plan_id,
       location_id,
-      code,
     } = req.body;
 
-    const verification = await twilio_client.verify
-      .services(process.env.TWILIO_VERIFY_SERVICE_SID)
-      .verificationChecks.create({ to: `${email}`, code })
-      .then((verification_check) => verification_check);
-
-    if (verification && verification.status === "approved") {
-      // Hash password
-      const salt = await bcrypt.genSalt(10);
-      password_hash = await bcrypt.hash(password_hash, salt);
-      const new_account = await models.Account.query().insert({
-        email: email,
-        first_name: full_name,
-        last_name: company_name,
-        password_hash: password_hash,
-        is_admin: false,
-        is_email_verified: true,
-        is_age_verified: false,
-        plan_id,
-        location_id,
-      });
-      const jwt_token = await jwt.sign(
-        {
-          id: new_account.id,
-          email: new_account.email,
-        },
-        process.env.SECRET_KEY,
-        { expiresIn: "3h" }
-      );
-      const refresh_token = await crypto.randomBytes(16).toString("hex");
-      await models.Account.query()
-        .where("id", new_account.id)
-        .update({ refresh_token });
-      return res
-        .status(200)
-        .json({ Status: true, Message: "Success", jwt_token, refresh_token })
-        .send();
-    } else {
-      return res
-        .status(400)
-        .json({ Status: false, Message: "Invalid OTP" })
-        .send();
-    }
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    password_hash = await bcrypt.hash(password_hash, salt);
+    const new_account = await models.Account.query().insert({
+      email: email,
+      first_name: full_name,
+      last_name: company_name,
+      password_hash: password_hash,
+      is_admin: false,
+      is_email_verified: true,
+      is_age_verified: false,
+      plan_id,
+      location_id,
+    });
+    const jwt_token = await jwt.sign(
+      {
+        id: new_account.id,
+        email: new_account.email,
+      },
+      process.env.SECRET_KEY,
+      { expiresIn: "3h" }
+    );
+    const refresh_token = await crypto.randomBytes(16).toString("hex");
+    await models.Account.query()
+      .where("id", new_account.id)
+      .update({ refresh_token });
+    return res
+      .status(200)
+      .json({ Status: true, Message: "Success", jwt_token, refresh_token })
+      .send();
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e)).send();
@@ -397,7 +403,7 @@ const waiterSignup = async (req, res, next) => {
       last_name,
       phone_number,
       password_hash,
-      is_admin: false,
+      is_admin: true,
       is_email_verified: true,
       is_age_verified: true,
       refresh_token,
@@ -1795,6 +1801,83 @@ const authWithFacebook = async (req, res, next) => {
     return res.status(500).json(JSON.stringify(e)).send();
   }
 };
+const updateProfile = async (req, res, next) => {
+  try {
+    const { account_id } = req;
+    const {
+      email,
+      first_name,
+      last_name,
+      current_password,
+      new_password,
+      plan_id,
+    } = req.body;
+    // Get the account
+    const account = await models.Account.query()
+      .where("id", account_id)
+      .first();
+
+    // Validate account
+    if (!account) return res.status(401).json("No account found").send();
+
+    if (current_password && new_password) {
+      const isCorrectPassword = await bcrypt.compareSync(
+        current_password,
+        account.password_hash
+      );
+
+      if (isCorrectPassword) {
+        // Hash password
+        const salt = await bcrypt.genSalt(10);
+        const password_hash = await bcrypt.hash(new_password, salt);
+        await models.Account.query()
+          .update({
+            password_hash,
+          })
+          .where("id", account_id);
+      } else {
+        return res
+          .status(401)
+          .json("Please Enter Valid Current Password")
+          .send();
+      }
+    }
+    let buf, profile_image;
+    if (req.files) {
+      profile_image = req.files.profile_image;
+      buf = profile_image.data;
+    } else if (req.body.profile_image) {
+      profile_image = req.body.profile_image;
+      buf = Buffer.from(
+        profile_image.data.replace(/^data:image\/\w+;base64,/, ""),
+        "base64"
+      );
+    }
+    if (buf && profile_image) {
+      const key = `public/cover_images/outletvenues/${profile_image.name}`;
+      uploadImage({ key, buf });
+      await models.Account.query()
+        .update({
+          profile_img: `https://s3.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
+        })
+        .where("id", account_id);
+    }
+
+    await models.Account.query()
+      .update({
+        first_name,
+        last_name,
+        email,
+        plan_id,
+      })
+      .where("id", account_id);
+
+    return res.status(200).json("Profile Updated Successfully");
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
 
 const userController = {
   // User
@@ -1815,6 +1898,7 @@ const userController = {
   reset,
   verifyCredentals,
   userSignup,
+  updateProfile,
   // OAuth
   authWithFacebook,
   inviteOutletManager,

@@ -75,6 +75,9 @@ router.post("/tomati-forgot", accountController.tomatiforgot);
 /* POST Reset Password */
 router.post("/reset", accountController.reset);
 
+/* POST Reset Password */
+router.post("/reset-profile", VerifyToken, accountController.updateProfile);
+
 /* POST Facebook OAuth */
 router.post("/facebook-oauth", accountController.authWithFacebook);
 
