@@ -224,27 +224,22 @@ const updateEvent = async (req, res, next) => {
     let buf, cover_image;
     let logobuf, logo_image;
     if (req.files) {
-      if (req.files.cover_image) {
-        cover_image = req.files.cover_image;
-        buf = cover_image.data;
-      } else {
-        logo_image = req.files.logo_img;
-        logobuf = logo_image.data;
-      }
+      cover_image = req.files.cover_image;
+      buf = cover_image.data;
+      logo_image = req.files.logo_img;
+      logobuf = logo_image.data;
+    } else if (req.body.logo_img) {
+      logo_image = req.body.logo_img;
+      logobuf = Buffer.from(
+        logo_image.data.replace(/^data:image\/\w+;base64,/, ""),
+        "base64"
+      );
     } else if (req.body.cover_image) {
       cover_image = req.body.cover_image;
-      if (isBase64(cover_image.data, { mimeRequired: true }))
-        buf = Buffer.from(
-          cover_image.data.replace(/^data:image\/\w+;base64,/, ""),
-          "base64"
-        );
-    } else if (req.body.logo_img) {
-      logo_image = req.files.logo_image;
-      if (isBase64(logo_image.data, { mimeRequired: true }))
-        logobuf = Buffer.from(
-          logo_image.data.replace(/^data:image\/\w+;base64,/, ""),
-          "base64"
-        );
+      buf = Buffer.from(
+        cover_image.data.replace(/^data:image\/\w+;base64,/, ""),
+        "base64"
+      );
     }
     if (logobuf && logo_image) {
       const key = `public/cover_images/outletevents/${logo_image.name}`;
