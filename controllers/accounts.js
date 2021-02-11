@@ -156,7 +156,9 @@ const userSignup = async (req, res, next) => {
       plan_id,
       location_id,
     } = req.body;
-
+    const account = await models.Account.query().where("email", email).first();
+    console.log(account);
+    if (account) return res.status(404).json("User Already Exists").send();
     // Hash password
     const salt = await bcrypt.genSalt(10);
     password_hash = await bcrypt.hash(password_hash, salt);

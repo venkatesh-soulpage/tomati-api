@@ -47,7 +47,7 @@ router.post(
 
 router.get(
   "/:outlet_event_id",
-  VerifyToken,
+  // VerifyToken,
   // VerifyRole([
   //   { scope: "OUTLET", role: "MANAGER" },
   //   { scope: "OUTLET", role: "OWNER" },
