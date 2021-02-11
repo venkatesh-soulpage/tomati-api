@@ -17,7 +17,7 @@ router.get(
 
 router.get(
   "/user-events",
-  // VerifyToken,
+  VerifyToken,
   // VerifyRole([
   //   { scope: "OUTLET", role: "MANAGER" },
   //   { scope: "OUTLET", role: "OWNER" },
