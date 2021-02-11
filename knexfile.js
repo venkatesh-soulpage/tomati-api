@@ -6,7 +6,7 @@ module.exports = {
 
   development: {
     client: 'pg',
-    connection: `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`,
+    connection: `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}?ssl=true`,
     migrations: {
       directory: './data/migrations',
     },
@@ -25,7 +25,7 @@ module.exports = {
   },
   production: {
     client: 'pg',
-    connection: `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`,
+    connection: `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}?ssl=true`,
     migrations: {
       directory: './data/migrations',
     },
