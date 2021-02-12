@@ -128,7 +128,7 @@ const createVenue = async (req, res, next) => {
     );
     if (
       account[0].plan[0] !== undefined &&
-      venues_of_account_holder.length >= account[0].plan[0].outlet_limit
+      venues_of_account_holder.length >= account[0].no_of_outlets
     ) {
       return res
         .status(400)
