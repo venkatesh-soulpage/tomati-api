@@ -24,6 +24,7 @@
     "reset_wallet": "knex seed:run --specific=reset_wallet_data.js",
     "populate_countries": "knex seed:run --specific=initial_locations.js",
     "populate_roles": "knex seed:run --specific=roles.js",
+    "populate_plans": "knex seed:run --specific=plans.js",
     "populate_all": "npm run populate_organizations && npm run populate_products && npm run populate_warehouses &&  npm run populate_briefs && npm run populate_requisitions && npm run populate_events && npm run populate_wallet",
     "reset_all": "npm run reset_wallet && npm run reset_events && npm run reset_requisitions && npm run reset_briefs && npm run reset_warehouses && npm run reset_products && npm run reset_organizations"
   },
