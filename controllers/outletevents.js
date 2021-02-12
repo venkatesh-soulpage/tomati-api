@@ -132,7 +132,7 @@ const createEvent = async (req, res, next) => {
     );
     if (
       account[0].plan[0] !== undefined &&
-      venues_of_account_holder.length >= account[0].plan[0].event_limit
+      venues_of_account_holder.length >= account[0].no_of_events
     ) {
       return res
         .status(400)
@@ -360,7 +360,7 @@ const createEventMenu = async (req, res, next) => {
     return res.status(201).json({
       Status: true,
       event: new_event,
-      Message: "Event Created Successfully",
+      Message: "Event Menu Created Successfully",
     });
   } catch (e) {
     console.log(e);

@@ -155,6 +155,10 @@ const userSignup = async (req, res, next) => {
       password_hash,
       plan_id,
       location_id,
+      no_of_outlets,
+      no_of_events,
+      no_of_users,
+      no_of_qrcodes,
     } = req.body;
     const account = await models.Account.query().where("email", email).first();
     console.log(account);
@@ -172,6 +176,10 @@ const userSignup = async (req, res, next) => {
       is_age_verified: false,
       plan_id,
       location_id,
+      no_of_outlets,
+      no_of_events,
+      no_of_users,
+      no_of_qrcodes,
     });
     const jwt_token = await jwt.sign(
       {
