@@ -382,7 +382,6 @@ const checkVerificationEMAIL = async (req, res, next) => {
   try {
     const { account_id } = req;
     const { code, email } = req.body;
-
     const verification = await twilio_client.verify
       .services(process.env.TWILIO_VERIFY_SERVICE_SID)
       .verificationChecks.create({ to: `${email}`, code })
