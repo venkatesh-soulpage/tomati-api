@@ -50,6 +50,7 @@ import OrderInfo from "./order_info";
 import Statistics from "./statistics";
 import tempOutletRegistrations from "./temp_registrations";
 import Plan from "./plans";
+import Discount from "./discount";
 
 export default {
   Location,
@@ -104,4 +105,5 @@ export default {
   Statistics,
   tempOutletRegistrations,
   Plan,
+  Discount,
 };
