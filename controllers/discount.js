@@ -40,9 +40,30 @@ const postDiscounts = async (req, res, next) => {
   }
 };
 
+const getDiscount = async (req, res, next) => {
+  try {
+    const { discount_code } = req.body;
+    if (!discount_code) {
+      return res.status(400).send("Invalid discount code");
+    }
+    const discountDetails = await models.Discount.query().findOne(
+      "discount_code",
+      discount_code
+    );
+    if (discountDetails) {
+      return res.status(200).send(discountDetails);
+    }
+    return res.status(400).send("Couldn't find the discount code");
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
+
 const planController = {
   getDiscounts,
   postDiscounts,
+  getDiscount,
 };
 
 export default planController;

@@ -8,5 +8,6 @@ import VerifyRole from "../utils/verification_role";
 /* GET - Get a list of client organizations */
 router.get("/", discountController.getDiscounts);
 router.post("/post-discount", VerifyToken, discountController.postDiscounts);
+router.post("/discount-value", discountController.getDiscount);
 
 module.exports = router;
