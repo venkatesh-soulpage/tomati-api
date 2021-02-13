@@ -16,3 +16,6 @@ yarn-error.log
 .env.prod
 
 *.dump
+
+yarn.lock
+package-lock.json
