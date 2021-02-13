@@ -130,16 +130,16 @@ const createEvent = async (req, res, next) => {
       "account_id",
       account_id
     );
-    if (
-      account[0].plan[0] !== undefined &&
-      venues_of_account_holder.length >= account[0].no_of_events
-    ) {
-      return res
-        .status(400)
-        .json(
-          "Failed to create venue.Upgrade to Preminum to create more venues"
-        );
-    }
+    // if (
+    //   account[0].plan[0] !== undefined &&
+    //   venues_of_account_holder.length >= account[0].no_of_events
+    // ) {
+    //   return res
+    //     .status(400)
+    //     .json(
+    //       "Failed to create venue.Upgrade to Preminum to create more venues"
+    //     );
+    // }
 
     if (req.files) {
       cover_image = req.files.cover_image;
