@@ -37,6 +37,7 @@ var tomatiRegistrationsRoute = require("./routes/TomatiRegistrations.js");
 var plansRoute = require("./routes/plans");
 var subscriptionsRoute = require("./routes/subscription");
 var discountRoute = require("./routes/discount");
+var paymentRoute = require("./routes/payment");
 
 var app = express();
 
@@ -90,6 +91,7 @@ app.use("/api/tomati/registrations", tomatiRegistrationsRoute);
 app.use("/api/plans", plansRoute);
 app.use("/api/subscriptions", subscriptionsRoute);
 app.use("/api/discounts", discountRoute);
+app.use("/api/payment", paymentRoute);
 
 // check
 // catch 404 and forward to error handler

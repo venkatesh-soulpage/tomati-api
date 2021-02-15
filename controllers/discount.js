@@ -16,7 +16,7 @@ const getDiscounts = async (req, res, next) => {
       return res.status(400).send("No discounts at present");
 
     // Send the clientss
-    return res.status(200).send(discounts);
+    return res.status(200).json(discounts);
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e));
@@ -26,14 +26,15 @@ const getDiscounts = async (req, res, next) => {
 const postDiscounts = async (req, res, next) => {
   try {
     const { account_id } = req;
-    const account = await models.Account.query().where("id", account_id);
-
-    if (account[0].is_admin) {
-      const { data } = req.body;
-      const insertedDiscounts = await models.Discount.query().insert(data);
-      return res.status(200).send("Inserted Successfully");
+    const account = await models.Account.query().findOne("id", account_id);
+    if (!account || !"is_admin" in account) {
+      return res
+        .status(400)
+        .send("This user has no privilege to add discounts");
     }
-    return res.status(400).send("This user has no privilege to add discounts");
+    const { data } = req.body;
+    const insertedDiscounts = await models.Discount.query().insert(data);
+    return res.status(200).send("Inserted Successfully");
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e));
