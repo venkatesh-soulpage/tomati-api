@@ -6,7 +6,7 @@ exports.seed = function (knex) {
       // Inserts seed entries
       return knex("plans").insert([
         {
-          plan: "starter-monthly",
+          plan: "starter",
           outlet_limit: 1,
           event_limit: 4,
           subscription_type: "monthly",
@@ -42,19 +42,6 @@ exports.seed = function (knex) {
           event_addon_price: 16,
           user_addon_price: 2,
           user_limit: 50,
-          qr_tags_limit: 0,
-        },
-        {
-          plan: "starter-yearly",
-          outlet_limit: 1,
-          event_limit: 4,
-          subscription_type: "yearly",
-          price: 0,
-          outlet_addon_price: 25,
-          qr_tags_addon_price: 7,
-          event_addon_price: 25,
-          user_addon_price: 3,
-          user_limit: 10,
           qr_tags_limit: 0,
         },
         {
