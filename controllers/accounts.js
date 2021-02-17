@@ -163,6 +163,7 @@ const userSignup = async (req, res, next) => {
       no_of_users,
       no_of_qrcodes,
       is_notifications_permited,
+      transaction_id,
     } = req.body;
     const account = await models.Account.query().where("email", email).first();
     console.log(account);
@@ -188,6 +189,7 @@ const userSignup = async (req, res, next) => {
       no_of_users,
       no_of_qrcodes,
       is_notifications_permited,
+      transaction_id,
     });
     const jwt_token = await jwt.sign(
       {
@@ -1829,6 +1831,11 @@ const updateProfile = async (req, res, next) => {
       current_password,
       new_password,
       plan_id,
+      no_of_outlets,
+      no_of_qrcodes,
+      no_of_users,
+      no_of_events,
+      transaction_id,
     } = req.body;
     // Get the account
     const account = await models.Account.query()
@@ -1887,6 +1894,11 @@ const updateProfile = async (req, res, next) => {
         last_name,
         email,
         plan_id,
+        no_of_outlets,
+        no_of_qrcodes,
+        no_of_users,
+        no_of_events,
+        transaction_id,
       })
       .where("id", account_id);
 
