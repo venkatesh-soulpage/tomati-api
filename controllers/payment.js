@@ -14,6 +14,7 @@ const makePayment = async (req, res, next) => {
       first_name,
       last_name,
       plan,
+      addons,
       email,
       address,
       city,
@@ -28,9 +29,7 @@ const makePayment = async (req, res, next) => {
         subscription: {
           plan_id: plan,
         },
-        customer: {
-          id: "cbdemo_sir",
-        },
+        addons,
       })
       .request(function (error, result) {
         if (error) {
