@@ -17,6 +17,7 @@ exports.seed = function (knex) {
           user_addon_price: 3,
           user_limit: 5,
           qr_tags_limit: 0,
+          chargebee_plan_id: "tomati-starter-",
         },
         {
           plan: "growth-monthly",
@@ -30,6 +31,7 @@ exports.seed = function (knex) {
           user_addon_price: 2,
           user_limit: 15,
           qr_tags_limit: 0,
+          chargebee_plan_id: "tomati-growth",
         },
         {
           plan: "premium-monthly",
@@ -43,6 +45,7 @@ exports.seed = function (knex) {
           user_addon_price: 2,
           user_limit: 50,
           qr_tags_limit: 0,
+          chargebee_plan_id: "",
         },
         {
           plan: "growth-yearly",
@@ -56,6 +59,7 @@ exports.seed = function (knex) {
           user_addon_price: 2,
           user_limit: 35,
           qr_tags_limit: 0,
+          chargebee_plan_id: "",
         },
         {
           plan: "premium-yearly",
@@ -69,6 +73,7 @@ exports.seed = function (knex) {
           user_addon_price: 2,
           user_limit: 50,
           qr_tags_limit: 0,
+          chargebee_plan_id: "",
         },
       ]);
     });
