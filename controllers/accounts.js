@@ -17,6 +17,7 @@ import {
   outletInviteEmail,
   outletInviteWaiterEmail,
   sendFotgotPasswordEmailTomati,
+  outletInvitecollaboratorEmail,
 } from "./mailling";
 
 const twilio_client = twilio(
