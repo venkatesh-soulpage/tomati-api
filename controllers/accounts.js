@@ -17,6 +17,7 @@ import {
   outletInviteEmail,
   outletInviteWaiterEmail,
   sendFotgotPasswordEmailTomati,
+  outletInvitecollaboratorEmail,
 } from "./mailling";
 
 const twilio_client = twilio(
@@ -662,6 +663,78 @@ const inviteOutletManager = async (req, res, next) => {
       new_token,
       { scope: "OUTLET", name: "MANAGER" },
       { name: display_name, custom_message, host }
+    );
+
+    // Add collaborator invitation
+    let invitation_expiration_date = new Date();
+    invitation_expiration_date.setHours(
+      invitation_expiration_date.getHours() + 1
+    ); // Default expiration time to 1 hour.
+    await models.CollaboratorInvitation.query().insert({
+      role_id: role.id,
+      email: owner_email,
+      expiration_date: invitation_expiration_date,
+    });
+
+    return res.status(201).json("Invitation successfull").send();
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e)).send();
+  }
+};
+
+// POST - Invite a new regional organization
+const invitecollaborator = async (req, res, next) => {
+  try {
+    /* Todo add client organization logic */
+    const {
+      owner_email,
+      display_name,
+      custom_message,
+      outlet_venue,
+      outlet_event,
+    } = req.body;
+
+    // Validate that the client hasn't been registered on the platform
+    const client_account = await models.Account.query()
+      .where("email", owner_email)
+      .first();
+    if (client_account)
+      return res
+        .status(400)
+        .json("An account already exists with this email address")
+        .send();
+
+    // Create new token to validate owner email
+    const role = await models.Role.query()
+      .where("scope", "OUTLET")
+      .where("name", "WAITER")
+      .first();
+
+    // Sign jwt
+    const token = await jwt.sign(
+      {
+        role_id: role.id,
+        scope: role.scope,
+        name: role.name,
+      },
+      process.env.SECRET_KEY
+    );
+
+    const new_token = await models.Token.query().insert({
+      email: owner_email,
+      token,
+    });
+
+    // send invite email
+    const host = { first_name: "LiquidIntel", last_name: "Team" };
+    await outletInvitecollaboratorEmail(
+      owner_email,
+      new_token,
+      { scope: "OUTLET", name: "WAITER" },
+      { name: display_name, custom_message, host },
+      outlet_venue,
+      outlet_event
     );
 
     // Add collaborator invitation
@@ -1936,6 +2009,7 @@ const userController = {
   waiterSignup,
   inviteOutletWaiter,
   tomatiforgot,
+  invitecollaborator,
 };
 
 export default userController;
