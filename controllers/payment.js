@@ -8,6 +8,11 @@ var chargebee = require("chargebee");
 
 import _, { result } from "lodash";
 
+chargebee.configure({
+  site: `${process.env.CHARGEBEE_SITE}`,
+  api_key: `${process.env.CHARGEBEE_API_KEY}`,
+});
+
 const makePayment = async (req, res, next) => {
   try {
     const { plan, addons, customer } = req.body;
@@ -28,6 +33,7 @@ const makePayment = async (req, res, next) => {
           //handle error
           console.log(error);
         } else {
+          console.log(result, "RESULT");
           res.send(result.hosted_page);
         }
       });
@@ -40,10 +46,7 @@ const makePayment = async (req, res, next) => {
 const updateSubscription = async (req, res, next) => {
   try {
     const { subscription_id, addons, plan_id } = req.body;
-    chargebee.configure({
-      site: `${process.env.CHARGEBEE_SITE}`,
-      api_key: `${process.env.CHARGEBEE_API_KEY}`,
-    });
+
     chargebee.subscription
       .update(subscription_id, {
         plan_id,
@@ -74,9 +77,31 @@ const updateSubscription = async (req, res, next) => {
   }
 };
 
+const retriveSubscriptionByHostedId = async (req, res, next) => {
+  try {
+    const { hostedPageId } = req.body;
+    chargebee.hosted_page
+      .retrieve(hostedPageId)
+      .request(function (error, result) {
+        if (error) {
+          //handle error
+          console.log(error);
+        } else {
+          // console.log(result, "HOSTED PAGE RESULT");
+          var hosted_page = result.hosted_page;
+          return res.status(200).json(result);
+        }
+      });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
+
 const paymentController = {
   makePayment,
   updateSubscription,
+  retriveSubscriptionByHostedId,
 };
 
 export default paymentController;
