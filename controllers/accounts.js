@@ -1956,7 +1956,7 @@ const updateProfile = async (req, res, next) => {
       uploadImage({ key, buf });
       await models.Account.query()
         .update({
-          profile_img: `https://s3.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
+          profile_img: `https://s3.${BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
         })
         .where("id", account_id);
     }
