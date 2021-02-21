@@ -15,7 +15,18 @@ chargebee.configure({
 
 const makePayment = async (req, res, next) => {
   try {
-    const { plan, addons, customer } = req.body;
+    const {
+      first_name,
+      last_name,
+      plan,
+      addons,
+      customer,
+      coupon,
+      email,
+      address,
+      city,
+      state,
+    } = req.body;
     chargebee.configure({
       site: `${process.env.CHARGEBEE_SITE}`,
       api_key: `${process.env.CHARGEBEE_API_KEY}`,
@@ -27,6 +38,7 @@ const makePayment = async (req, res, next) => {
         },
         addons,
         customer,
+        coupon_ids: coupon,
       })
       .request(function (error, result) {
         if (error) {

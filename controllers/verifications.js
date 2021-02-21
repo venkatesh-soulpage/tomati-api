@@ -374,6 +374,9 @@ const getVerificationEMAIL = async (req, res, next) => {
     }
   } catch (e) {
     console.log(e);
+    if (e.status === 429) {
+      return res.status(400).json("Max send attempts reached").send();
+    }
     return res.status(500).json(JSON.stringify(e)).send();
   }
 };
@@ -394,7 +397,14 @@ const checkVerificationEMAIL = async (req, res, next) => {
     }
   } catch (e) {
     console.log(e);
-    return res.status(500).json(JSON.stringify(e)).send();
+    if (e.status === 404 && e.code === 20404) {
+      return res
+        .status(400)
+        .json("Already Verified/Email and Otp doesn't match.")
+        .send();
+    } else if (e.status === 400 && e.code === 60200) {
+      return res.status(400).json("Invalid code").send();
+    }
   }
 };
 
