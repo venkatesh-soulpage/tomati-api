@@ -49,6 +49,7 @@ router.post("/resend-verification", accountController.resendToken);
 /* POST Outlet Manager invitation */
 router.post("/invite-outlet-manager", accountController.inviteOutletManager);
 router.post("/invite-outlet-waiter", accountController.inviteOutletWaiter);
+router.post("/invite-collaborator", accountController.invitecollaborator);
 
 /* POST Resend the verification email */
 router.post(

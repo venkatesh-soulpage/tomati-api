@@ -8,6 +8,11 @@ var chargebee = require("chargebee");
 
 import _, { result } from "lodash";
 
+chargebee.configure({
+  site: `${process.env.CHARGEBEE_SITE}`,
+  api_key: `${process.env.CHARGEBEE_API_KEY}`,
+});
+
 const makePayment = async (req, res, next) => {
   try {
     const {
@@ -40,7 +45,63 @@ const makePayment = async (req, res, next) => {
           //handle error
           console.log(error);
         } else {
+          console.log(result, "RESULT");
           res.send(result.hosted_page);
+        }
+      });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
+
+const updateSubscription = async (req, res, next) => {
+  try {
+    const { subscription_id, addons, plan_id } = req.body;
+
+    chargebee.subscription
+      .update(subscription_id, {
+        plan_id,
+        // end_of_term: true,
+        addons,
+      })
+      .request(function (error, result) {
+        if (error) {
+          //handle error
+          console.log(error);
+        } else {
+          // console.log(result);
+          var subscription = result.subscription;
+          var customer = result.customer;
+          var card = result.card;
+          var invoice = result.invoice;
+          var unbilled_charges = result.unbilled_charges;
+          var credit_notes = result.credit_notes;
+          res.status(200).json({
+            status: true,
+            Message: "Subscription Updated Successfully",
+          });
+        }
+      });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
+
+const retriveSubscriptionByHostedId = async (req, res, next) => {
+  try {
+    const { hostedPageId } = req.body;
+    chargebee.hosted_page
+      .retrieve(hostedPageId)
+      .request(function (error, result) {
+        if (error) {
+          //handle error
+          console.log(error);
+        } else {
+          // console.log(result, "HOSTED PAGE RESULT");
+          var hosted_page = result.hosted_page;
+          return res.status(200).json(result);
         }
       });
   } catch (e) {
@@ -51,6 +112,8 @@ const makePayment = async (req, res, next) => {
 
 const paymentController = {
   makePayment,
+  updateSubscription,
+  retriveSubscriptionByHostedId,
 };
 
 export default paymentController;

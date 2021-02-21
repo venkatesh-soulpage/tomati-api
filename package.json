@@ -28,9 +28,6 @@
     "populate_all": "npm run populate_organizations && npm run populate_products && npm run populate_warehouses &&  npm run populate_briefs && npm run populate_requisitions && npm run populate_events && npm run populate_wallet",
     "reset_all": "npm run reset_wallet && npm run reset_events && npm run reset_requisitions && npm run reset_briefs && npm run reset_warehouses && npm run reset_products && npm run reset_organizations"
   },
-  "engines": {
-    "node": "12.x"
-  },
   "dependencies": {
     "@octokit/auth-app": "^2.4.2",
     "aws-sdk": "^2.667.0",
