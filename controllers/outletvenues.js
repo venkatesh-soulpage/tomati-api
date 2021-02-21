@@ -168,8 +168,8 @@ const createVenue = async (req, res, next) => {
       account_id,
       location_id,
       description,
-      cover_image: `https://s3.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
-      logo_img: `https://s3.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key2}`,
+      cover_image: `https://s3.${BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
+      logo_img: `https://s3.${BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key2}`,
     });
 
     // Send the clients
@@ -234,7 +234,7 @@ const updateVenue = async (req, res, next) => {
       uploadImage({ key, buf: logobuf });
       await models.OutletVenue.query()
         .update({
-          logo_img: `https://s3.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
+          logo_img: `https://s3.${BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
         })
         .where("id", outlet_venue_id);
     }
@@ -243,7 +243,7 @@ const updateVenue = async (req, res, next) => {
       uploadImage({ key, buf });
       await models.OutletVenue.query()
         .update({
-          cover_image: `https://s3.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
+          cover_image: `https://s3.${BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
         })
         .where("id", outlet_venue_id);
     }
@@ -309,7 +309,7 @@ const generateQRCode = async (outlet_venue_id) => {
 
   await models.OutletVenue.query()
     .update({
-      menu_link: `https://s3.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
+      menu_link: `https://s3.${BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
     })
     .where({ id: outlet_venue_id });
 };
