@@ -16,6 +16,7 @@ const makePayment = async (req, res, next) => {
       plan,
       addons,
       customer,
+      coupon,
       email,
       address,
       city,
@@ -32,6 +33,7 @@ const makePayment = async (req, res, next) => {
         },
         addons,
         customer,
+        coupon_ids: coupon,
       })
       .request(function (error, result) {
         if (error) {
