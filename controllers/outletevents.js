@@ -12,9 +12,7 @@ const isBase64 = require("is-base64");
 
 // Inititialize AWS
 const s3 = new AWS.S3({
-  accessKeyId: process.env.BUCKETEER_AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.BUCKETEER_AWS_SECRET_ACCESS_KEY,
-  region: process.env.BUCKETEER_AWS_REGION,
+  region:process.env.BUCKETEER_AWS_REGION,
 });
 
 const getEvents = async (req, res, next) => {
@@ -177,8 +175,8 @@ const createEvent = async (req, res, next) => {
       account_id,
       address,
       description,
-      cover_image: `https://s3.${BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
-      logo_img: `https://s3.${BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key2}`,
+      cover_image: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
+      logo_img: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key2}`,
     });
 
     // Send the clients
@@ -246,7 +244,7 @@ const updateEvent = async (req, res, next) => {
       uploadImage({ key, buf: logobuf });
       await models.OutletVenue.query()
         .update({
-          logo_img: `https://s3.${BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
+          logo_img: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
         })
         .where("id", outlet_event_id);
     }
@@ -255,7 +253,7 @@ const updateEvent = async (req, res, next) => {
       uploadImage({ key, buf });
       await models.OutletEvent.query()
         .update({
-          cover_image: `https://s3.${BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
+          cover_image: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
         })
         .where("id", outlet_event_id);
     }
@@ -327,7 +325,7 @@ const generateQRCode = async (outlet_event_id) => {
 
   await models.OutletEvent.query()
     .update({
-      menu_link: `https://s3.${BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
+      menu_link: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
     })
     .where({ id: outlet_event_id });
 };
