@@ -110,10 +110,34 @@ const retriveSubscriptionByHostedId = async (req, res, next) => {
   }
 };
 
+const retriveCoupon = async (req, res, next) => {
+  try {
+    const { couponId } = req.body;
+    if (!couponId || req.body) {
+      return res.status(400).send("Enter valid coupon");
+    }
+    chargebee.coupon.retrieve(couponId).request(function (error, result) {
+      if (error) {
+        //handle error
+        console.log(error);
+        return res.status(400).send(error.message);
+      } else {
+        console.log(result);
+        var coupon = result.coupon;
+        return res.status(200).json(coupon);
+      }
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
+
 const paymentController = {
   makePayment,
   updateSubscription,
   retriveSubscriptionByHostedId,
+  retriveCoupon,
 };
 
 export default paymentController;

@@ -11,5 +11,6 @@ router.post(
   "/retrive-subscription",
   paymentController.retriveSubscriptionByHostedId
 );
+router.post("/get-coupon", paymentController.retriveCoupon);
 
 module.exports = router;
