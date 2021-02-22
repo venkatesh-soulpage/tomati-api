@@ -113,7 +113,7 @@ const retriveSubscriptionByHostedId = async (req, res, next) => {
 const retriveCoupon = async (req, res, next) => {
   try {
     const { couponId } = req.body;
-    if (!couponId || req.body) {
+    if (!couponId || !req.body) {
       return res.status(400).send("Enter valid coupon");
     }
     chargebee.coupon.retrieve(couponId).request(function (error, result) {
