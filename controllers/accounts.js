@@ -165,6 +165,7 @@ const userSignup = async (req, res, next) => {
       no_of_qrcodes,
       is_notifications_permited,
       transaction_id,
+      extra_location,
     } = req.body;
     const account = await models.Account.query().where("email", email).first();
     console.log(account);
@@ -191,6 +192,7 @@ const userSignup = async (req, res, next) => {
       no_of_qrcodes,
       is_notifications_permited,
       transaction_id,
+      extra_location,
     });
     const jwt_token = await jwt.sign(
       {
