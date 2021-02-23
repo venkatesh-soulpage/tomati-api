@@ -205,7 +205,7 @@ const sendFotgotPasswordEmailTomati = (user, token) => {
   const email = new Email({
     message: {
       from: process.env.FROM_EMAIL,
-      subject: "LiquidIntel - Password reset",
+      subject: "Tomati - Password reset",
     },
     send: true,
     transport: transporter,
@@ -219,7 +219,7 @@ const sendFotgotPasswordEmailTomati = (user, token) => {
       },
       locals: {
         email: user.email,
-        resetUrl: `${process.env.SCHEMA}://${process.env.FRONT_HOST}:${process.env.APP_PORT}/reset?email=${user.email}&token=${token}`,
+        resetUrl: `${process.env.SCHEMA}://${process.env.FRONT_END_TOMATI_HOST}:${process.env.FRONT_END_TOMATI_PORT}/reset?email=${user.email}&token=${token}`,
       },
     })
     .then(/* console.log */)
