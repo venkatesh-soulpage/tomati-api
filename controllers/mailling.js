@@ -213,7 +213,7 @@ const sendFotgotPasswordEmailTomati = (user, token) => {
 
   email
     .send({
-      template: "forgot",
+      template: "tomati-forgot",
       message: {
         to: user.email,
       },
@@ -414,7 +414,7 @@ const outletInvitecollaboratorEmail = (
   const email = new Email({
     message: {
       from: process.env.FROM_EMAIL,
-      subject: "Welcome to LiquidIntel",
+      subject: "Welcome to Tomati",
     },
     send: true,
     transport: transporter,
@@ -426,7 +426,7 @@ const outletInvitecollaboratorEmail = (
 
   email
     .send({
-      template: "invite_waiter",
+      template: "invite_collaborator",
       message: {
         to: account_email,
       },
