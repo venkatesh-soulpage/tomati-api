@@ -1918,13 +1918,10 @@ const updateProfile = async (req, res, next) => {
       no_of_events,
       transaction_id,
     } = req.body;
-
-    console.log(account_id, "ACCOUNT ID");
     // Get the account
     const account = await models.Account.query()
       .where("id", account_id)
       .first();
-    console.log(account, "ACCOUNT");
     // Validate account
     if (!account) return res.status(401).json("No account found").send();
 
