@@ -2,8 +2,6 @@ FROM node:14
 
 ENV PORT 3000
 
-ENV DEBIAN_FRONTEND=noninteractive
-
 # installing Postgresql client
 RUN apt-get update && \
     apt-get install -y postgresql-client
