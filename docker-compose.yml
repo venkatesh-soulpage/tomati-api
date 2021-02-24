@@ -1,6 +1,20 @@
-version: '3.3'
+version: "3.3"
 
 services:
+  database:
+    # We use the predefined Postgres image
+    image: postgres:11
+    environment:
+      # Set user/password for Postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: "tomati"
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+      # Set a path where Postgres should store the data
+      PGDATA: /var/lib/postgresql/data/pgdata
+    restart: always
+    volumes:
+      - dbdata:/var/lib/postgresql/data
   wallet:
     build:
       context: .
@@ -8,4 +22,9 @@ services:
       - .env
     ports:
       - 80:3000
+    depends_on:
+      # The db container needs to be started before we start this container
+      - database
     command: npm start
+volumes:
+  dbdata:

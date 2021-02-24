@@ -2,6 +2,12 @@ FROM node:14
 
 ENV PORT 3000
 
+ENV DEBIAN_FRONTEND=noninteractive
+
+# installing Postgresql client
+RUN apt-get update && \
+    apt-get install -y postgresql-client
+
 # Create app directory
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
