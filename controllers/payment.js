@@ -22,6 +22,7 @@ const makePayment = async (req, res, next) => {
       addons,
       customer,
       coupon,
+      billing_address,
       email,
       address,
       city,
@@ -39,6 +40,7 @@ const makePayment = async (req, res, next) => {
         addons,
         customer,
         coupon_ids: coupon,
+        billing_address,
       })
       .request(function (error, result) {
         if (error) {

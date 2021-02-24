@@ -205,7 +205,7 @@ const sendFotgotPasswordEmailTomati = (user, token) => {
   const email = new Email({
     message: {
       from: process.env.FROM_EMAIL,
-      subject: "LiquidIntel - Password reset",
+      subject: "Tomati - Password reset",
     },
     send: true,
     transport: transporter,
@@ -213,13 +213,13 @@ const sendFotgotPasswordEmailTomati = (user, token) => {
 
   email
     .send({
-      template: "forgot",
+      template: "tomati-forgot",
       message: {
         to: user.email,
       },
       locals: {
         email: user.email,
-        resetUrl: `${process.env.SCHEMA}://${process.env.FRONT_HOST}:${process.env.APP_PORT}/reset?email=${user.email}&token=${token}`,
+        resetUrl: `${process.env.SCHEMA}://${process.env.FRONT_END_TOMATI_HOST}:${process.env.FRONT_END_TOMATI_PORT}/reset?email=${user.email}&token=${token}`,
       },
     })
     .then(/* console.log */)
@@ -414,7 +414,7 @@ const outletInvitecollaboratorEmail = (
   const email = new Email({
     message: {
       from: process.env.FROM_EMAIL,
-      subject: "Welcome to LiquidIntel",
+      subject: "Welcome to Tomati",
     },
     send: true,
     transport: transporter,
@@ -426,7 +426,7 @@ const outletInvitecollaboratorEmail = (
 
   email
     .send({
-      template: "invite_waiter",
+      template: "invite_collaborator",
       message: {
         to: account_email,
       },
