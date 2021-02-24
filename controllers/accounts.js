@@ -7,6 +7,7 @@ import fetch from "node-fetch";
 import queryString from "query-string";
 import moment from "moment";
 import twilio from "twilio";
+import AWS from "aws-sdk";
 
 import {
   sendConfirmationEmail,
@@ -19,6 +20,11 @@ import {
   sendFotgotPasswordEmailTomati,
   outletInvitecollaboratorEmail,
 } from "./mailling";
+
+// Inititialize AWS
+const s3 = new AWS.S3({
+  region: process.env.BUCKETEER_AWS_REGION,
+});
 
 const twilio_client = twilio(
   process.env.TWILIO_ACCOUNT_SID,
@@ -1916,7 +1922,6 @@ const updateProfile = async (req, res, next) => {
     const account = await models.Account.query()
       .where("id", account_id)
       .first();
-
     // Validate account
     if (!account) return res.status(401).json("No account found").send();
 
@@ -1958,7 +1963,7 @@ const updateProfile = async (req, res, next) => {
       uploadImage({ key, buf });
       await models.Account.query()
         .update({
-          profile_img: `https://s3.${BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
+          profile_img: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
         })
         .where("id", account_id);
     }
