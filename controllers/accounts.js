@@ -174,11 +174,11 @@ const userSignup = async (req, res, next) => {
       extra_location,
     } = req.body;
     const account = await models.Account.query().where("email", email).first();
-    console.log(account);
     if (account) return res.status(404).json("User Already Exists").send();
     // Hash password
     const salt = await bcrypt.genSalt(10);
     password_hash = await bcrypt.hash(password_hash, salt);
+    const refresh_token = await crypto.randomBytes(16).toString("hex");
     const new_account = await models.Account.query().insert({
       email: email,
       first_name: full_name,
@@ -199,6 +199,7 @@ const userSignup = async (req, res, next) => {
       is_notifications_permited,
       transaction_id,
       extra_location,
+      refresh_token,
     });
     const jwt_token = await jwt.sign(
       {
@@ -208,10 +209,7 @@ const userSignup = async (req, res, next) => {
       process.env.SECRET_KEY,
       { expiresIn: "3h" }
     );
-    const refresh_token = await crypto.randomBytes(16).toString("hex");
-    await models.Account.query()
-      .where("id", new_account.id)
-      .update({ refresh_token });
+
     return res
       .status(200)
       .json({ Status: true, Message: "Success", jwt_token, refresh_token })
