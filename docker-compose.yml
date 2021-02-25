@@ -20,5 +20,6 @@ services:
       - 80:3000
     depends_on:
       # The db container needs to be started before we start this container
+      #npm run migrate && npm run populate_countries && npm run populate_roles && npm run populate_plans && 
       - db
-    command: npm start
+    command: bash -c "npm start"
