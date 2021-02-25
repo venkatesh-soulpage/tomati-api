@@ -7,7 +7,7 @@ import fetch from "node-fetch";
 import queryString from "query-string";
 import moment from "moment";
 import twilio from "twilio";
-import AWS from "aws-sdk";
+const { s3 } = require("../utils/s3Config");
 
 import {
   sendConfirmationEmail,
@@ -20,11 +20,6 @@ import {
   sendFotgotPasswordEmailTomati,
   outletInvitecollaboratorEmail,
 } from "./mailling";
-
-// Inititialize AWS
-const s3 = new AWS.S3({
-  region: process.env.BUCKETEER_AWS_REGION,
-});
 
 const twilio_client = twilio(
   process.env.TWILIO_ACCOUNT_SID,
@@ -62,7 +57,8 @@ const getUser = async (req, res, next) => {
                         location,
                         plan,
                         outlets,
-                        events
+                        events,
+                        state
                     ]`
       )
       .findById(account_id);
@@ -189,7 +185,7 @@ const userSignup = async (req, res, next) => {
       is_age_verified: false,
       plan_id,
       location_id,
-      state,
+      state_id: state,
       city,
       street,
       no_of_outlets,

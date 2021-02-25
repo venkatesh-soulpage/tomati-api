@@ -1,5 +1,4 @@
 import models from "../models";
-import AWS from "aws-sdk";
 
 import _ from "lodash";
 
@@ -7,11 +6,7 @@ var requestIp = require("request-ip");
 
 const QRCode = require("qrcode");
 const isBase64 = require("is-base64");
-
-// Inititialize AWS
-const s3 = new AWS.S3({
-  region: process.env.BUCKETEER_AWS_REGION,
-});
+const { s3 } = require("../utils/s3Config");
 
 const getVenues = async (req, res, next) => {
   try {
