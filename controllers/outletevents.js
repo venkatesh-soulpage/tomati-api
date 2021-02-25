@@ -1,19 +1,17 @@
 import models from "../models";
-import AWS from "aws-sdk";
 
 import _ from "lodash";
+import moment from "moment";
 
 import { jsPDF } from "jspdf";
 var requestIp = require("request-ip");
+const { s3 } = require("../utils/s3Config");
+
+var schedule = require("node-schedule");
 
 const QRCode = require("qrcode");
 var fs = require("fs");
 const isBase64 = require("is-base64");
-
-// Inititialize AWS
-const s3 = new AWS.S3({
-  region:process.env.BUCKETEER_AWS_REGION,
-});
 
 const getEvents = async (req, res, next) => {
   try {
@@ -117,6 +115,7 @@ const createEvent = async (req, res, next) => {
       location_id,
       address,
       description,
+      qr_isActive,
     } = req.body;
 
     let buf, cover_image;
@@ -175,8 +174,22 @@ const createEvent = async (req, res, next) => {
       account_id,
       address,
       description,
+      qr_isActive,
       cover_image: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
       logo_img: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key2}`,
+    });
+    let check = moment(new_outlet_event.end_time, "YYYY/MM/DD/hh/mm/ss");
+    check.add("24", "hours");
+    let j = schedule.scheduleJob(check.toString(), async () => {
+      try {
+        await models.OutletEvent.query()
+          .update({
+            qr_isActive: false,
+          })
+          .where("id", new_outlet_event.id);
+      } catch (e) {
+        console.log(e, "FAILED TO RUN CRON JOB");
+      }
     });
 
     // Send the clients

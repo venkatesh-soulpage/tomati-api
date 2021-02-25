@@ -7,7 +7,7 @@ import fetch from "node-fetch";
 import queryString from "query-string";
 import moment from "moment";
 import twilio from "twilio";
-import AWS from "aws-sdk";
+const { s3 } = require("../utils/s3Config");
 
 import {
   sendConfirmationEmail,
@@ -20,11 +20,6 @@ import {
   sendFotgotPasswordEmailTomati,
   outletInvitecollaboratorEmail,
 } from "./mailling";
-
-// Inititialize AWS
-const s3 = new AWS.S3({
-  region: process.env.BUCKETEER_AWS_REGION,
-});
 
 const twilio_client = twilio(
   process.env.TWILIO_ACCOUNT_SID,
