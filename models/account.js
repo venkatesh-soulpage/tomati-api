@@ -100,6 +100,14 @@ export default class Account extends Model {
           to: "outletevents.account_id",
         },
       },
+      state: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: models.Location,
+        join: {
+          from: "accounts.state_id",
+          to: "locations.id",
+        },
+      },
     };
   }
 }

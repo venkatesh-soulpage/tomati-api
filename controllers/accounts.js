@@ -62,7 +62,8 @@ const getUser = async (req, res, next) => {
                         location,
                         plan,
                         outlets,
-                        events
+                        events,
+                        state
                     ]`
       )
       .findById(account_id);
@@ -189,7 +190,7 @@ const userSignup = async (req, res, next) => {
       is_age_verified: false,
       plan_id,
       location_id,
-      state,
+      state_id: state,
       city,
       street,
       no_of_outlets,
