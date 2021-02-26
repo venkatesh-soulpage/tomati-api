@@ -8,6 +8,11 @@ import queryString from "query-string";
 import moment from "moment";
 import twilio from "twilio";
 const { s3 } = require("../utils/s3Config");
+var chargebee = require("chargebee");
+chargebee.configure({
+  site: `${process.env.CHARGEBEE_SITE}`,
+  api_key: `${process.env.CHARGEBEE_API_KEY}`,
+});
 
 import {
   sendConfirmationEmail,
@@ -147,6 +152,28 @@ const verifyEmailOrPhone = async (req, res, next) => {
   }
 };
 
+const getSubcriptionStatus = async (transaction_id) => {
+  const status = await chargebee.hosted_page
+    .retrieve(transaction_id)
+    .request((error, result) => {
+      if (error) {
+        //handle error
+        console.log(error, "Error occured in getting the status");
+        return false;
+      } else {
+        // console.log(result);
+      }
+    });
+  if (status.hosted_page.content.invoice.status === "paid") {
+    return true;
+  } else if (status.hosted_page.content.invoice.status === "payment_due") {
+    return false;
+  } else {
+    console.log("Error occured in getting the status");
+    return false;
+  }
+};
+
 // Create Tomati User
 
 const userSignup = async (req, res, next) => {
@@ -175,6 +202,7 @@ const userSignup = async (req, res, next) => {
     const salt = await bcrypt.genSalt(10);
     password_hash = await bcrypt.hash(password_hash, salt);
     const refresh_token = await crypto.randomBytes(16).toString("hex");
+    const status = await getSubcriptionStatus(transaction_id);
     const new_account = await models.Account.query().insert({
       email: email,
       first_name: full_name,
@@ -196,6 +224,7 @@ const userSignup = async (req, res, next) => {
       transaction_id,
       extra_location,
       refresh_token,
+      is_subscription_active: status,
     });
     const jwt_token = await jwt.sign(
       {
