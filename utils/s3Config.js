@@ -3,7 +3,7 @@ import AWS from "aws-sdk";
 let config = {};
 
 if (process.env.AWS === "true" || process.env.AWS_STAGING === "true") {
-  config = { SS_KEY, region: process.env.BUCKETEER_AWS_REGION };
+  config = {region: process.env.BUCKETEER_AWS_REGION };
 } else {
   config = {
     accessKeyId: process.env.BUCKETEER_AWS_ACCESS_KEY_ID,
