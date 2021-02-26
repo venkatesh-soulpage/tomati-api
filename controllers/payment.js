@@ -15,7 +15,6 @@ chargebee.configure({
 
 const makePayment = async (req, res, next) => {
   try {
-    let redirect_url = req.headers.origin + "/success";
     const {
       first_name,
       last_name,
@@ -42,7 +41,7 @@ const makePayment = async (req, res, next) => {
         customer,
         coupon_ids: coupon,
         billing_address,
-        redirect_url,
+        redirect_url: req.headers.origin + "/success",
       })
       .request(function (error, result) {
         if (error) {
