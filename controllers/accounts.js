@@ -180,6 +180,7 @@ const userSignup = async (req, res, next) => {
   try {
     let {
       full_name,
+      last_name,
       company_name,
       email,
       password_hash,
@@ -206,7 +207,8 @@ const userSignup = async (req, res, next) => {
     const new_account = await models.Account.query().insert({
       email: email,
       first_name: full_name,
-      last_name: company_name,
+      company_name,
+      last_name,
       password_hash: password_hash,
       is_admin: false,
       is_email_verified: true,
