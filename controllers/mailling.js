@@ -213,7 +213,7 @@ const sendFotgotPasswordEmailTomati = (user, token) => {
 
   email
     .send({
-      template: "tomati-forgot",
+      template: "tomati_forgot",
       message: {
         to: user.email,
       },
