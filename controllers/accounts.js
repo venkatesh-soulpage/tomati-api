@@ -2018,6 +2018,7 @@ const updateSubscription = async (req, res, next) => {
     await models.Account.query()
       .update({
         is_subscription_active,
+        transaction_id: hostedPageID,
       })
       .where("email", email);
     return res
