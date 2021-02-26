@@ -152,30 +152,7 @@ const verifyEmailOrPhone = async (req, res, next) => {
   }
 };
 
-const getSubcriptionStatus = async (transaction_id) => {
-  const status = await chargebee.hosted_page
-    .retrieve(transaction_id)
-    .request((error, result) => {
-      if (error) {
-        //handle error
-        console.log(error, "Error occured in getting the status");
-        return false;
-      } else {
-        // console.log(result);
-      }
-    });
-  if (status.hosted_page.content.invoice.status === "paid") {
-    return true;
-  } else if (status.hosted_page.content.invoice.status === "payment_due") {
-    return false;
-  } else {
-    console.log("Error occured in getting the status");
-    return false;
-  }
-};
-
 // Create Tomati User
-
 const userSignup = async (req, res, next) => {
   try {
     let {
@@ -203,7 +180,6 @@ const userSignup = async (req, res, next) => {
     const salt = await bcrypt.genSalt(10);
     password_hash = await bcrypt.hash(password_hash, salt);
     const refresh_token = await crypto.randomBytes(16).toString("hex");
-    const status = await getSubcriptionStatus(transaction_id);
     const new_account = await models.Account.query().insert({
       email: email,
       first_name,
@@ -226,7 +202,6 @@ const userSignup = async (req, res, next) => {
       transaction_id,
       extra_location,
       refresh_token,
-      is_subscription_active: status,
     });
     const jwt_token = await jwt.sign(
       {
@@ -2014,6 +1989,46 @@ const updateProfile = async (req, res, next) => {
   }
 };
 
+const getSubcriptionStatus = async (transaction_id) => {
+  const details = await chargebee.hosted_page
+    .retrieve(transaction_id)
+    .request((error, result) => {
+      if (error) {
+        //handle error
+        console.log(error, "Error occured in getting the status");
+        return false;
+      } else {
+        // console.log(result);
+      }
+    });
+  return details;
+};
+
+const updateSubscription = async (req, res, next) => {
+  try {
+    const { hostedPageID } = req.body;
+    let is_subscription_active = null;
+    const details = await getSubcriptionStatus(hostedPageID);
+    if (details.hosted_page.content.invoice.status === "paid") {
+      is_subscription_active = true;
+    } else if (details.hosted_page.content.invoice.status === "payment_due") {
+      is_subscription_active = false;
+    }
+    let email = details.hosted_page.content.customer.email;
+    await models.Account.query()
+      .update({
+        is_subscription_active,
+      })
+      .where("email", email);
+    return res
+      .status(200)
+      .json({ Status: true, Message: "Updated Successfully" });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
+
 const userController = {
   // User
   getUser,
@@ -2034,6 +2049,7 @@ const userController = {
   verifyCredentals,
   userSignup,
   updateProfile,
+  updateSubscription,
   // OAuth
   authWithFacebook,
   inviteOutletManager,
