@@ -1989,26 +1989,16 @@ const updateProfile = async (req, res, next) => {
   }
 };
 
-const getSubcriptionStatus = async (transaction_id) => {
-  const details = await chargebee.hosted_page
-    .retrieve(transaction_id)
-    .request((error, result) => {
-      if (error) {
-        //handle error
-        console.log(error, "Error occured in getting the status");
-        return false;
-      } else {
-        // console.log(result);
-      }
-    });
-  return details;
-};
-
 const updateSubscription = async (req, res, next) => {
   try {
     const { hostedPageID } = req.body;
     let is_subscription_active = null;
-    const details = await getSubcriptionStatus(hostedPageID);
+    const details = await chargebee.hosted_page
+      .retrieve(hostedPageID)
+      .request();
+    const invoiceDetails = await chargebee.invoice
+      .pdf(details.hosted_page.content.invoice.id)
+      .request();
     if (details.hosted_page.content.invoice.status === "paid") {
       is_subscription_active = true;
     } else if (details.hosted_page.content.invoice.status === "payment_due") {
@@ -2021,9 +2011,11 @@ const updateSubscription = async (req, res, next) => {
         transaction_id: hostedPageID,
       })
       .where("email", email);
-    return res
-      .status(200)
-      .json({ Status: true, Message: "Updated Successfully" });
+    return res.status(200).json({
+      Status: true,
+      Message: "Updated Successfully",
+      DownloadURL: invoiceDetails.download.download_url,
+    });
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e));
