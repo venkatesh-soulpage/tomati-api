@@ -179,7 +179,7 @@ const getSubcriptionStatus = async (transaction_id) => {
 const userSignup = async (req, res, next) => {
   try {
     let {
-      full_name,
+      first_name,
       last_name,
       company_name,
       email,
@@ -206,7 +206,7 @@ const userSignup = async (req, res, next) => {
     const status = await getSubcriptionStatus(transaction_id);
     const new_account = await models.Account.query().insert({
       email: email,
-      first_name: full_name,
+      first_name,
       company_name,
       last_name,
       password_hash: password_hash,
