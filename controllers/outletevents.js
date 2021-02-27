@@ -73,8 +73,11 @@ const getEvent = async (req, res, next) => {
         .update({ stats: { data: [countObject] } })
         .findById(outlet_event_id);
     }
-
-    return res.status(200).json(event);
+    if (event.qr_isActive) {
+      return res.status(200).json(event);
+    } else {
+      return res.status(200).send("Requested event is inactive");
+    }
   } catch (error) {
     console.log(error);
     return res.status(500).json(JSON.stringify(error));

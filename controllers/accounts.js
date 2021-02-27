@@ -24,6 +24,7 @@ import {
   outletInviteWaiterEmail,
   sendFotgotPasswordEmailTomati,
   outletInvitecollaboratorEmail,
+  sendSubscriptionInvoiceEmail,
 } from "./mailling";
 
 const twilio_client = twilio(
@@ -152,34 +153,12 @@ const verifyEmailOrPhone = async (req, res, next) => {
   }
 };
 
-const getSubcriptionStatus = async (transaction_id) => {
-  const status = await chargebee.hosted_page
-    .retrieve(transaction_id)
-    .request((error, result) => {
-      if (error) {
-        //handle error
-        console.log(error, "Error occured in getting the status");
-        return false;
-      } else {
-        // console.log(result);
-      }
-    });
-  if (status.hosted_page.content.invoice.status === "paid") {
-    return true;
-  } else if (status.hosted_page.content.invoice.status === "payment_due") {
-    return false;
-  } else {
-    console.log("Error occured in getting the status");
-    return false;
-  }
-};
-
 // Create Tomati User
-
 const userSignup = async (req, res, next) => {
   try {
     let {
-      full_name,
+      first_name,
+      last_name,
       company_name,
       email,
       password_hash,
@@ -202,11 +181,11 @@ const userSignup = async (req, res, next) => {
     const salt = await bcrypt.genSalt(10);
     password_hash = await bcrypt.hash(password_hash, salt);
     const refresh_token = await crypto.randomBytes(16).toString("hex");
-    const status = await getSubcriptionStatus(transaction_id);
     const new_account = await models.Account.query().insert({
       email: email,
-      first_name: full_name,
-      last_name: company_name,
+      first_name,
+      company_name,
+      last_name,
       password_hash: password_hash,
       is_admin: false,
       is_email_verified: true,
@@ -224,7 +203,6 @@ const userSignup = async (req, res, next) => {
       transaction_id,
       extra_location,
       refresh_token,
-      is_subscription_active: status,
     });
     const jwt_token = await jwt.sign(
       {
@@ -2012,6 +1990,39 @@ const updateProfile = async (req, res, next) => {
   }
 };
 
+const updateSubscription = async (req, res, next) => {
+  try {
+    const { hostedPageID } = req.body;
+    let is_subscription_active = null;
+    const details = await chargebee.hosted_page
+      .retrieve(hostedPageID)
+      .request();
+    const invoiceDetails = await chargebee.invoice
+      .pdf(details.hosted_page.content.invoice.id)
+      .request();
+    if (details.hosted_page.content.invoice.status === "paid") {
+      is_subscription_active = true;
+    } else if (details.hosted_page.content.invoice.status === "payment_due") {
+      is_subscription_active = false;
+    }
+    let email = details.hosted_page.content.customer.email;
+    await models.Account.query()
+      .update({
+        is_subscription_active,
+        transaction_id: hostedPageID,
+      })
+      .where("email", email);
+    sendSubscriptionInvoiceEmail(email, invoiceDetails.download.download_url);
+    return res.status(200).json({
+      Status: true,
+      Message: "Updated Successfully",
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
+
 const userController = {
   // User
   getUser,
@@ -2032,6 +2043,7 @@ const userController = {
   verifyCredentals,
   userSignup,
   updateProfile,
+  updateSubscription,
   // OAuth
   authWithFacebook,
   inviteOutletManager,
