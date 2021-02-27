@@ -24,6 +24,7 @@ import {
   outletInviteWaiterEmail,
   sendFotgotPasswordEmailTomati,
   outletInvitecollaboratorEmail,
+  sendSubscriptionInvoiceEmail,
 } from "./mailling";
 
 const twilio_client = twilio(
@@ -2011,10 +2012,10 @@ const updateSubscription = async (req, res, next) => {
         transaction_id: hostedPageID,
       })
       .where("email", email);
+    sendSubscriptionInvoiceEmail(email, invoiceDetails.download.download_url);
     return res.status(200).json({
       Status: true,
       Message: "Updated Successfully",
-      DownloadURL: invoiceDetails.download.download_url,
     });
   } catch (e) {
     console.log(e);
