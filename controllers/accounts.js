@@ -2024,6 +2024,21 @@ const updateSubscription = async (req, res, next) => {
   }
 };
 
+const getAllUsers = async (req, res, next) => {
+  try {
+    // const { account_id } = req;
+
+    const account = await models.Account.query().orderBy("created_at", "DESC");
+
+    if (!account) return res.status(400).json("No accounts found").send();
+
+    return res.status(200).send(account);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e)).send();
+  }
+};
+
 const userController = {
   // User
   getUser,
@@ -2045,6 +2060,7 @@ const userController = {
   userSignup,
   updateProfile,
   updateSubscription,
+  getAllUsers,
   // OAuth
   authWithFacebook,
   inviteOutletManager,
