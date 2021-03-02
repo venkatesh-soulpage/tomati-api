@@ -511,32 +511,6 @@ const outletInviteWaiterEmail = (
     .catch(console.error);
 };
 
-const sendSubscriptionInvoiceEmail = (subscriberEmail, url) => {
-  const email = new Email({
-    message: {
-      from: process.env.FROM_EMAIL,
-      subject: "Tomati - Invoice Email",
-      /* text: 'Hello ,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + process.env.HOST + ':' + process.env.PORT + '\/confirmation\/' + token.token + '.\n' */
-    },
-    send: true,
-    transport: transporter,
-  });
-
-  email
-    .send({
-      template: "subscription_invoice",
-      message: {
-        to: subscriberEmail,
-      },
-      locals: {
-        email: subscriberEmail,
-        verificationUrl: url,
-      },
-    })
-    .then(/* console.log */)
-    .catch(console.error);
-};
-
 export {
   sendConfirmationEmail,
   sendFotgotPasswordEmail,
@@ -551,5 +525,4 @@ export {
   outletInviteWaiterEmail,
   sendFotgotPasswordEmailTomati,
   outletInvitecollaboratorEmail,
-  sendSubscriptionInvoiceEmail,
 };

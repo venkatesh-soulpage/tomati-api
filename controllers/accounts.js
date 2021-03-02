@@ -24,7 +24,6 @@ import {
   outletInviteWaiterEmail,
   sendFotgotPasswordEmailTomati,
   outletInvitecollaboratorEmail,
-  sendSubscriptionInvoiceEmail,
 } from "./mailling";
 
 const twilio_client = twilio(
@@ -2013,7 +2012,6 @@ const updateSubscription = async (req, res, next) => {
         transaction_id: hostedPageID,
       })
       .where("email", email);
-    sendSubscriptionInvoiceEmail(email, invoiceDetails.download.download_url);
     return res.status(200).json({
       Status: true,
       Message: "Updated Successfully",
@@ -2026,7 +2024,14 @@ const updateSubscription = async (req, res, next) => {
 
 const getAllUsers = async (req, res, next) => {
   try {
-    // const { account_id } = req;
+    const { account_id } = req;
+    // Get the account
+    const admin = await models.Account.query().findById(account_id);
+    if (!admin.is_admin) {
+      return res
+        .status(400)
+        .send("You are not authorized to access this information");
+    }
 
     const account = await models.Account.query().orderBy("created_at", "DESC");
 
