@@ -1,0 +1,41 @@
+extends layout
+
+block content
+  h1 Hi, #{email},
+  p
+    | You have been invited to LiquidIntel as a #{role} by #{host_name} to join #{agency_name}.
+    | To find out more about your role visit our
+    a(href=supportUrl)  FAQ.
+  br
+  p
+    | Click sign up below to finish your account set up.
+  // Action
+  br
+  b.f-fallback.sub="LiquidIntel Support Team"
+
+  table.body-action(align='center', width='100%', cellpadding='0', cellspacing='0', role='presentation')
+    tbody
+      tr
+        td(align='center')
+          //
+            Border based button
+            https://litmus.com/blog/a-guide-to-bulletproof-buttons-in-email-design
+          table(width='100%', border='0', cellspacing='0', cellpadding='0', role='presentation')
+            tbody
+              tr
+                td(align='center')
+                  a.f-fallback.button(href=signupUrl, target='_blank') Signup
+  p
+    strong 
+    |   Visit our help 
+    a(href=supportUrl)  articles
+    |  for full introduction into using LiquidIntel or reach out to us at 
+    a(href='mailto:support@liquidintel.io') support@liquidintel.io
+  // Sub copy
+  table.body-sub(role='presentation')
+    tbody
+      tr
+        td
+          p.f-fallback.sub
+            | If the signup button doesn't work, you can also copy and paste the link below into your browser.
+          p.f-fallback.sub=signupUrl
