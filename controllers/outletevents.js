@@ -258,7 +258,7 @@ const updateEvent = async (req, res, next) => {
     if (logobuf && logo_image) {
       const key = `public/cover_images/outletevents/${logo_image.name}`;
       uploadImage({ key, buf: logobuf });
-      await models.OutletVenue.query()
+      await models.OutletEvent.query()
         .update({
           logo_img: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
         })

@@ -88,10 +88,11 @@ router.post("/verify-credentials", accountController.verifyCredentals);
 /* Tomati User Signup */
 router.post("/user-signup", accountController.userSignup);
 
-/* Tomati User Signup */
+/* Tomati User Update Subscription */
 router.post(
   "/update-subscription-status",
   accountController.updateSubscription
 );
 
+router.get("/get-all-users", VerifyToken, accountController.getAllUsers);
 module.exports = router;

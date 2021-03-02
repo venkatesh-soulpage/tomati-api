@@ -24,7 +24,6 @@ import {
   outletInviteWaiterEmail,
   sendFotgotPasswordEmailTomati,
   outletInvitecollaboratorEmail,
-  sendSubscriptionInvoiceEmail,
 } from "./mailling";
 
 const twilio_client = twilio(
@@ -1784,7 +1783,7 @@ const reset = async (req, res, next) => {
       })
       .where("email", account.email);
 
-    return res.status(201).json(`Password updated!`);
+    return res.status(201).json(`Password updated successfully !`);
   } catch (e) {
     return res.status(500).json(JSON.stringify(e)).send();
   }
@@ -1941,6 +1940,7 @@ const updateProfile = async (req, res, next) => {
             password_hash,
           })
           .where("id", account_id);
+        return res.status(200).json("Password Updated Successfully");
       } else {
         return res
           .status(401)
@@ -2012,7 +2012,6 @@ const updateSubscription = async (req, res, next) => {
         transaction_id: hostedPageID,
       })
       .where("email", email);
-    sendSubscriptionInvoiceEmail(email, invoiceDetails.download.download_url);
     return res.status(200).json({
       Status: true,
       Message: "Updated Successfully",
@@ -2020,6 +2019,28 @@ const updateSubscription = async (req, res, next) => {
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e));
+  }
+};
+
+const getAllUsers = async (req, res, next) => {
+  try {
+    const { account_id } = req;
+    // Get the account
+    const admin = await models.Account.query().findById(account_id);
+    if (!admin.is_admin) {
+      return res
+        .status(400)
+        .send("You are not authorized to access this information");
+    }
+
+    const account = await models.Account.query().orderBy("created_at", "DESC");
+
+    if (!account) return res.status(400).json("No accounts found").send();
+
+    return res.status(200).send(account);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e)).send();
   }
 };
 
@@ -2044,6 +2065,7 @@ const userController = {
   userSignup,
   updateProfile,
   updateSubscription,
+  getAllUsers,
   // OAuth
   authWithFacebook,
   inviteOutletManager,
