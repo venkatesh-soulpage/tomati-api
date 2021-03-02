@@ -1941,6 +1941,7 @@ const updateProfile = async (req, res, next) => {
             password_hash,
           })
           .where("id", account_id);
+        return res.status(200).json("Password Updated Successfully");
       } else {
         return res
           .status(401)
