@@ -1784,7 +1784,7 @@ const reset = async (req, res, next) => {
       })
       .where("email", account.email);
 
-    return res.status(201).json(`Password updated!`);
+    return res.status(201).json(`Password updated successfully !`);
   } catch (e) {
     return res.status(500).json(JSON.stringify(e)).send();
   }
