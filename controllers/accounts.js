@@ -1815,7 +1815,10 @@ const userSignup = async (req, res, next) => {
         if (error) {
           //handle error
           console.log(error);
-          return res.status(404).json("Error occured while subscribing").send();
+          return res
+            .status(404)
+            .json("Error occurred while subscribing")
+            .send();
         } else {
           // Hash password
           const salt = await bcrypt.genSalt(10);
@@ -1841,6 +1844,7 @@ const userSignup = async (req, res, next) => {
             is_notifications_permited,
             transaction_id: result.subscription.id,
             extra_location,
+            is_subscription_active: true,
           });
           return res
             .status(200)
