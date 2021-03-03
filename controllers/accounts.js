@@ -153,91 +153,6 @@ const verifyEmailOrPhone = async (req, res, next) => {
   }
 };
 
-// Create Tomati User
-const userSignup = async (req, res, next) => {
-  try {
-    let {
-      first_name,
-      last_name,
-      company_name,
-      email,
-      password_hash,
-      plan_id,
-      location_id,
-      state,
-      city,
-      street,
-      is_notifications_permited,
-      extra_location,
-    } = req.body;
-    const account = await models.Account.query().where("email", email).first();
-    if (account) return res.status(404).json("User Already Exists").send();
-    chargebee.subscription
-      .create({
-        plan_id: `${process.env.STARTER_PLAN_ID}`,
-        auto_collection: "off",
-        customer: {
-          first_name,
-          last_name,
-          email,
-        },
-        addons: [
-          {
-            id: `${process.env.STARTER_CHARRGEBEE_FREE_OUTLET_ID}`,
-            quantity: 1,
-          },
-          {
-            id: `${process.env.STARTER_CHARRGEBEE_FREE_EVENTS_ID}`,
-            quantity: 4,
-          },
-          {
-            id: `${process.env.STARTER_CHARRGEBEE_FREE_USERS_ID}`,
-            quantity: 5,
-          },
-        ],
-      })
-      .request(async (error, result) => {
-        if (error) {
-          //handle error
-          console.log(error);
-          return res.status(404).json("Error occured while subscribing").send();
-        } else {
-          // Hash password
-          const salt = await bcrypt.genSalt(10);
-          password_hash = await bcrypt.hash(password_hash, salt);
-          const new_account = await models.Account.query().insert({
-            email: email,
-            first_name,
-            company_name,
-            last_name,
-            password_hash: password_hash,
-            is_admin: false,
-            is_email_verified: true,
-            is_age_verified: false,
-            plan_id,
-            location_id,
-            state_id: state,
-            city,
-            street,
-            no_of_outlets: `${process.env.STARTER_NO_OF_OUTLETS}`,
-            no_of_events: `${process.env.STARTER_NO_OF_EVENTS}`,
-            no_of_users: `${process.env.STARTER_NO_OF_USERS}`,
-            no_of_qrcodes: `${process.env.STARTER_NO_OF_QR_TAGS}`,
-            is_notifications_permited,
-            transaction_id: result.subscription.id,
-            extra_location,
-          });
-          return res
-            .status(200)
-            .json({ Status: true, Message: "Success" })
-            .send();
-        }
-      });
-  } catch (e) {
-    console.log(e);
-    return res.status(500).json(JSON.stringify(e)).send();
-  }
-};
 // POST - Signup
 const signup = async (req, res, next) => {
   const { email, password, first_name, last_name } = req.body;
@@ -709,78 +624,6 @@ const inviteOutletManager = async (req, res, next) => {
 };
 
 // POST - Invite a new regional organization
-const invitecollaborator = async (req, res, next) => {
-  try {
-    /* Todo add client organization logic */
-    const {
-      owner_email,
-      display_name,
-      custom_message,
-      outlet_venue,
-      outlet_event,
-    } = req.body;
-
-    // Validate that the client hasn't been registered on the platform
-    const client_account = await models.Account.query()
-      .where("email", owner_email)
-      .first();
-    if (client_account)
-      return res
-        .status(400)
-        .json("An account already exists with this email address")
-        .send();
-
-    // Create new token to validate owner email
-    const role = await models.Role.query()
-      .where("scope", "OUTLET")
-      .where("name", "WAITER")
-      .first();
-
-    // Sign jwt
-    const token = await jwt.sign(
-      {
-        role_id: role.id,
-        scope: role.scope,
-        name: role.name,
-      },
-      process.env.SECRET_KEY
-    );
-
-    const new_token = await models.Token.query().insert({
-      email: owner_email,
-      token,
-    });
-
-    // send invite email
-    const host = { first_name: "LiquidIntel", last_name: "Team" };
-    await outletInvitecollaboratorEmail(
-      owner_email,
-      new_token,
-      { scope: "OUTLET", name: "WAITER" },
-      { name: display_name, custom_message, host },
-      outlet_venue,
-      outlet_event
-    );
-
-    // Add collaborator invitation
-    let invitation_expiration_date = new Date();
-    invitation_expiration_date.setHours(
-      invitation_expiration_date.getHours() + 1
-    ); // Default expiration time to 1 hour.
-    await models.CollaboratorInvitation.query().insert({
-      role_id: role.id,
-      email: owner_email,
-      expiration_date: invitation_expiration_date,
-    });
-
-    return res.status(201).json("Invitation successfull").send();
-  } catch (e) {
-    console.log(e);
-    return res.status(500).json(JSON.stringify(e)).send();
-  }
-};
-
-// POST - Invite a new regional organization
 const inviteOutletWaiter = async (req, res, next) => {
   try {
     /* Todo add client organization logic */
@@ -1108,39 +951,7 @@ const agencySignup = async (req, res, next) => {
     return res.status(500).json(JSON.stringify(e)).send();
   }
 };
-// Verify Credentials Exists
-const verifyCredentals = async (req, res, next) => {
-  try {
-    const { phone_number, email } = req.body;
-    const to_search_item = phone_number || email;
-    let to_search_field = "";
-    let message_field = "";
-    if (phone_number) {
-      to_search_field = "phone_number";
-      message_field = "Phone Number";
-    } else {
-      to_search_field = "email";
-      message_field = "Email";
-    }
-    const account = await models.Account.query().where(
-      to_search_field,
-      to_search_item
-    );
-    if (account.length === 0) {
-      res
-        .status(200)
-        .json({ Status: true, Message: `This ${message_field} is available` });
-    } else {
-      res.status(400).json({
-        Status: false,
-        Message: `This ${message_field} is already taken`,
-      });
-    }
-  } catch (e) {
-    console.log(e);
-    return res.status(500).json(JSON.stringify(e)).send();
-  }
-};
+
 // Signup for event guests
 const guestSignup = async (req, res, next) => {
   try {
@@ -1722,90 +1533,6 @@ const forgot = async (req, res, next) => {
   }
 };
 
-// POST - Set the reset token and send an email with the url
-const tomatiforgot = async (req, res, next) => {
-  try {
-    const { email } = req.body;
-
-    // Get the account
-    const accounts = await models.Account.query().where("email", email);
-
-    // Validate account
-    if (!accounts[0] || accounts.length < 1)
-      return res.status(401).json("No account found").send();
-
-    // Generate a new password reset token and expiration
-    const password_reset_token = await crypto.randomBytes(16).toString("hex");
-    const password_reset_expiration = new Date(Date.now() + 3600000);
-
-    // Set the token password_reset_token and expiration
-    const updated_account = await models.Account.query()
-      .patch({ password_reset_token, password_reset_expiration })
-      .where("email", accounts[0].email);
-
-    // Send an email with recovery instructions
-    await sendFotgotPasswordEmailTomati(accounts[0], password_reset_token);
-
-    return res
-      .status(201)
-      .json(
-        `An email was sent to ${accounts[0].email} with further instructions.`
-      );
-  } catch (e) {
-    return res.status(500).json(JSON.stringify(e)).send();
-  }
-};
-
-// POST - Set the new password comparing the token
-const reset = async (req, res, next) => {
-  try {
-    const { email, token, password } = req.body;
-
-    // Get the account
-    const account = await models.Account.query().where("email", email).first();
-
-    // Validate account
-    if (!account) return res.status(401).json("No account found").send();
-
-    // Validate that it isn't setting the same password
-    // Compare passwords
-    const isCorrectPassword = await bcrypt.compareSync(
-      password,
-      account.password_hash
-    );
-
-    // If the password is incorrect return
-    if (isCorrectPassword)
-      return res
-        .status(401)
-        .json("You can't set your old password as new")
-        .send();
-
-    // Validate token and expiration
-    if (token !== account.password_reset_token)
-      return res.status(401).json("Invalid token").send();
-    if (Date.now() > new Date(account.password_reset_expiration))
-      return res.status(401).json("Expired token").send();
-
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const password_hash = await bcrypt.hash(password, salt);
-
-    // Update account
-    await models.Account.query()
-      .patch({
-        password_hash,
-        password_reset_token: null,
-        password_reset_expiration: null,
-      })
-      .where("email", account.email);
-
-    return res.status(201).json(`Password updated successfully !`);
-  } catch (e) {
-    return res.status(500).json(JSON.stringify(e)).send();
-  }
-};
-
 const authWithFacebook = async (req, res, next) => {
   try {
     // Get facebook parameters
@@ -1914,6 +1641,213 @@ const authWithFacebook = async (req, res, next) => {
 
       return res.status(200).json(token).send();
     }
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e)).send();
+  }
+};
+
+//Tomati Controllers
+
+// POST - Set the new password comparing the token
+const reset = async (req, res, next) => {
+  try {
+    const { email, token, password } = req.body;
+
+    // Get the account
+    const account = await models.Account.query().where("email", email).first();
+
+    // Validate account
+    if (!account) return res.status(401).json("No account found").send();
+
+    // Validate that it isn't setting the same password
+    // Compare passwords
+    const isCorrectPassword = await bcrypt.compareSync(
+      password,
+      account.password_hash
+    );
+
+    // If the password is incorrect return
+    if (isCorrectPassword)
+      return res
+        .status(401)
+        .json("You can't set your old password as new")
+        .send();
+
+    // Validate token and expiration
+    if (token !== account.password_reset_token)
+      return res.status(401).json("Invalid token").send();
+    if (Date.now() > new Date(account.password_reset_expiration))
+      return res.status(401).json("Expired token").send();
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const password_hash = await bcrypt.hash(password, salt);
+
+    // Update account
+    await models.Account.query()
+      .patch({
+        password_hash,
+        password_reset_token: null,
+        password_reset_expiration: null,
+      })
+      .where("email", account.email);
+
+    return res.status(201).json(`Password updated successfully !`);
+  } catch (e) {
+    return res.status(500).json(JSON.stringify(e)).send();
+  }
+};
+
+// POST - Set the reset token and send an email with the url
+const tomatiforgot = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    // Get the account
+    const accounts = await models.Account.query().where("email", email);
+
+    // Validate account
+    if (!accounts[0] || accounts.length < 1)
+      return res.status(401).json("No account found").send();
+
+    // Generate a new password reset token and expiration
+    const password_reset_token = await crypto.randomBytes(16).toString("hex");
+    const password_reset_expiration = new Date(Date.now() + 3600000);
+
+    // Set the token password_reset_token and expiration
+    const updated_account = await models.Account.query()
+      .patch({ password_reset_token, password_reset_expiration })
+      .where("email", accounts[0].email);
+
+    // Send an email with recovery instructions
+    await sendFotgotPasswordEmailTomati(accounts[0], password_reset_token);
+
+    return res
+      .status(201)
+      .json(
+        `An email was sent to ${accounts[0].email} with further instructions.`
+      );
+  } catch (e) {
+    return res.status(500).json(JSON.stringify(e)).send();
+  }
+};
+// Verify Credentials Exists
+const verifyCredentals = async (req, res, next) => {
+  try {
+    const { phone_number, email } = req.body;
+    const to_search_item = phone_number || email;
+    let to_search_field = "";
+    let message_field = "";
+    if (phone_number) {
+      to_search_field = "phone_number";
+      message_field = "Phone Number";
+    } else {
+      to_search_field = "email";
+      message_field = "Email";
+    }
+    const account = await models.Account.query().where(
+      to_search_field,
+      to_search_item
+    );
+    if (account.length === 0) {
+      res
+        .status(200)
+        .json({ Status: true, Message: `This ${message_field} is available` });
+    } else {
+      res.status(400).json({
+        Status: false,
+        Message: `This ${message_field} is already taken`,
+      });
+    }
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e)).send();
+  }
+};
+// Create Tomati User
+const userSignup = async (req, res, next) => {
+  try {
+    let {
+      first_name,
+      last_name,
+      company_name,
+      email,
+      password_hash,
+      location_id,
+      state_id,
+      city,
+      street,
+      is_notifications_permited,
+      extra_location,
+    } = req.body;
+    const account = await models.Account.query().where("email", email).first();
+    if (account) return res.status(404).json("User Already Exists").send();
+    const plan = await models.Plan.query().where("plan", "starter").first();
+    chargebee.subscription
+      .create({
+        plan_id: plan.chargebee_plan_id,
+        auto_collection: "off",
+        customer: {
+          first_name,
+          last_name,
+          email,
+        },
+        addons: [
+          {
+            id: plan.chargebee_outlets_addon_id,
+            unit_price: 0,
+            quantity: plan.outlet_limit,
+          },
+          {
+            id: plan.chargebee_events_addon_id,
+            unit_price: 0,
+            quantity: plan.event_limit,
+          },
+          {
+            id: plan.chargebee_collaborators_addon_id,
+            unit_price: 0,
+            quantity: plan.user_limit,
+          },
+        ],
+      })
+      .request(async (error, result) => {
+        if (error) {
+          //handle error
+          console.log(error);
+          return res.status(404).json("Error occured while subscribing").send();
+        } else {
+          // Hash password
+          const salt = await bcrypt.genSalt(10);
+          password_hash = await bcrypt.hash(password_hash, salt);
+          const new_account = await models.Account.query().insert({
+            email: email,
+            first_name,
+            company_name,
+            last_name,
+            password_hash: password_hash,
+            is_admin: false,
+            is_email_verified: true,
+            is_age_verified: false,
+            location_id,
+            state_id,
+            city,
+            street,
+            plan_id: plan.id,
+            no_of_outlets: plan.outlet_limit,
+            no_of_events: plan.event_limit,
+            no_of_users: plan.user_limit,
+            no_of_qrcodes: plan.qr_tags_limit,
+            is_notifications_permited,
+            transaction_id: result.subscription.id,
+            extra_location,
+          });
+          return res
+            .status(200)
+            .json({ Status: true, Message: "Success" })
+            .send();
+        }
+      });
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e)).send();
@@ -2038,7 +1972,6 @@ const updateSubscription = async (req, res, next) => {
     return res.status(500).json(JSON.stringify(e));
   }
 };
-
 const getAllUsers = async (req, res, next) => {
   try {
     const { account_id } = req;
@@ -2055,6 +1988,77 @@ const getAllUsers = async (req, res, next) => {
     if (!account) return res.status(400).json("No accounts found").send();
 
     return res.status(200).send(account);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e)).send();
+  }
+};
+// POST - Invite a new regional organization
+const invitecollaborator = async (req, res, next) => {
+  try {
+    /* Todo add client organization logic */
+    const {
+      owner_email,
+      display_name,
+      custom_message,
+      outlet_venue,
+      outlet_event,
+    } = req.body;
+
+    // Validate that the client hasn't been registered on the platform
+    const client_account = await models.Account.query()
+      .where("email", owner_email)
+      .first();
+    if (client_account)
+      return res
+        .status(400)
+        .json("An account already exists with this email address")
+        .send();
+
+    // Create new token to validate owner email
+    const role = await models.Role.query()
+      .where("scope", "OUTLET")
+      .where("name", "WAITER")
+      .first();
+
+    // Sign jwt
+    const token = await jwt.sign(
+      {
+        role_id: role.id,
+        scope: role.scope,
+        name: role.name,
+      },
+      process.env.SECRET_KEY
+    );
+
+    const new_token = await models.Token.query().insert({
+      email: owner_email,
+      token,
+    });
+
+    // send invite email
+    const host = { first_name: "LiquidIntel", last_name: "Team" };
+    await outletInvitecollaboratorEmail(
+      owner_email,
+      new_token,
+      { scope: "OUTLET", name: "WAITER" },
+      { name: display_name, custom_message, host },
+      outlet_venue,
+      outlet_event
+    );
+
+    // Add collaborator invitation
+    let invitation_expiration_date = new Date();
+    invitation_expiration_date.setHours(
+      invitation_expiration_date.getHours() + 1
+    ); // Default expiration time to 1 hour.
+    await models.CollaboratorInvitation.query().insert({
+      role_id: role.id,
+      email: owner_email,
+      expiration_date: invitation_expiration_date,
+    });
+
+    return res.status(201).json("Invitation successfull").send();
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e)).send();
@@ -2077,19 +2081,20 @@ const userController = {
   resendToken,
   resendInvitation,
   forgot,
-  reset,
-  verifyCredentals,
-  userSignup,
-  updateProfile,
-  updateSubscription,
-  getAllUsers,
   // OAuth
   authWithFacebook,
   inviteOutletManager,
   verifyEmailOrPhone,
   waiterSignup,
   inviteOutletWaiter,
+  //Tomati
+  reset,
   tomatiforgot,
+  verifyCredentals,
+  userSignup,
+  updateProfile,
+  updateSubscription,
+  getAllUsers,
   invitecollaborator,
 };
 

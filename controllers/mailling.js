@@ -201,31 +201,6 @@ const sendFotgotPasswordEmail = (user, token) => {
     .catch(console.error);
 };
 
-const sendFotgotPasswordEmailTomati = (user, token) => {
-  const email = new Email({
-    message: {
-      from: process.env.FROM_EMAIL,
-      subject: "Tomati - Password reset",
-    },
-    send: true,
-    transport: transporter,
-  });
-
-  email
-    .send({
-      template: "tomati_forgot",
-      message: {
-        to: user.email,
-      },
-      locals: {
-        email: user.email,
-        resetUrl: `${process.env.SCHEMA}://${process.env.FRONT_END_TOMATI_HOST}:${process.env.FRONT_END_TOMATI_PORT}/reset?email=${user.email}&token=${token}`,
-      },
-    })
-    .then(/* console.log */)
-    .catch(console.error);
-};
-
 const sendBriefToEmail = (brief, account, status, options) => {
   const email = new Email({
     message: {
@@ -403,6 +378,61 @@ const outletInviteEmail = (account_email, token, role, options) => {
     .catch(console.error);
 };
 
+const outletInviteWaiterEmail = (
+  account_email,
+  token,
+  role,
+  options,
+  outlet_venue,
+  outlet_event
+) => {
+  const email = new Email({
+    message: {
+      from: process.env.FROM_EMAIL,
+      subject: "Welcome to LiquidIntel",
+    },
+    send: true,
+    transport: transporter,
+  });
+
+  const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
+  email
+    .send({
+      template: "invite_waiter",
+      message: {
+        to: account_email,
+      },
+      locals: {
+        email: options && options.name ? options.name : account_email,
+        role: `${capitalizeFirstLetter(role.scope)} ${capitalizeFirstLetter(
+          role.name
+        )}`,
+        signupUrl: `${process.env.SCHEMA}://${process.env.FRONT_HOST}:${
+          process.env.FRONT_PORT
+        }/waiter-signup?email=${account_email}&token=${token.token}&${
+          outlet_event
+            ? `outlet_event=${outlet_event}`
+            : `outlet_venue=${outlet_venue}`
+        }`,
+        custom_message: options && options.custom_message,
+        host_name:
+          options &&
+          options.host &&
+          `${options.host.first_name} ${options.host.last_name}`,
+        host_sign:
+          options &&
+          options.host &&
+          `- ${options.host.first_name} ${options.host.last_name}`,
+      },
+    })
+    .then(/* console.log */)
+    .catch(console.error);
+};
+
+//Tomati App mails
 const outletInvitecollaboratorEmail = (
   account_email,
   token,
@@ -458,55 +488,25 @@ const outletInvitecollaboratorEmail = (
     .then(/* console.log */)
     .catch(console.error);
 };
-
-const outletInviteWaiterEmail = (
-  account_email,
-  token,
-  role,
-  options,
-  outlet_venue,
-  outlet_event
-) => {
+const sendFotgotPasswordEmailTomati = (user, token) => {
   const email = new Email({
     message: {
       from: process.env.FROM_EMAIL,
-      subject: "Welcome to LiquidIntel",
+      subject: "Tomati - Password reset",
     },
     send: true,
     transport: transporter,
   });
 
-  const capitalizeFirstLetter = (string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  };
-
   email
     .send({
-      template: "invite_waiter",
+      template: "tomati_forgot",
       message: {
-        to: account_email,
+        to: user.email,
       },
       locals: {
-        email: options && options.name ? options.name : account_email,
-        role: `${capitalizeFirstLetter(role.scope)} ${capitalizeFirstLetter(
-          role.name
-        )}`,
-        signupUrl: `${process.env.SCHEMA}://${process.env.FRONT_HOST}:${
-          process.env.FRONT_PORT
-        }/waiter-signup?email=${account_email}&token=${token.token}&${
-          outlet_event
-            ? `outlet_event=${outlet_event}`
-            : `outlet_venue=${outlet_venue}`
-        }`,
-        custom_message: options && options.custom_message,
-        host_name:
-          options &&
-          options.host &&
-          `${options.host.first_name} ${options.host.last_name}`,
-        host_sign:
-          options &&
-          options.host &&
-          `- ${options.host.first_name} ${options.host.last_name}`,
+        email: user.email,
+        resetUrl: `${process.env.SCHEMA}://${process.env.FRONT_END_TOMATI_HOST}:${process.env.FRONT_END_TOMATI_PORT}/reset?email=${user.email}&token=${token}`,
       },
     })
     .then(/* console.log */)
@@ -525,6 +525,7 @@ export {
   sendInviteCode,
   outletInviteEmail,
   outletInviteWaiterEmail,
+  //Tomati Mails
   sendFotgotPasswordEmailTomati,
   outletInvitecollaboratorEmail,
 };
