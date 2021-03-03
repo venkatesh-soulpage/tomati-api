@@ -667,7 +667,7 @@ const inviteOutletWaiter = async (req, res, next) => {
     });
 
     // send invite email
-    const host = { first_name: "LiquidIntel", last_name: "Team" };
+    const host = { first_name: "Liquidintel", last_name: "Team" };
     await outletInviteWaiterEmail(
       owner_email,
       new_token,
@@ -2037,7 +2037,7 @@ const invitecollaborator = async (req, res, next) => {
     });
 
     // send invite email
-    const host = { first_name: "LiquidIntel", last_name: "Team" };
+    const host = { first_name: "Tomati", last_name: "Team" };
     await outletInvitecollaboratorEmail(
       owner_email,
       new_token,
