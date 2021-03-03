@@ -181,6 +181,20 @@ const userSignup = async (req, res, next) => {
           last_name,
           email,
         },
+        addons: [
+          {
+            id: `${process.env.STARTER_CHARRGEBEE_FREE_OUTLET_ID}`,
+            quantity: 1,
+          },
+          {
+            id: `${process.env.STARTER_CHARRGEBEE_FREE_EVENTS_ID}`,
+            quantity: 4,
+          },
+          {
+            id: `${process.env.STARTER_CHARRGEBEE_FREE_USERS_ID}`,
+            quantity: 5,
+          },
+        ],
       })
       .request(async (error, result) => {
         if (error) {
