@@ -13,4 +13,9 @@ router.post(
 );
 router.post("/get-coupon", paymentController.retriveCoupon);
 
+router.post(
+  "/get-subscription-details",
+  paymentController.getSubscriptionDetails
+);
+
 module.exports = router;

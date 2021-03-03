@@ -25,6 +25,7 @@ import {
   sendFotgotPasswordEmailTomati,
   outletInvitecollaboratorEmail,
 } from "./mailling";
+import { address } from "chargebee/lib/resources/api_endpoints";
 
 const twilio_client = twilio(
   process.env.TWILIO_ACCOUNT_SID,
@@ -166,56 +167,58 @@ const userSignup = async (req, res, next) => {
       state,
       city,
       street,
-      no_of_outlets,
-      no_of_events,
-      no_of_users,
-      no_of_qrcodes,
       is_notifications_permited,
-      transaction_id,
       extra_location,
     } = req.body;
     const account = await models.Account.query().where("email", email).first();
     if (account) return res.status(404).json("User Already Exists").send();
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    password_hash = await bcrypt.hash(password_hash, salt);
-    const refresh_token = await crypto.randomBytes(16).toString("hex");
-    const new_account = await models.Account.query().insert({
-      email: email,
-      first_name,
-      company_name,
-      last_name,
-      password_hash: password_hash,
-      is_admin: false,
-      is_email_verified: true,
-      is_age_verified: false,
-      plan_id,
-      location_id,
-      state_id: state,
-      city,
-      street,
-      no_of_outlets,
-      no_of_events,
-      no_of_users,
-      no_of_qrcodes,
-      is_notifications_permited,
-      transaction_id,
-      extra_location,
-      refresh_token,
-    });
-    const jwt_token = await jwt.sign(
-      {
-        id: new_account.id,
-        email: new_account.email,
-      },
-      process.env.SECRET_KEY,
-      { expiresIn: "3h" }
-    );
-
-    return res
-      .status(200)
-      .json({ Status: true, Message: "Success", jwt_token, refresh_token })
-      .send();
+    chargebee.subscription
+      .create({
+        plan_id: `${process.env.STARTER_PLAN_ID}`,
+        auto_collection: "off",
+        customer: {
+          first_name,
+          last_name,
+          email,
+        },
+      })
+      .request(async (error, result) => {
+        if (error) {
+          //handle error
+          console.log(error);
+          return res.status(404).json("Error occured while subscribing").send();
+        } else {
+          // Hash password
+          const salt = await bcrypt.genSalt(10);
+          password_hash = await bcrypt.hash(password_hash, salt);
+          const new_account = await models.Account.query().insert({
+            email: email,
+            first_name,
+            company_name,
+            last_name,
+            password_hash: password_hash,
+            is_admin: false,
+            is_email_verified: true,
+            is_age_verified: false,
+            plan_id,
+            location_id,
+            state_id: state,
+            city,
+            street,
+            no_of_outlets: `${process.env.STARTER_NO_OF_OUTLETS}`,
+            no_of_events: `${process.env.STARTER_NO_OF_EVENTS}`,
+            no_of_users: `${process.env.STARTER_NO_OF_USERS}`,
+            no_of_qrcodes: `${process.env.STARTER_NO_OF_QR_TAGS}`,
+            is_notifications_permited,
+            transaction_id: result.subscription.id,
+            extra_location,
+          });
+          return res
+            .status(200)
+            .json({ Status: true, Message: "Success" })
+            .send();
+        }
+      });
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e)).send();

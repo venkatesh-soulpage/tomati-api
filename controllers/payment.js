@@ -136,11 +136,24 @@ const retriveCoupon = async (req, res, next) => {
   }
 };
 
+const getSubscriptionDetails = async (req, res, next) => {
+  try {
+    const id = req.body.subscription_id;
+    if (!id) return res.status(400).send("Invalid Payload");
+    const details = await chargebee.subscription.retrieve(id).request();
+    return res.status(200).json(details);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
+
 const paymentController = {
   makePayment,
   updateSubscription,
   retriveSubscriptionByHostedId,
   retriveCoupon,
+  getSubscriptionDetails,
 };
 
 export default paymentController;

@@ -435,8 +435,10 @@ const outletInvitecollaboratorEmail = (
         role: `${capitalizeFirstLetter(role.scope)} ${capitalizeFirstLetter(
           role.name
         )}`,
-        signupUrl: `${process.env.SCHEMA}://${process.env.FRONT_HOST}:${
-          process.env.DESKTOP_PORT
+        signupUrl: `${process.env.SCHEMA}://${
+          process.env.FRONT_END_TOMATI_HOST
+        }:${
+          process.env.FRONT_END_TOMATI_PORT
         }/collborator/signup?email=${account_email}&token=${token.token}&${
           outlet_event
             ? `outlet_event=${outlet_event}`
