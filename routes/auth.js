@@ -49,7 +49,6 @@ router.post("/resend-verification", accountController.resendToken);
 /* POST Outlet Manager invitation */
 router.post("/invite-outlet-manager", accountController.inviteOutletManager);
 router.post("/invite-outlet-waiter", accountController.inviteOutletWaiter);
-router.post("/invite-collaborator", accountController.invitecollaborator);
 
 /* POST Resend the verification email */
 router.post(
@@ -74,13 +73,15 @@ router.post("/forgot", accountController.forgot);
 router.post("/tomati-forgot", accountController.tomatiforgot);
 
 /* POST Reset Password */
-router.post("/reset", accountController.reset);
-
-/* POST Reset Password */
 router.post("/reset-profile", VerifyToken, accountController.updateProfile);
 
 /* POST Facebook OAuth */
 router.post("/facebook-oauth", accountController.authWithFacebook);
+
+// Tomati Routes
+
+/* POST Reset Password */
+router.post("/reset", accountController.reset);
 
 /* Verify Email and Password */
 router.post("/verify-credentials", accountController.verifyCredentals);
@@ -94,5 +95,11 @@ router.post(
   accountController.updateSubscription
 );
 
+/* Get All Users */
 router.get("/get-all-users", VerifyToken, accountController.getAllUsers);
+
+/* POST Resend the verification email */
+router.post("/tomati-forgot", accountController.tomatiforgot);
+
+router.post("/invite-collaborator", accountController.invitecollaborator);
 module.exports = router;

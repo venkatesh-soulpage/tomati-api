@@ -33,10 +33,8 @@ var outletLocationsRoute = require("./routes/outletlocations");
 var cartRoute = require("./routes/cart");
 var orderInfo = require("./routes/order_info");
 var statistics = require("./routes/statistics");
-var tomatiRegistrationsRoute = require("./routes/TomatiRegistrations.js");
 var plansRoute = require("./routes/plans");
 var subscriptionsRoute = require("./routes/subscription");
-var discountRoute = require("./routes/discount");
 var paymentRoute = require("./routes/payment");
 
 var app = express();
@@ -96,10 +94,10 @@ app.use("/api/outletlocations", outletLocationsRoute);
 app.use("/api/cart", cartRoute);
 app.use("/api/orderinfo", orderInfo);
 app.use("/api/statistics", statistics);
-app.use("/api/tomati/registrations", tomatiRegistrationsRoute);
+
+//Tomati Routes
 app.use("/api/plans", plansRoute);
 app.use("/api/subscriptions", subscriptionsRoute);
-app.use("/api/discounts", discountRoute);
 app.use("/api/payment", paymentRoute);
 
 // check

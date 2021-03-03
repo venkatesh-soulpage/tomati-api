@@ -2,6 +2,8 @@ import models from "../models";
 
 import _ from "lodash";
 
+//Tomati contollers
+
 const getSubscriptions = async (req, res, next) => {
   try {
     const subscriptions = await models.Plan.query().orderBy("id", "desc");
@@ -26,6 +28,7 @@ const createSubscription = async (req, res, next) => {
 };
 
 const subscriptionController = {
+  //Tomati contollers
   getSubscriptions,
   createSubscription,
 };
