@@ -19,5 +19,8 @@ router.post(
   "/get-subscription-details",
   paymentController.getSubscriptionDetails
 );
-
+router.post(
+  "/upgrade-subscription",
+  paymentController.updateSubscriptionThroughCheckout
+);
 module.exports = router;

@@ -149,12 +149,53 @@ const getSubscriptionDetails = async (req, res, next) => {
   }
 };
 
+const updateSubscriptionThroughCheckout = async (req, res, next) => {
+  const plan = await models.Plan.query().where("plan", "starter").first();
+  chargebee.hosted_page
+    .checkout_existing({
+      subscription: {
+        id: "AzZlqkSQboC8r12ov",
+        plan_id: "tomati-growth",
+      },
+
+      // replace_addon_list: true,
+      // addons: [
+      //   {
+      //     id: plan.chargebee_outlets_addon_id,
+      //     unit_price: 1000,
+      //     quantity: plan.outlet_limit,
+      //   },
+      //   {
+      //     id: plan.chargebee_events_addon_id,
+      //     unit_price: 1000,
+      //     quantity: plan.event_limit,
+      //   },
+      //   {
+      //     id: plan.chargebee_collaborators_addon_id,
+      //     unit_price: 1000,
+      //     quantity: plan.user_limit,
+      //   },
+      // ],
+    })
+    .request(function (error, result) {
+      if (error) {
+        //handle error
+        console.log(error);
+      } else {
+        console.log(result);
+        var hosted_page = result.hosted_page;
+        res.send(result.hosted_page);
+      }
+    });
+};
+
 const paymentController = {
   makePayment,
   updateSubscription,
   retriveSubscriptionByHostedId,
   retriveCoupon,
   getSubscriptionDetails,
+  updateSubscriptionThroughCheckout,
 };
 
 export default paymentController;
