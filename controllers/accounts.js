@@ -1825,12 +1825,12 @@ const userSignup = async (req, res, next) => {
             quantity: plan.outlet_limit,
           },
           {
-            id: plan.chargebee_events_addon_id,
+            id: plan.chargebee_free_events_addon_id,
             // unit_price: 0,
             quantity: plan.event_limit,
           },
           {
-            id: plan.chargebee_collaborators_addon_id,
+            id: plan.chargebee_free_collaborators_addon_id,
             // unit_price: 0,
             quantity: plan.user_limit,
           },
