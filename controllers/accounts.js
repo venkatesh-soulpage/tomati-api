@@ -1784,6 +1784,31 @@ const userSignup = async (req, res, next) => {
     const account = await models.Account.query().where("email", email).first();
     if (account) return res.status(404).json("User Already Exists").send();
     const plan = await models.Plan.query().where("plan", "starter").first();
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    password_hash = await bcrypt.hash(password_hash, salt);
+    const new_account = await models.Account.query().insert({
+      email: email,
+      first_name,
+      company_name,
+      last_name,
+      password_hash: password_hash,
+      is_admin: false,
+      is_email_verified: true,
+      is_age_verified: false,
+      location_id,
+      state_id,
+      city,
+      street,
+      plan_id: plan.id,
+      no_of_outlets: plan.outlet_limit,
+      no_of_events: plan.event_limit,
+      no_of_users: plan.user_limit,
+      no_of_qrcodes: plan.qr_tags_limit,
+      is_notifications_permited,
+      is_subscription_active: true,
+      extra_location,
+    });
     chargebee.subscription
       .create({
         plan_id: plan.chargebee_plan_id,
@@ -1815,37 +1840,13 @@ const userSignup = async (req, res, next) => {
         if (error) {
           //handle error
           console.log(error);
-          return res
-            .status(404)
-            .json("Error occurred while subscribing")
-            .send();
+          return res.status(404).json("Error occured while subscribing").send();
         } else {
-          // Hash password
-          const salt = await bcrypt.genSalt(10);
-          password_hash = await bcrypt.hash(password_hash, salt);
-          const new_account = await models.Account.query().insert({
-            email: email,
-            first_name,
-            company_name,
-            last_name,
-            password_hash: password_hash,
-            is_admin: false,
-            is_email_verified: true,
-            is_age_verified: false,
-            location_id,
-            state_id,
-            city,
-            street,
-            plan_id: plan.id,
-            no_of_outlets: plan.outlet_limit,
-            no_of_events: plan.event_limit,
-            no_of_users: plan.user_limit,
-            no_of_qrcodes: plan.qr_tags_limit,
-            is_notifications_permited,
-            transaction_id: result.subscription.id,
-            extra_location,
-            is_subscription_active: true,
-          });
+          const updateaccount = await models.Account.query()
+            .update({
+              transaction_id: result.subscription.id,
+            })
+            .where("id", new_account.id);
           return res
             .status(200)
             .json({ Status: true, Message: "Success" })
