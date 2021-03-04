@@ -1820,7 +1820,7 @@ const userSignup = async (req, res, next) => {
         },
         addons: [
           {
-            id: plan.chargebee_outlets_addon_id,
+            id: plan.chargebee_free_outlets_addon_id,
             // unit_price: 0,
             quantity: plan.outlet_limit,
           },
