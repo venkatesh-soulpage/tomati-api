@@ -1806,7 +1806,7 @@ const userSignup = async (req, res, next) => {
       no_of_users: plan.user_limit,
       no_of_qrcodes: plan.qr_tags_limit,
       is_notifications_permited,
-      // transaction_id: result.subscription.id,
+      is_subscription_active: true,
       extra_location,
     });
     chargebee.subscription
