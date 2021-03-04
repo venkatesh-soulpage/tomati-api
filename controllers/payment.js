@@ -141,8 +141,37 @@ const getSubscriptionDetails = async (req, res, next) => {
   try {
     const id = req.body.subscription_id;
     if (!id) return res.status(400).send("Invalid Payload");
+    const plans = await models.Plan.query();
     const details = await chargebee.subscription.retrieve(id).request();
-    return res.status(200).json(details);
+    const plan = plans.find(
+      (plan) => plan.chargebee_plan_id === details.subscription.plan_id
+    );
+    if (!plan) return res.status(400).send("Subscription plan id");
+    let subscription = plan.plan;
+    let outlet_limit = 0;
+    let event_limit = 0;
+    let user_limit = 0;
+    let qr_limit = 0;
+    for (let addon of details.subscription.addons) {
+      if (addon.id === plan.chargebee_free_outlets_addon_id) {
+        outlet_limit += addon.quantity;
+      } else if (addon.id === plan.chargebee_paid_outlets_addon_id) {
+        outlet_limit += addon.quantity;
+      } else if (addon.id === plan.chargebee_free_events_addon_id) {
+        event_limit += addon.quantity;
+      } else if (addon.id === plan.chargebee_paid_events_addon_id) {
+        event_limit += addon.quantity;
+      } else if (addon.id === plan.chargebee_free_collaborators_addon_id) {
+        user_limit += addon.quantity;
+      } else if (addon.id === plan.chargebee_paid_collaborators_addon_id) {
+        user_limit += addon.quantity;
+      } else {
+        console.log("INVALID ID HAS BEEN CREATED WHILE SUBSCRIBING");
+      }
+    }
+    return res
+      .status(200)
+      .json({ subscription, outlet_limit, event_limit, user_limit, qr_limit });
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e));
