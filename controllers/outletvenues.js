@@ -26,6 +26,18 @@ const getVenues = async (req, res, next) => {
 const getUserVenues = async (req, res, next) => {
   try {
     const { account_id } = req;
+    const user = await models.Account.query()
+      .where({ id: account_id, is_admin: true })
+      .first();
+    if (user) {
+      console.log(req.body);
+      const venues = await models.OutletVenue.query()
+        .withGraphFetched(`[menu]`)
+        .orderBy("created_at", "desc")
+        .where("account_id", req.body.account_id);
+      console.log(venues);
+      return res.status(200).send(venues);
+    }
     console.log(account_id, "ACCOUNT ID");
     // Get brief
     const venues = await models.OutletVenue.query()
@@ -249,7 +261,7 @@ const updateVenue = async (req, res, next) => {
         location_id,
         latitude,
         longitude,
-        account_id,
+        // account_id: outletvenue.account_id,
       })
       .where("id", outlet_venue_id);
     return res.status(200).json("Venue Updated Successfully");

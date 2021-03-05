@@ -15,7 +15,7 @@ router.get(
   venuesController.getVenues
 );
 
-router.get(
+router.post(
   "/user-venues",
   VerifyToken,
   // VerifyRole([
