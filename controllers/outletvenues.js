@@ -38,13 +38,11 @@ const getUserVenues = async (req, res, next) => {
       console.log(venues);
       return res.status(200).send(venues);
     }
-    console.log(account_id, "ACCOUNT ID");
     // Get brief
     const venues = await models.OutletVenue.query()
       .withGraphFetched(`[menu]`)
       .orderBy("created_at", "desc")
       .where("account_id", account_id);
-
     // Send the clientss
     return res.status(200).send(venues);
   } catch (e) {
@@ -261,7 +259,7 @@ const updateVenue = async (req, res, next) => {
         location_id,
         latitude,
         longitude,
-        // account_id: outletvenue.account_id,
+        // account_id,
       })
       .where("id", outlet_venue_id);
     return res.status(200).json("Venue Updated Successfully");
