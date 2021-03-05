@@ -29,20 +29,31 @@ const makePayment = async (req, res, next) => {
       city,
       state,
     } = req.body;
-    chargebee.configure({
-      site: `${process.env.CHARGEBEE_SITE}`,
-      api_key: `${process.env.CHARGEBEE_API_KEY}`,
-    });
+    // chargebee.hosted_page
+    //   .checkout_new({
+    //     subscription: {
+    //       plan_id: plan,
+    //     },
+    //     addons,
+    //     customer,
+    //     coupon_ids: coupon,
+    //     billing_address,
+    //     redirect_url: req.headers.origin + "/success",
+    //   })
     chargebee.hosted_page
       .checkout_new({
         subscription: {
-          plan_id: plan,
+          plan_id: "starter",
         },
-        addons,
-        customer,
-        coupon_ids: coupon,
-        billing_address,
-        redirect_url: req.headers.origin + "/success",
+        addons: [
+          {
+            id: "premium-qr-table-tags",
+          },
+        ],
+        // customer,
+        // coupon_ids: coupon,
+        // billing_address,
+        // redirect_url: req.headers.origin + "/success",
       })
       .request(function (error, result) {
         if (error) {
@@ -93,21 +104,13 @@ const updateSubscription = async (req, res, next) => {
   }
 };
 
-const retriveSubscriptionByHostedId = async (req, res, next) => {
+const retriveSubscriptionById = async (req, res, next) => {
   try {
-    const { hostedPageId } = req.body;
-    chargebee.hosted_page
-      .retrieve(hostedPageId)
-      .request(function (error, result) {
-        if (error) {
-          //handle error
-          console.log(error);
-        } else {
-          // console.log(result, "HOSTED PAGE RESULT");
-          var hosted_page = result.hosted_page;
-          return res.status(200).json(result);
-        }
-      });
+    const { subscription_id } = req.body;
+    const details = await chargebee.subscription
+      .retrieve(subscription_id)
+      .request();
+    return res.status(200).json(details);
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e));
@@ -221,7 +224,7 @@ const updateSubscriptionThroughCheckout = async (req, res, next) => {
 const paymentController = {
   makePayment,
   updateSubscription,
-  retriveSubscriptionByHostedId,
+  retriveSubscriptionById,
   retriveCoupon,
   getSubscriptionDetails,
   updateSubscriptionThroughCheckout,
