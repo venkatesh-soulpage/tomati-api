@@ -42,14 +42,25 @@ const makePayment = async (req, res, next) => {
     //   })
     chargebee.hosted_page
       .checkout_new({
-        subscription: {
-          plan_id: "starter",
+        customer: {
+          first_name: "Preetham Varnasi",
+          email: "varanasipreetham999@gmail.com",
         },
-        addons: [
-          {
-            id: "premium-qr-table-tags",
-          },
-        ],
+        subscription: {
+          plan_id: "starter-monthly",
+        },
+        // addons: [
+        // {
+        //   id: "free-vip-support",
+        //   // unit_price: 0,
+        //   quantity: 1,
+        // },
+        // {
+        //   id: "starter-menu-monthly",
+        //   // unit_price: 0,
+        //   quantity: 1,
+        // },
+        // ],
         // customer,
         // coupon_ids: coupon,
         // billing_address,

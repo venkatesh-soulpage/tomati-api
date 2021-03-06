@@ -1818,18 +1818,18 @@ const userSignup = async (req, res, next) => {
           last_name,
           email,
         },
-        addons: [
-          {
-            id: "free-vip-support",
-            // unit_price: 0,
-            quantity: 1,
-          },
-          {
-            id: "starter-menu-monthly",
-            // unit_price: 0,
-            quantity: 1,
-          },
-        ],
+        // addons: [
+        //   {
+        //     id: "free-vip-support",
+        //     // unit_price: 0,
+        //     quantity: 1,
+        //   },
+        //   {
+        //     id: "starter-menu-monthly",
+        //     // unit_price: 0,
+        //     quantity: 1,
+        //   },
+        // ],
       })
       .request(async (error, result) => {
         if (error) {
