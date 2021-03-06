@@ -7,6 +7,11 @@ var requestIp = require("request-ip");
 const QRCode = require("qrcode");
 const isBase64 = require("is-base64");
 const { s3 } = require("../utils/s3Config");
+var chargebee = require("chargebee");
+chargebee.configure({
+  site: `${process.env.CHARGEBEE_SITE}`,
+  api_key: `${process.env.CHARGEBEE_API_KEY}`,
+});
 
 const getVenues = async (req, res, next) => {
   try {
@@ -26,25 +31,42 @@ const getVenues = async (req, res, next) => {
 const getUserVenues = async (req, res, next) => {
   try {
     const { account_id } = req;
-    const user = await models.Account.query()
-      .where({ id: account_id, is_admin: true })
-      .first();
-    if (user) {
-      console.log(req.body);
+    const user = await models.Account.query().where("id", account_id).first();
+    if (user.is_admin) {
       const venues = await models.OutletVenue.query()
         .withGraphFetched(`[menu]`)
         .orderBy("created_at", "desc")
         .where("account_id", req.body.account_id);
-      console.log(venues);
       return res.status(200).send(venues);
     }
+    const subscriptionDetails = await chargebee.subscription
+      .retrieve(user.transaction_id)
+      .request();
+    const menuAddon = subscriptionDetails.subscription.addons.find(
+      (addon) => addon.id === "free-menu"
+    );
     // Get brief
     const venues = await models.OutletVenue.query()
       .withGraphFetched(`[menu]`)
       .orderBy("created_at", "desc")
       .where("account_id", account_id);
-    // Send the clientss
-    return res.status(200).send(venues);
+    if (menuAddon.quantity < venues.length) {
+      const difference = venues.length - menuAddon.quantity;
+      const lastVenues = venues.slice(-difference);
+      for (let venue of lastVenues) {
+        await models.OutletVenue.query()
+          .update({
+            is_venue_active: false,
+            is_qr_active: false,
+          })
+          .where({ id: venue.id });
+      }
+      // Send the clientss
+      return res.status(200).send(venues);
+    } else {
+      // Send the clientss
+      return res.status(200).send(venues);
+    }
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e));
