@@ -56,7 +56,7 @@ const getUserVenues = async (req, res, next) => {
       for (let venue of lastVenues) {
         await models.OutletVenue.query()
           .update({
-            is_venue_active: false,
+            // is_venue_active: false,
             is_qr_active: false,
           })
           .where({ id: venue.id });
@@ -67,7 +67,7 @@ const getUserVenues = async (req, res, next) => {
       for (let venue of venues) {
         await models.OutletVenue.query()
           .update({
-            is_venue_active: true,
+            // is_venue_active: true,
             is_qr_active: true,
           })
           .where({ id: venue.id });
@@ -390,13 +390,13 @@ const inactivateMenu = async (req, res, next) => {
     await models.OutletVenue.query()
       .update({
         is_venue_active: false,
-        is_qr_active: false,
+        // is_qr_active: false,
       })
       .where("id", venue.id);
     await models.OutletVenue.query()
       .update({
         is_venue_active: true,
-        is_qr_active: true,
+        // is_qr_active: true,
       })
       .where("id", to_activate_id);
 
