@@ -51,12 +51,7 @@ const getUserVenues = async (req, res, next) => {
       .orderBy("created_at", "desc")
       .where("account_id", account_id);
     if (menuAddon.quantity < venues.length) {
-      const activeVenues = venues.filter((venue) => {
-        if (venue.is_venue_active) {
-          return venue;
-        }
-      });
-      const difference = activeVenues.length - menuAddon.quantity;
+      const difference = venues.length - menuAddon.quantity;
       const lastVenues = venues.slice(-difference);
       for (let venue of lastVenues) {
         await models.OutletVenue.query()
