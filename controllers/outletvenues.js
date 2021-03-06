@@ -51,13 +51,17 @@ const getUserVenues = async (req, res, next) => {
       .orderBy("created_at", "desc")
       .where("account_id", account_id);
     if (menuAddon.quantity < venues.length) {
-      const difference = venues.length - menuAddon.quantity;
+      const activeVenues = venues.filter((venue) => {
+        if (venue.is_venue_active) {
+          return venue;
+        }
+      });
+      const difference = activeVenues.length - menuAddon.quantity;
       const lastVenues = venues.slice(-difference);
       for (let venue of lastVenues) {
         await models.OutletVenue.query()
           .update({
-            // is_venue_active: false,
-            is_qr_active: false,
+            is_venue_active: false,
           })
           .where({ id: venue.id });
       }
@@ -67,8 +71,7 @@ const getUserVenues = async (req, res, next) => {
       for (let venue of venues) {
         await models.OutletVenue.query()
           .update({
-            // is_venue_active: true,
-            is_qr_active: true,
+            is_venue_active: true,
           })
           .where({ id: venue.id });
       }
