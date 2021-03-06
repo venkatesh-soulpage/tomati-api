@@ -390,6 +390,7 @@ const inactivateMenu = async (req, res, next) => {
     await models.OutletVenue.query()
       .update({
         is_venue_active: false,
+        is_qr_active: false,
       })
       .where("id", venue.id);
     await models.OutletVenue.query()
@@ -398,6 +399,7 @@ const inactivateMenu = async (req, res, next) => {
         is_qr_active: true,
       })
       .where("id", to_activate_id);
+
     // console.log(account_id, venue_id);
     return res.status(201).json("Success");
   } catch (e) {
