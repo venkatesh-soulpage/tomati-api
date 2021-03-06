@@ -92,7 +92,7 @@ const getVenue = async (req, res, next) => {
     const venue = await models.OutletVenue.query()
       .withGraphFetched(`[menu, location]`)
       // .findById(outlet_venue_id);
-      .where({ id: outlet_venue_id, is_qr_active: true })
+      .where({ id: outlet_venue_id, is_venue_active: true })
       .first();
 
     if (!venue) return res.status(400).json("Invalid or Inactive menu");
