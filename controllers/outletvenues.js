@@ -64,6 +64,14 @@ const getUserVenues = async (req, res, next) => {
       // Send the clientss
       return res.status(200).send(venues);
     } else {
+      for (let venue of venues) {
+        await models.OutletVenue.query()
+          .update({
+            is_venue_active: true,
+            is_qr_active: true,
+          })
+          .where({ id: venue.id });
+      }
       // Send the clientss
       return res.status(200).send(venues);
     }
