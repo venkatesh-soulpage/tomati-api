@@ -76,4 +76,10 @@ router.post(
   venuesController.createVenueMenu
 );
 
+router.put(
+  "/:venue_id/inactivate_menu",
+  VerifyToken,
+  venuesController.inactivateMenu
+);
+
 module.exports = router;

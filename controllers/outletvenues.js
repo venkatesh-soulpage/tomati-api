@@ -93,9 +93,11 @@ const getVenue = async (req, res, next) => {
 
     const venue = await models.OutletVenue.query()
       .withGraphFetched(`[menu, location]`)
-      .findById(outlet_venue_id);
+      // .findById(outlet_venue_id);
+      .where({ id: outlet_venue_id, is_qr_active: true })
+      .first();
 
-    if (!venue) return res.status(400).json("Invalid ID");
+    if (!venue) return res.status(400).json("Invalid or Inactive menu");
 
     const { stats } = venue;
     if (stats && stats.data && stats.data.length > 0) {
@@ -109,7 +111,6 @@ const getVenue = async (req, res, next) => {
         .update({ stats: { data: [countObject] } })
         .findById(outlet_venue_id);
     }
-
     return res.status(200).json(venue);
   } catch (error) {
     console.log(error);
@@ -378,6 +379,33 @@ const createVenueMenu = async (req, res, next) => {
   }
 };
 
+const inactivateMenu = async (req, res, next) => {
+  try {
+    const { account_id } = req;
+    const to_activate_id = req.params.venue_id;
+    const venue = await models.OutletVenue.query()
+      .orderBy("created_at", "asc")
+      .where({ account_id, is_venue_active: true })
+      .first();
+    await models.OutletVenue.query()
+      .update({
+        is_venue_active: false,
+      })
+      .where("id", venue.id);
+    await models.OutletVenue.query()
+      .update({
+        is_venue_active: true,
+        is_qr_active: true,
+      })
+      .where("id", to_activate_id);
+    // console.log(account_id, venue_id);
+    return res.status(201).json("Success");
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
+
 const venuesController = {
   getVenues,
   getUserVenues,
@@ -386,6 +414,7 @@ const venuesController = {
   createVenueMenu,
   updateVenue,
   deleteVenue,
+  inactivateMenu,
 };
 
 export default venuesController;
