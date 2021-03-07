@@ -50,29 +50,19 @@ const getUserVenues = async (req, res, next) => {
       .withGraphFetched(`[menu]`)
       .orderBy("created_at", "desc")
       .where("account_id", account_id);
-    if (menuAddon.quantity < venues.length) {
-      const difference = venues.length - menuAddon.quantity;
-      const lastVenues = venues.slice(-difference);
-      for (let venue of lastVenues) {
-        await models.OutletVenue.query()
-          .update({
-            is_venue_active: false,
-          })
-          .where({ id: venue.id });
-      }
-      // Send the clientss
-      return res.status(200).send(venues);
-    } else {
-      for (let venue of venues) {
-        await models.OutletVenue.query()
-          .update({
-            is_venue_active: true,
-          })
-          .where({ id: venue.id });
-      }
-      // Send the clientss
-      return res.status(200).send(venues);
+    const activeMenus = _.filter(venues, ["is_venue_active", true]);
+    if (menuAddon.quantity < activeMenus.length) {
+      const activeMenusIds = _.map(
+        _.slice(activeMenus, 0, menuAddon.quantity),
+        "id"
+      );
+
+      await models.OutletVenue.query()
+        .update({ is_venue_active: false })
+        .where({ account_id, is_venue_active: true })
+        .whereNotIn("id", activeMenusIds);
     }
+    return res.status(200).send(venues);
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e));
@@ -94,7 +84,7 @@ const getVenue = async (req, res, next) => {
       // .findById(outlet_venue_id);
       .where({ id: outlet_venue_id, is_venue_active: true })
       .first();
-
+    //TODO  we dont have qr active I changed to venue active check every where
     if (!venue) return res.status(400).json("Invalid or Inactive menu");
 
     const { stats } = venue;
@@ -380,26 +370,45 @@ const createVenueMenu = async (req, res, next) => {
 const inactivateMenu = async (req, res, next) => {
   try {
     const { account_id } = req;
-    const to_activate_id = req.params.venue_id;
-    const venue = await models.OutletVenue.query()
+    const { venue_id } = req.params;
+    const { status } = req.body;
+    const user = await models.Account.query().where("id", account_id).first();
+    //TODO admin can change active-inavtive state funtionality needed
+    // if (user.is_admin) {
+    //   const venues = await models.OutletVenue.query()
+    //     .withGraphFetched(`[menu]`)
+    //     .orderBy("created_at", "desc")
+    //     .where("account_id", req.body.account_id);
+    //   return res.status(200).send(venues);
+    // }
+    //TODO restrict the number of times user can change status to menuAddon.quantity
+    const subscriptionDetails = await chargebee.subscription
+      .retrieve(user.transaction_id)
+      .request();
+    const menuAddon = subscriptionDetails.subscription.addons.find(
+      (addon) => addon.id === "free-menu"
+    );
+    const venues = await models.OutletVenue.query()
       .orderBy("created_at", "asc")
-      .where({ account_id, is_venue_active: true })
-      .first();
+      .where({ account_id });
+    const activeMenus = _.filter(venues, ["is_venue_active", true]);
+    if (status && menuAddon.quantity <= activeMenus.length) {
+      //TODO change message to a appropriate one
+      return res.status(400).json("Unable to activate");
+    }
     await models.OutletVenue.query()
       .update({
-        is_venue_active: false,
-        // is_qr_active: false,
+        is_venue_active: status,
       })
-      .where("id", venue.id);
-    await models.OutletVenue.query()
-      .update({
-        is_venue_active: true,
-        // is_qr_active: true,
-      })
-      .where("id", to_activate_id);
+      .where("id", venue_id);
+    // await models.OutletVenue.query()
+    //   .update({
+    //     is_venue_active: true,
+    //   })
+    //   .where("id", to_activate_id);
 
     // console.log(account_id, venue_id);
-    return res.status(201).json("Success");
+    return res.status(202).json("Success");
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e));
