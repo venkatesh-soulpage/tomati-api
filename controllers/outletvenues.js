@@ -7,6 +7,11 @@ var requestIp = require("request-ip");
 const QRCode = require("qrcode");
 const isBase64 = require("is-base64");
 const { s3 } = require("../utils/s3Config");
+var chargebee = require("chargebee");
+chargebee.configure({
+  site: `${process.env.CHARGEBEE_SITE}`,
+  api_key: `${process.env.CHARGEBEE_API_KEY}`,
+});
 
 const getVenues = async (req, res, next) => {
   try {
@@ -26,15 +31,48 @@ const getVenues = async (req, res, next) => {
 const getUserVenues = async (req, res, next) => {
   try {
     const { account_id } = req;
-    console.log(account_id, "ACCOUNT ID");
+    const user = await models.Account.query().where("id", account_id).first();
+    if (user.is_admin) {
+      const venues = await models.OutletVenue.query()
+        .withGraphFetched(`[menu]`)
+        .orderBy("created_at", "desc")
+        .where("account_id", req.body.account_id);
+      return res.status(200).send(venues);
+    }
+    const subscriptionDetails = await chargebee.subscription
+      .retrieve(user.transaction_id)
+      .request();
+    const menuAddon = subscriptionDetails.subscription.addons.find(
+      (addon) => addon.id === "free-menu"
+    );
     // Get brief
     const venues = await models.OutletVenue.query()
       .withGraphFetched(`[menu]`)
       .orderBy("created_at", "desc")
       .where("account_id", account_id);
-
-    // Send the clientss
-    return res.status(200).send(venues);
+    if (menuAddon.quantity < venues.length) {
+      const difference = venues.length - menuAddon.quantity;
+      const lastVenues = venues.slice(-difference);
+      for (let venue of lastVenues) {
+        await models.OutletVenue.query()
+          .update({
+            is_venue_active: false,
+          })
+          .where({ id: venue.id });
+      }
+      // Send the clientss
+      return res.status(200).send(venues);
+    } else {
+      for (let venue of venues) {
+        await models.OutletVenue.query()
+          .update({
+            is_venue_active: true,
+          })
+          .where({ id: venue.id });
+      }
+      // Send the clientss
+      return res.status(200).send(venues);
+    }
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e));
@@ -53,9 +91,11 @@ const getVenue = async (req, res, next) => {
 
     const venue = await models.OutletVenue.query()
       .withGraphFetched(`[menu, location]`)
-      .findById(outlet_venue_id);
+      // .findById(outlet_venue_id);
+      .where({ id: outlet_venue_id, is_venue_active: true })
+      .first();
 
-    if (!venue) return res.status(400).json("Invalid ID");
+    if (!venue) return res.status(400).json("Invalid or Inactive menu");
 
     const { stats } = venue;
     if (stats && stats.data && stats.data.length > 0) {
@@ -69,7 +109,6 @@ const getVenue = async (req, res, next) => {
         .update({ stats: { data: [countObject] } })
         .findById(outlet_venue_id);
     }
-
     return res.status(200).json(venue);
   } catch (error) {
     console.log(error);
@@ -249,7 +288,7 @@ const updateVenue = async (req, res, next) => {
         location_id,
         latitude,
         longitude,
-        account_id,
+        // account_id,
       })
       .where("id", outlet_venue_id);
     return res.status(200).json("Venue Updated Successfully");
@@ -338,6 +377,35 @@ const createVenueMenu = async (req, res, next) => {
   }
 };
 
+const inactivateMenu = async (req, res, next) => {
+  try {
+    const { account_id } = req;
+    const to_activate_id = req.params.venue_id;
+    const venue = await models.OutletVenue.query()
+      .orderBy("created_at", "asc")
+      .where({ account_id, is_venue_active: true })
+      .first();
+    await models.OutletVenue.query()
+      .update({
+        is_venue_active: false,
+        // is_qr_active: false,
+      })
+      .where("id", venue.id);
+    await models.OutletVenue.query()
+      .update({
+        is_venue_active: true,
+        // is_qr_active: true,
+      })
+      .where("id", to_activate_id);
+
+    // console.log(account_id, venue_id);
+    return res.status(201).json("Success");
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
+
 const venuesController = {
   getVenues,
   getUserVenues,
@@ -346,6 +414,7 @@ const venuesController = {
   createVenueMenu,
   updateVenue,
   deleteVenue,
+  inactivateMenu,
 };
 
 export default venuesController;

@@ -1783,7 +1783,7 @@ const userSignup = async (req, res, next) => {
     } = req.body;
     const account = await models.Account.query().where("email", email).first();
     if (account) return res.status(404).json("User Already Exists").send();
-    const plan = await models.Plan.query().where("plan", "starter").first();
+    // const plan = await models.Plan.query().where("plan", "starter").first();
     // Hash password
     const salt = await bcrypt.genSalt(10);
     password_hash = await bcrypt.hash(password_hash, salt);
@@ -1800,41 +1800,36 @@ const userSignup = async (req, res, next) => {
       state_id,
       city,
       street,
-      plan_id: plan.id,
-      no_of_outlets: plan.outlet_limit,
-      no_of_events: plan.event_limit,
-      no_of_users: plan.user_limit,
-      no_of_qrcodes: plan.qr_tags_limit,
+      // plan_id: plan.id,
+      // no_of_outlets: plan.outlet_limit,
+      // no_of_events: plan.event_limit,
+      // no_of_users: plan.user_limit,
+      // no_of_qrcodes: plan.qr_tags_limit,
       is_notifications_permited,
       is_subscription_active: true,
       extra_location,
     });
     chargebee.subscription
       .create({
-        plan_id: plan.chargebee_plan_id,
+        plan_id: "starter-monthly",
         auto_collection: "off",
         customer: {
           first_name,
           last_name,
           email,
         },
-        addons: [
-          {
-            id: plan.chargebee_outlets_addon_id,
-            // unit_price: 0,
-            quantity: plan.outlet_limit,
-          },
-          {
-            id: plan.chargebee_events_addon_id,
-            // unit_price: 0,
-            quantity: plan.event_limit,
-          },
-          {
-            id: plan.chargebee_collaborators_addon_id,
-            // unit_price: 0,
-            quantity: plan.user_limit,
-          },
-        ],
+        // addons: [
+        //   {
+        //     id: "free-vip-support",
+        //     // unit_price: 0,
+        //     quantity: 1,
+        //   },
+        //   {
+        //     id: "starter-menu-monthly",
+        //     // unit_price: 0,
+        //     quantity: 1,
+        //   },
+        // ],
       })
       .request(async (error, result) => {
         if (error) {
