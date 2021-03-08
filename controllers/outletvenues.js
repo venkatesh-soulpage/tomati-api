@@ -398,19 +398,13 @@ const inactivateMenu = async (req, res, next) => {
       .where("created_at", ">=", new moment().startOf("month"))
       .where("created_at", "<", new moment().endOf("month"))
       .where({ account_id });
-    console.log(monthlyStatusCount.length, "MONTHLY STATUS COUNT");
+    if (menuAddon.quantity < monthlyStatusCount.length)
+      return res.status(400).json("you've exceeded your limit to activate");
     await models.OutletVenue.query()
       .update({
         is_venue_active: status,
       })
       .where("id", venue_id);
-    if (menuAddon.quantity > monthlyStatusCount.length)
-      return res.status(400).json("you've exceeded your limit to activate");
-    await models.OutletVenue.query()
-      .update({
-        is_venue_active: true,
-      })
-      .where("id", to_activate_id);
 
     if (status) {
       await models.MenuStatusCount.query().insert({
