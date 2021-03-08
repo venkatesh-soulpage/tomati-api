@@ -392,14 +392,14 @@ const inactivateMenu = async (req, res, next) => {
       .where({ account_id });
     const activeMenus = _.filter(venues, ["is_venue_active", true]);
     if (status && menuAddon.quantity <= activeMenus.length) {
-      return res.status(400).json("Upgrade your plan or contact admin");
+      return res.status(400).json("Please upgrade your plan or contact");
     }
     const monthlyStatusCount = await models.MenuStatusCount.query()
       .where("created_at", ">=", new moment().startOf("month"))
       .where("created_at", "<", new moment().endOf("month"))
       .where({ account_id });
-    if (menuAddon.quantity < monthlyStatusCount.length)
-      return res.status(400).json("you've exceeded your limit to activate");
+    if (menuAddon.quantity <= monthlyStatusCount.length)
+      return res.status(400).json("You've exceeded your limit to activate");
     await models.OutletVenue.query()
       .update({
         is_venue_active: status,
