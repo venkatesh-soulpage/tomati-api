@@ -81,11 +81,9 @@ const getVenue = async (req, res, next) => {
 
     const venue = await models.OutletVenue.query()
       .withGraphFetched(`[menu, location]`)
-      // .findById(outlet_venue_id);
-      .where({ id: outlet_venue_id, is_venue_active: true })
-      .first();
-    //TODO  we dont have qr active I changed to venue active check every where
-    if (!venue) return res.status(400).json("Invalid or Inactive menu");
+      .findById(outlet_venue_id);
+    if (venue === undefined) return res.status(400).json("Invalid");
+    if (!venue.is_venue_active) return res.status(400).json("Inactive menu");
 
     const { stats } = venue;
     if (stats && stats.data && stats.data.length > 0) {
@@ -393,8 +391,7 @@ const inactivateMenu = async (req, res, next) => {
       .where({ account_id });
     const activeMenus = _.filter(venues, ["is_venue_active", true]);
     if (status && menuAddon.quantity <= activeMenus.length) {
-      //TODO change message to a appropriate one
-      return res.status(400).json("Unable to activate");
+      return res.status(400).json("Upgrade your plan or contact admin");
     }
     await models.OutletVenue.query()
       .update({
