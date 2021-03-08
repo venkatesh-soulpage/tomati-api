@@ -29,20 +29,42 @@ const makePayment = async (req, res, next) => {
       city,
       state,
     } = req.body;
-    chargebee.configure({
-      site: `${process.env.CHARGEBEE_SITE}`,
-      api_key: `${process.env.CHARGEBEE_API_KEY}`,
-    });
+    // chargebee.hosted_page
+    //   .checkout_new({
+    //     subscription: {
+    //       plan_id: plan,
+    //     },
+    //     addons,
+    //     customer,
+    //     coupon_ids: coupon,
+    //     billing_address,
+    //     redirect_url: req.headers.origin + "/success",
+    //   })
     chargebee.hosted_page
       .checkout_new({
-        subscription: {
-          plan_id: plan,
+        customer: {
+          first_name: "Preetham Varnasi",
+          email: "varanasipreetham999@gmail.com",
         },
-        addons,
-        customer,
-        coupon_ids: coupon,
-        billing_address,
-        redirect_url: req.headers.origin + "/success",
+        subscription: {
+          plan_id: "starter-monthly",
+        },
+        // addons: [
+        // {
+        //   id: "free-vip-support",
+        //   // unit_price: 0,
+        //   quantity: 1,
+        // },
+        // {
+        //   id: "starter-menu-monthly",
+        //   // unit_price: 0,
+        //   quantity: 1,
+        // },
+        // ],
+        // customer,
+        // coupon_ids: coupon,
+        // billing_address,
+        // redirect_url: req.headers.origin + "/success",
       })
       .request(function (error, result) {
         if (error) {
@@ -93,21 +115,13 @@ const updateSubscription = async (req, res, next) => {
   }
 };
 
-const retriveSubscriptionByHostedId = async (req, res, next) => {
+const retriveSubscriptionById = async (req, res, next) => {
   try {
-    const { hostedPageId } = req.body;
-    chargebee.hosted_page
-      .retrieve(hostedPageId)
-      .request(function (error, result) {
-        if (error) {
-          //handle error
-          console.log(error);
-        } else {
-          // console.log(result, "HOSTED PAGE RESULT");
-          var hosted_page = result.hosted_page;
-          return res.status(200).json(result);
-        }
-      });
+    const { subscription_id } = req.body;
+    const details = await chargebee.subscription
+      .retrieve(subscription_id)
+      .request();
+    return res.status(200).json(details);
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e));
@@ -141,8 +155,37 @@ const getSubscriptionDetails = async (req, res, next) => {
   try {
     const id = req.body.subscription_id;
     if (!id) return res.status(400).send("Invalid Payload");
+    const plans = await models.Plan.query();
     const details = await chargebee.subscription.retrieve(id).request();
-    return res.status(200).json(details);
+    const plan = plans.find(
+      (plan) => plan.chargebee_plan_id === details.subscription.plan_id
+    );
+    if (!plan) return res.status(400).send("Subscription plan id");
+    let subscription = plan.plan;
+    let outlet_limit = 0;
+    let event_limit = 0;
+    let user_limit = 0;
+    let qr_limit = 0;
+    for (let addon of details.subscription.addons) {
+      if (addon.id === plan.chargebee_free_outlets_addon_id) {
+        outlet_limit += addon.quantity;
+      } else if (addon.id === plan.chargebee_paid_outlets_addon_id) {
+        outlet_limit += addon.quantity;
+      } else if (addon.id === plan.chargebee_free_events_addon_id) {
+        event_limit += addon.quantity;
+      } else if (addon.id === plan.chargebee_paid_events_addon_id) {
+        event_limit += addon.quantity;
+      } else if (addon.id === plan.chargebee_free_collaborators_addon_id) {
+        user_limit += addon.quantity;
+      } else if (addon.id === plan.chargebee_paid_collaborators_addon_id) {
+        user_limit += addon.quantity;
+      } else {
+        console.log("INVALID ID HAS BEEN CREATED WHILE SUBSCRIBING");
+      }
+    }
+    return res
+      .status(200)
+      .json({ subscription, outlet_limit, event_limit, user_limit, qr_limit });
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e));
@@ -192,7 +235,7 @@ const updateSubscriptionThroughCheckout = async (req, res, next) => {
 const paymentController = {
   makePayment,
   updateSubscription,
-  retriveSubscriptionByHostedId,
+  retriveSubscriptionById,
   retriveCoupon,
   getSubscriptionDetails,
   updateSubscriptionThroughCheckout,

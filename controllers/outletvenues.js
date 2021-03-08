@@ -1,12 +1,18 @@
 import models from "../models";
 
 import _ from "lodash";
+import moment from "moment";
 
 var requestIp = require("request-ip");
 
 const QRCode = require("qrcode");
 const isBase64 = require("is-base64");
 const { s3 } = require("../utils/s3Config");
+var chargebee = require("chargebee");
+chargebee.configure({
+  site: `${process.env.CHARGEBEE_SITE}`,
+  api_key: `${process.env.CHARGEBEE_API_KEY}`,
+});
 
 const getVenues = async (req, res, next) => {
   try {
@@ -26,14 +32,37 @@ const getVenues = async (req, res, next) => {
 const getUserVenues = async (req, res, next) => {
   try {
     const { account_id } = req;
-    console.log(account_id, "ACCOUNT ID");
+    const user = await models.Account.query().where("id", account_id).first();
+    if (user.is_admin) {
+      const venues = await models.OutletVenue.query()
+        .withGraphFetched(`[menu]`)
+        .orderBy("created_at", "desc")
+        .where("account_id", req.body.account_id);
+      return res.status(200).send(venues);
+    }
+    const subscriptionDetails = await chargebee.subscription
+      .retrieve(user.transaction_id)
+      .request();
+    const menuAddon = subscriptionDetails.subscription.addons.find(
+      (addon) => addon.id === "free-menu"
+    );
     // Get brief
     const venues = await models.OutletVenue.query()
       .withGraphFetched(`[menu]`)
       .orderBy("created_at", "desc")
       .where("account_id", account_id);
+    const activeMenus = _.filter(venues, ["is_venue_active", true]);
+    if (menuAddon.quantity < activeMenus.length) {
+      const activeMenusIds = _.map(
+        _.slice(activeMenus, 0, menuAddon.quantity),
+        "id"
+      );
 
-    // Send the clientss
+      await models.OutletVenue.query()
+        .update({ is_venue_active: false })
+        .where({ account_id, is_venue_active: true })
+        .whereNotIn("id", activeMenusIds);
+    }
     return res.status(200).send(venues);
   } catch (e) {
     console.log(e);
@@ -54,8 +83,8 @@ const getVenue = async (req, res, next) => {
     const venue = await models.OutletVenue.query()
       .withGraphFetched(`[menu, location]`)
       .findById(outlet_venue_id);
-
-    if (!venue) return res.status(400).json("Invalid ID");
+    if (venue === undefined) return res.status(400).json("invalid");
+    if (!venue.is_venue_active) return res.status(400).json("inactive");
 
     const { stats } = venue;
     if (stats && stats.data && stats.data.length > 0) {
@@ -69,7 +98,6 @@ const getVenue = async (req, res, next) => {
         .update({ stats: { data: [countObject] } })
         .findById(outlet_venue_id);
     }
-
     return res.status(200).json(venue);
   } catch (error) {
     console.log(error);
@@ -249,7 +277,7 @@ const updateVenue = async (req, res, next) => {
         location_id,
         latitude,
         longitude,
-        account_id,
+        // account_id,
       })
       .where("id", outlet_venue_id);
     return res.status(200).json("Venue Updated Successfully");
@@ -338,6 +366,60 @@ const createVenueMenu = async (req, res, next) => {
   }
 };
 
+const inactivateMenu = async (req, res, next) => {
+  try {
+    const { account_id } = req;
+    const { venue_id } = req.params;
+    const { status } = req.body;
+    const user = await models.Account.query().where("id", account_id).first();
+    //TODO admin can change active-inavtive state funtionality needed
+    // if (user.is_admin) {
+    //   const venues = await models.OutletVenue.query()
+    //     .withGraphFetched(`[menu]`)
+    //     .orderBy("created_at", "desc")
+    //     .where("account_id", req.body.account_id);
+    //   return res.status(200).send(venues);
+    // }
+    //TODO restrict the number of times user can change status to menuAddon.quantity
+    const subscriptionDetails = await chargebee.subscription
+      .retrieve(user.transaction_id)
+      .request();
+    const menuAddon = subscriptionDetails.subscription.addons.find(
+      (addon) => addon.id === "free-menu"
+    );
+    const venues = await models.OutletVenue.query()
+      .orderBy("created_at", "asc")
+      .where({ account_id });
+    const activeMenus = _.filter(venues, ["is_venue_active", true]);
+    if (status && menuAddon.quantity <= activeMenus.length) {
+      return res.status(400).json("Please upgrade your plan or contact");
+    }
+    const monthlyStatusCount = await models.MenuStatusCount.query()
+      .where("created_at", ">=", new moment().startOf("month"))
+      .where("created_at", "<", new moment().endOf("month"))
+      .where({ account_id });
+    if (menuAddon.quantity <= monthlyStatusCount.length)
+      return res
+        .status(400)
+        .json("You've exceeded your limit to activate menu");
+    await models.OutletVenue.query()
+      .update({
+        is_venue_active: status,
+      })
+      .where("id", venue_id);
+
+    if (status) {
+      await models.MenuStatusCount.query().insert({
+        account_id,
+      });
+    }
+    return res.status(202).json("Success");
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
+
 const venuesController = {
   getVenues,
   getUserVenues,
@@ -346,6 +428,7 @@ const venuesController = {
   createVenueMenu,
   updateVenue,
   deleteVenue,
+  inactivateMenu,
 };
 
 export default venuesController;

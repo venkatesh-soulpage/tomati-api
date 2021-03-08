@@ -15,7 +15,7 @@ router.get(
   venuesController.getVenues
 );
 
-router.get(
+router.post(
   "/user-venues",
   VerifyToken,
   // VerifyRole([
@@ -74,6 +74,12 @@ router.post(
   //   { scope: "OUTLET", role: "OWNER" },
   // ]),
   venuesController.createVenueMenu
+);
+
+router.put(
+  "/:venue_id/inactivate_menu",
+  VerifyToken,
+  venuesController.inactivateMenu
 );
 
 module.exports = router;
