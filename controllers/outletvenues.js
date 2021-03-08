@@ -399,7 +399,9 @@ const inactivateMenu = async (req, res, next) => {
       .where("created_at", "<", new moment().endOf("month"))
       .where({ account_id });
     if (menuAddon.quantity <= monthlyStatusCount.length)
-      return res.status(400).json("You've exceeded your limit to activate");
+      return res
+        .status(400)
+        .json("You've exceeded your limit to activate menu");
     await models.OutletVenue.query()
       .update({
         is_venue_active: status,
