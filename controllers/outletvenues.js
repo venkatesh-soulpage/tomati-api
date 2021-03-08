@@ -82,8 +82,8 @@ const getVenue = async (req, res, next) => {
     const venue = await models.OutletVenue.query()
       .withGraphFetched(`[menu, location]`)
       .findById(outlet_venue_id);
-    if (venue === undefined) return res.status(400).json("Invalid");
-    if (!venue.is_venue_active) return res.status(400).json("Inactive menu");
+    if (venue === undefined) return res.status(400).json("invalid");
+    if (!venue.is_venue_active) return res.status(400).json("inactive");
 
     const { stats } = venue;
     if (stats && stats.data && stats.data.length > 0) {
