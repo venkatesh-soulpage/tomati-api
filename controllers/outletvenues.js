@@ -1,6 +1,7 @@
 import models from "../models";
 
 import _ from "lodash";
+import moment from "moment";
 
 var requestIp = require("request-ip");
 
@@ -393,18 +394,29 @@ const inactivateMenu = async (req, res, next) => {
     if (status && menuAddon.quantity <= activeMenus.length) {
       return res.status(400).json("Upgrade your plan or contact admin");
     }
+    const monthlyStatusCount = await models.MenuStatusCount.query()
+      .where("created_at", ">=", new moment().startOf("month"))
+      .where("created_at", "<", new moment().endOf("month"))
+      .where({ account_id });
+    console.log(monthlyStatusCount.length, "MONTHLY STATUS COUNT");
     await models.OutletVenue.query()
       .update({
         is_venue_active: status,
       })
       .where("id", venue_id);
-    // await models.OutletVenue.query()
-    //   .update({
-    //     is_venue_active: true,
-    //   })
-    //   .where("id", to_activate_id);
+    if (menuAddon.quantity > monthlyStatusCount.length)
+      return res.status(400).json("you've exceeded your limit to activate");
+    await models.OutletVenue.query()
+      .update({
+        is_venue_active: true,
+      })
+      .where("id", to_activate_id);
 
-    // console.log(account_id, venue_id);
+    if (status) {
+      await models.MenuStatusCount.query().insert({
+        account_id,
+      });
+    }
     return res.status(202).json("Success");
   } catch (e) {
     console.log(e);

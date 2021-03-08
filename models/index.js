@@ -51,6 +51,7 @@ import Statistics from "./statistics";
 import tempOutletRegistrations from "./temp_registrations";
 import Plan from "./plans";
 import Discount from "./discount";
+import MenuStatusCount from "./menu_status_count";
 
 export default {
   Location,
@@ -106,4 +107,5 @@ export default {
   tempOutletRegistrations,
   Plan,
   Discount,
+  MenuStatusCount,
 };
