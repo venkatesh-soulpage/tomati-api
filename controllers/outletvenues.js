@@ -371,7 +371,7 @@ const inactivateMenu = async (req, res, next) => {
     const { account_id } = req;
     const { venue_id } = req.params;
     const { status } = req.body;
-    const user = await models.Account.query().where("id", account_id).first();
+    const user = await models.Account.query().findById(account_id);
     //TODO admin can change active-inavtive state funtionality needed
     // if (user.is_admin) {
     //   const venues = await models.OutletVenue.query()
@@ -392,28 +392,40 @@ const inactivateMenu = async (req, res, next) => {
       .where({ account_id });
     const activeMenus = _.filter(venues, ["is_venue_active", true]);
     if (status && menuAddon.quantity <= activeMenus.length) {
-      return res.status(400).json("Please upgrade your plan or contact");
+      return res.status(400).json({
+        status: false,
+        message: "Please upgrade your plan or contact",
+      });
     }
     const monthlyStatusCount = await models.MenuStatusCount.query()
       .where("created_at", ">=", new moment().startOf("month"))
       .where("created_at", "<", new moment().endOf("month"))
       .where({ account_id });
     if (menuAddon.quantity <= monthlyStatusCount.length)
-      return res
-        .status(400)
-        .json("You've exceeded your limit to activate menu");
+      return res.status(400).json({
+        status: false,
+        message: "You've exceeded your limit to activate menu",
+      });
     await models.OutletVenue.query()
       .update({
         is_venue_active: status,
       })
       .where("id", venue_id);
-
     if (status) {
       await models.MenuStatusCount.query().insert({
         account_id,
       });
+      return res.status(202).json({
+        status: true,
+        message: `You've only ${
+          menuAddon.quantity - monthlyStatusCount.length - 1
+        } remaining chances to switch your menus for this month`,
+      });
     }
-    return res.status(202).json("Success");
+    return res.status(202).json({
+      status: true,
+      message: "Deactived the requested menu",
+    });
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e));
