@@ -203,10 +203,10 @@ const adminSignup = async (req, res, next) => {
     if (!email || !password || !first_name || !last_name)
       return res.status(400).json("Invalid payload");
     // Check if the account doesn't exist
-    const account = await models.Account.query().where("email", email);
+    const account = await models.Account.query().findOne({ email });
 
     // If the account exist, return message
-    if (account && account.length > 0)
+    if (account)
       return res.status(400).json({ msg: "This email already exists" });
 
     // Hash password
