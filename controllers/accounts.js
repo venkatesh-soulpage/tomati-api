@@ -196,6 +196,47 @@ const signup = async (req, res, next) => {
   }
 };
 
+const adminSignup = async (req, res, next) => {
+  const { email, password, first_name, last_name } = req.body;
+
+  try {
+    if (!email || !password || !first_name || !last_name)
+      return res.status(400).json("Invalid payload");
+    // Check if the account doesn't exist
+    const account = await models.Account.query().findOne({ email });
+
+    // If the account exist, return message
+    if (account)
+      return res.status(400).json({ msg: "This email already exists" });
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const password_hash = await bcrypt.hash(password, salt);
+
+    // Add new account
+    const new_account = await models.Account.query().insert({
+      email,
+      first_name,
+      last_name,
+      password_hash,
+      is_admin: true,
+      is_email_verified: true,
+      is_age_verified: false,
+    });
+
+    // Create new token
+    const new_token = await models.Token.query().insert({
+      email: new_account.email,
+      token: crypto.randomBytes(16).toString("hex"),
+    });
+
+    // Return the account
+    return res.status(201).json({ new_account, new_token }).send();
+  } catch (e) {
+    return res.status(500).json(JSON.stringify(e)).send();
+  }
+};
+
 // POST - Outlet Signup
 const outletSignup = async (req, res, next) => {
   try {
@@ -2096,6 +2137,7 @@ const userController = {
   updateSubscription,
   getAllUsers,
   invitecollaborator,
+  adminSignup,
 };
 
 export default userController;
