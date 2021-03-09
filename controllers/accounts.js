@@ -200,6 +200,8 @@ const adminSignup = async (req, res, next) => {
   const { email, password, first_name, last_name } = req.body;
 
   try {
+    if (!email || !password || !first_name || !last_name)
+      return res.status(400).json("Invalid payload");
     // Check if the account doesn't exist
     const account = await models.Account.query().where("email", email);
 
