@@ -2025,13 +2025,6 @@ const getAllUsers = async (req, res, next) => {
     }
 
     const accounts = await models.Account.query()
-      .withGraphFetched(
-        `[
-                      wallet,
-                      outlets,
-                      events,
-                  ]`
-      )
       .where({ is_admin: false })
       .orderBy("created_at", "DESC");
 
