@@ -424,7 +424,7 @@ const inactivateMenu = async (req, res, next) => {
     }
     return res.status(202).json({
       status: true,
-      message: "Deactived the requested menu",
+      message: "Deactivated the requested menu",
     });
   } catch (e) {
     console.log(e);
