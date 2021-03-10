@@ -81,7 +81,7 @@ const getVenue = async (req, res, next) => {
     if (!outlet_venue_id) return res.status(400).json("Invalid ID");
 
     const venue = await models.OutletVenue.query()
-      .withGraphFetched(`[menu, location]`)
+      .withGraphFetched(`[menu,collaborators,location]`)
       .findById(outlet_venue_id);
     if (venue === undefined) return res.status(400).json("invalid");
     if (!venue.is_venue_active) return res.status(400).json("inactive");
@@ -432,20 +432,6 @@ const inactivateMenu = async (req, res, next) => {
   }
 };
 
-const getVenueCollaborators = async (req, res, next) => {
-  try {
-    const { venue_id } = req.params;
-    console.log(venue_id, "Venue ID");
-    const collaborators = await models.CollaboratorInvitation.query()
-      // .withGraphFetched(`[collaborators]`)
-      .where("venue_id", venue_id);
-    return res.status(200).json(collaborators);
-  } catch (e) {
-    console.log(e);
-    return res.status(500).json(JSON.stringify(e)).send();
-  }
-};
-
 const venuesController = {
   getVenues,
   getUserVenues,
@@ -455,7 +441,6 @@ const venuesController = {
   updateVenue,
   deleteVenue,
   inactivateMenu,
-  getVenueCollaborators,
 };
 
 export default venuesController;
