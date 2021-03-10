@@ -2024,11 +2024,20 @@ const getAllUsers = async (req, res, next) => {
         .send("You are not authorized to access this information");
     }
 
-    const account = await models.Account.query().orderBy("created_at", "DESC");
+    const accounts = await models.Account.query()
+      .withGraphFetched(
+        `[
+                      wallet,
+                      outlets,
+                      events,
+                  ]`
+      )
+      .where({ is_admin: false })
+      .orderBy("created_at", "DESC");
 
-    if (!account) return res.status(400).json("No accounts found").send();
+    if (!accounts) return res.status(400).json("No accounts found").send();
 
-    return res.status(200).send(account);
+    return res.status(200).send(accounts);
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e)).send();
