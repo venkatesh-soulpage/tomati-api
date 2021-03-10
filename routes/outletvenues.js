@@ -81,5 +81,10 @@ router.put(
   VerifyToken,
   venuesController.inactivateMenu
 );
+router.get(
+  "/:venue_id/venue-collaborators",
+  VerifyToken,
+  venuesController.getVenueCollaborators
+);
 
 module.exports = router;
