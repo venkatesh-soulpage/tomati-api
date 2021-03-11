@@ -32,8 +32,10 @@ const getVenues = async (req, res, next) => {
 const getUserVenues = async (req, res, next) => {
   try {
     const { account_id } = req;
-    const user = await models.Account.query().where("id", account_id).first();
+    const user = await models.Account.query().findById(account_id);
     if (user.is_admin) {
+      if (!req.body.account_id)
+        return res.status(400).json("Admin has no access to create menus");
       const venues = await models.OutletVenue.query()
         .withGraphFetched(`[menu]`)
         .orderBy("created_at", "desc")
