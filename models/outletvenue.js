@@ -23,6 +23,14 @@ export default class OutletVenue extends Model {
           to: "outletvenues.location_id",
         },
       },
+      collaborators: {
+        relation: Model.HasManyRelation,
+        modelClass: models.CollaboratorInvitation,
+        join: {
+          from: "collaborator_invitations.venue_id",
+          to: "outletvenues.id",
+        },
+      },
     };
   }
 }

@@ -26,6 +26,7 @@ import {
   outletInvitecollaboratorEmail,
 } from "./mailling";
 import { address } from "chargebee/lib/resources/api_endpoints";
+import Knex from "knex";
 
 const twilio_client = twilio(
   process.env.TWILIO_ACCOUNT_SID,
@@ -405,7 +406,7 @@ const waiterSignup = async (req, res, next) => {
       last_name,
       phone_number,
       password_hash,
-      is_admin: true,
+      is_admin: false,
       is_email_verified: true,
       is_age_verified: true,
       refresh_token,
@@ -453,6 +454,9 @@ const waiterSignup = async (req, res, next) => {
       process.env.SECRET_KEY,
       { expiresIn: "3h" }
     );
+    await models.CollaboratorInvitation.query()
+      .patch({ status: "SIGNED" })
+      .where("email", email);
 
     // Send signup email
     // await sendConfirmationEmail(new_account, new_token);
@@ -1850,6 +1854,17 @@ const userSignup = async (req, res, next) => {
       is_subscription_active: true,
       extra_location,
     });
+    // Search for Region Owner Role
+    const role = await models.Role.query()
+      .where("scope", "OUTLET")
+      .where("name", "MANAGER")
+      .first();
+
+    // Add a client collaborator
+    await models.Collaborator.query().insert({
+      role_id: role.id,
+      account_id: new_account.id,
+    });
     chargebee.subscription
       .create({
         plan_id: "starter-monthly",
@@ -2023,21 +2038,23 @@ const getAllUsers = async (req, res, next) => {
         .status(400)
         .send("You are not authorized to access this information");
     }
+    const ManagerRole = await models.Role.query()
+      .where("scope", "OUTLET")
+      .where("name", "MANAGER")
+      .first();
 
     const accounts = await models.Account.query()
-      .withGraphFetched(
-        `[
-                      wallet,
-                      outlets,
-                      events,
-                  ]`
-      )
-      .where({ is_admin: false })
+      .withGraphFetched(`[role]`)
+      // .where({ is_admin: false })
       .orderBy("created_at", "DESC");
 
     if (!accounts) return res.status(400).json("No accounts found").send();
+    const outletManagers = accounts.filter((account) => {
+      if (account.role !== null && account.role.id === ManagerRole.id)
+        return true;
+    });
 
-    return res.status(200).send(accounts);
+    return res.status(200).send(outletManagers);
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e)).send();
@@ -2106,6 +2123,7 @@ const invitecollaborator = async (req, res, next) => {
       role_id: role.id,
       email: owner_email,
       expiration_date: invitation_expiration_date,
+      venue_id: outlet_venue,
     });
 
     return res.status(201).json("Invitation successfull").send();
