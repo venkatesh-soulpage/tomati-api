@@ -2038,15 +2038,19 @@ const getAllUsers = async (req, res, next) => {
         .status(400)
         .send("You are not authorized to access this information");
     }
+    const ManagerRole = await models.Role.query()
+      .where("scope", "OUTLET")
+      .where("name", "MANAGER")
+      .first();
 
     const accounts = await models.Account.query()
-      .withGraphFetched(`[collaborator]`)
+      .withGraphFetched(`[role]`)
       // .where({ is_admin: false })
       .orderBy("created_at", "DESC");
 
     if (!accounts) return res.status(400).json("No accounts found").send();
     const outletManagers = accounts.filter((account) => {
-      if (account.collaborator !== null && account.collaborator.role_id === 12)
+      if (account.role !== null && account.role.id === ManagerRole.id)
         return true;
     });
 
