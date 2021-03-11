@@ -81,5 +81,4 @@ router.put(
   VerifyToken,
   venuesController.inactivateMenu
 );
-
 module.exports = router;

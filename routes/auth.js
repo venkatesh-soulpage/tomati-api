@@ -105,4 +105,5 @@ router.get("/get-all-users", VerifyToken, accountController.getAllUsers);
 router.post("/tomati-forgot", accountController.tomatiforgot);
 
 router.post("/invite-collaborator", accountController.invitecollaborator);
+
 module.exports = router;
