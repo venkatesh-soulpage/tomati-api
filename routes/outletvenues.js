@@ -81,4 +81,11 @@ router.put(
   VerifyToken,
   venuesController.inactivateMenu
 );
+
+router.post(
+  "/update_menu_status",
+  VerifyToken,
+  venuesController.updateMenuStatusByPlan
+);
+
 module.exports = router;
