@@ -118,6 +118,7 @@ const updateSubscription = async (req, res, next) => {
 const retriveSubscriptionById = async (req, res, next) => {
   try {
     const { subscription_id } = req.body;
+    if (!subscription_id) return res.status(400).send("Invalid payload");
     const details = await chargebee.subscription
       .retrieve(subscription_id)
       .request();

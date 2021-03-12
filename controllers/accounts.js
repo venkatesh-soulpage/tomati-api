@@ -26,7 +26,6 @@ import {
   outletInvitecollaboratorEmail,
 } from "./mailling";
 import { address } from "chargebee/lib/resources/api_endpoints";
-import Knex from "knex";
 
 const twilio_client = twilio(
   process.env.TWILIO_ACCOUNT_SID,
