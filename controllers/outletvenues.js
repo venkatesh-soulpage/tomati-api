@@ -429,29 +429,20 @@ const updateMenuStatusByPlan = async (req, res, next) => {
     const { account_id } = req;
     console.log(account_id, "account_id");
     const user = await models.Account.query().findById(account_id);
-    console.log(user, "user");
     if (!user)
       return res.status(400).json("No user active with this account Id");
     const subscriptionDetails = await chargebee.subscription
       .retrieve(user.transaction_id)
       .request();
-    console.log(subscriptionDetails, "subscriptionDetails");
     const menuAddon = subscriptionDetails.subscription.addons.find(
       (addon) => addon.id === "free-menu"
     );
-    console.log(menuAddon, "menuAddon");
     const venues = await models.OutletVenue.query()
       .orderBy("created_at", "desc")
       .where({ account_id });
-    console.log(venues, "venues");
     const activeMenus = _.filter(venues, ["is_venue_active", true]);
     const inactiveMenus = _.filter(venues, ["is_venue_active", false]);
-    console.log(menuAddon.quantity, "hitted");
-    console.log(inactiveMenus.length, "hitted");
-    console.log(activeMenus.length, "hitted");
     if (menuAddon.quantity < activeMenus.length) {
-      console.log(menuAddon.quantity, "if");
-      console.log(activeMenus.length, "if");
       const activeMenusIds = _.map(
         _.slice(activeMenus, 0, menuAddon.quantity),
         "id"
@@ -461,13 +452,10 @@ const updateMenuStatusByPlan = async (req, res, next) => {
         .where({ account_id, is_venue_active: true })
         .whereNotIn("id", activeMenusIds);
     } else {
-      console.log(menuAddon.quantity, "else");
-      console.log(inactiveMenus.length, "else");
       const inactiveMenusIds = _.map(
         _.slice(inactiveMenus, 0, menuAddon.quantity - activeMenus.length),
         "id"
       );
-      console.log(inactiveMenusIds);
       await models.OutletVenue.query()
         .update({ is_venue_active: true })
         .where({ account_id, is_venue_active: false })
@@ -475,7 +463,6 @@ const updateMenuStatusByPlan = async (req, res, next) => {
     }
     return res.status(202).json("RESPONSE SUCCESS");
   } catch (e) {
-    console.log("HITTING Catch");
     console.log(e);
     return res.status(500).json(JSON.stringify(e));
   }
