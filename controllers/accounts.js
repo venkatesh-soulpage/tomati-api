@@ -1827,43 +1827,6 @@ const userSignup = async (req, res, next) => {
     } = req.body;
     const account = await models.Account.query().where("email", email).first();
     if (account) return res.status(404).json("User Already Exists").send();
-    // const plan = await models.Plan.query().where("plan", "starter").first();
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    password_hash = await bcrypt.hash(password_hash, salt);
-    const new_account = await models.Account.query().insert({
-      email: email,
-      first_name,
-      company_name,
-      last_name,
-      password_hash: password_hash,
-      is_admin: false,
-      is_email_verified: true,
-      is_age_verified: false,
-      location_id,
-      state_id,
-      city,
-      street,
-      // plan_id: plan.id,
-      // no_of_outlets: plan.outlet_limit,
-      // no_of_events: plan.event_limit,
-      // no_of_users: plan.user_limit,
-      // no_of_qrcodes: plan.qr_tags_limit,
-      is_notifications_permited,
-      is_subscription_active: true,
-      extra_location,
-    });
-    // Search for Region Owner Role
-    const role = await models.Role.query()
-      .where("scope", "OUTLET")
-      .where("name", "MANAGER")
-      .first();
-
-    // Add a client collaborator
-    await models.Collaborator.query().insert({
-      role_id: role.id,
-      account_id: new_account.id,
-    });
     chargebee.subscription
       .create({
         plan_id: "starter-monthly",
@@ -1873,18 +1836,6 @@ const userSignup = async (req, res, next) => {
           last_name,
           email,
         },
-        // addons: [
-        //   {
-        //     id: "free-vip-support",
-        //     // unit_price: 0,
-        //     quantity: 1,
-        //   },
-        //   {
-        //     id: "starter-menu-monthly",
-        //     // unit_price: 0,
-        //     quantity: 1,
-        //   },
-        // ],
       })
       .request(async (error, result) => {
         if (error) {
@@ -1892,11 +1843,38 @@ const userSignup = async (req, res, next) => {
           console.log(error);
           return res.status(404).json("Error occured while subscribing").send();
         } else {
-          const updateaccount = await models.Account.query()
-            .update({
-              transaction_id: result.subscription.id,
-            })
-            .where("id", new_account.id);
+          // Hash password
+          const salt = await bcrypt.genSalt(10);
+          password_hash = await bcrypt.hash(password_hash, salt);
+          const new_account = await models.Account.query().insert({
+            email: email,
+            first_name,
+            company_name,
+            last_name,
+            password_hash: password_hash,
+            is_admin: false,
+            is_email_verified: true,
+            is_age_verified: false,
+            location_id,
+            state_id,
+            city,
+            street,
+            is_notifications_permited,
+            is_subscription_active: true,
+            extra_location,
+            transaction_id: result.subscription.id,
+          });
+          // Search for Region Owner Role
+          const role = await models.Role.query()
+            .where("scope", "OUTLET")
+            .where("name", "MANAGER")
+            .first();
+
+          // Add a client collaborator
+          await models.Collaborator.query().insert({
+            role_id: role.id,
+            account_id: new_account.id,
+          });
           return res
             .status(200)
             .json({ Status: true, Message: "Success" })
@@ -2125,7 +2103,7 @@ const invitecollaborator = async (req, res, next) => {
       venue_id: outlet_venue,
     });
 
-    return res.status(201).json("Invitation successfull").send();
+    return res.status(201).json("Invitation successful").send();
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e)).send();
