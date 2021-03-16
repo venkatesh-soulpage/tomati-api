@@ -193,6 +193,31 @@ const getSubscriptionDetails = async (req, res, next) => {
   }
 };
 
+const updateCustomerEmail = async (req, res, next) => {
+  try {
+    const { subscription_id, email } = req.body;
+    chargebee.customer
+      .update(subscription_id, {
+        email,
+      })
+      .request(function (error, result) {
+        if (error) {
+          //handle error
+          console.log(error);
+          return res.status(500).json(JSON.stringify(error));
+        } else {
+          console.log(result);
+          var customer = result.customer;
+          var card = result.card;
+          return res.status(200).json("Updated successfully");
+        }
+      });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
+
 const updateSubscriptionThroughCheckout = async (req, res, next) => {
   const plan = await models.Plan.query().where("plan", "starter").first();
   chargebee.hosted_page
@@ -240,6 +265,7 @@ const paymentController = {
   retriveCoupon,
   getSubscriptionDetails,
   updateSubscriptionThroughCheckout,
+  updateCustomerEmail,
 };
 
 export default paymentController;
