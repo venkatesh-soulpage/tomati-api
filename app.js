@@ -7,6 +7,7 @@ var logger = require("morgan");
 var bodyParser = require("body-parser");
 var cors = require("cors");
 var QRCode = require("qrcode");
+const Sentry = require("@sentry/node");
 
 var indexRouter = require("./routes/index");
 var authRouter = require("./routes/auth");
@@ -38,7 +39,12 @@ var subscriptionsRoute = require("./routes/subscription");
 var paymentRoute = require("./routes/payment");
 
 var app = express();
+Sentry.init({
+  dsn: process.env.SENTRY_DNS,
+});
 
+// The request handler must be the first middleware on the app
+app.use(Sentry.Handlers.requestHandler());
 // Cors
 app.use(cors());
 
@@ -105,7 +111,17 @@ app.use("/api/payment", paymentRoute);
 app.use(function (req, res, next) {
   next(createError(404));
 });
-
+app.use(
+  Sentry.Handlers.errorHandler({
+    shouldHandleError(error) {
+      // Capture all 404 and 500 errors
+      if (error.status >= 400) {
+        return true;
+      }
+      return false;
+    },
+  })
+);
 // error handler
 app.use(function (err, req, res, next) {
   // set locals, only providing error in development

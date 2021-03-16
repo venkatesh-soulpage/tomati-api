@@ -20,4 +20,6 @@ router.post(
   "/upgrade-subscription",
   paymentController.updateSubscriptionThroughCheckout
 );
+
+router.post("/update-chargebee-email", paymentController.updateCustomerEmail);
 module.exports = router;
