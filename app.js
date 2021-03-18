@@ -40,8 +40,7 @@ var paymentRoute = require("./routes/payment");
 
 var app = express();
 Sentry.init({
-  dsn:
-    "https://4a7f3c0d0ec541abb820b567db8c4299@o549625.ingest.sentry.io/5678455",
+  dsn: process.env.SENTRY_DNS,
 });
 
 // The request handler must be the first middleware on the app

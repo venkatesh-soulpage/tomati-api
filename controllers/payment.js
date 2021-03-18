@@ -200,15 +200,15 @@ const updateCustomerEmail = async (req, res, next) => {
       .update(subscription_id, {
         email,
       })
-      .request(function (error, result) {
+      .request(async (error, result) => {
         if (error) {
           //handle error
           console.log(error);
           return res.status(500).json(JSON.stringify(error));
         } else {
-          console.log(result);
-          var customer = result.customer;
-          var card = result.card;
+          await models.Account.query()
+            .update({ email })
+            .where("transaction_id", subscription_id);
           return res.status(200).json("Updated successfully");
         }
       });

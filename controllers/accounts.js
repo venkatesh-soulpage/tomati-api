@@ -1830,11 +1830,22 @@ const userSignup = async (req, res, next) => {
     chargebee.subscription
       .create({
         plan_id: "starter-monthly",
-        auto_collection: "off",
         customer: {
           first_name,
           last_name,
           email,
+        },
+        shipping_address: {
+          first_name,
+          last_name,
+          company: company_name,
+        },
+        billing_address: {
+          first_name,
+          last_name,
+          line1: street,
+          city,
+          country: "NG",
         },
       })
       .request(async (error, result) => {
