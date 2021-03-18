@@ -74,19 +74,21 @@ const getVenue = async (req, res, next) => {
       .withGraphFetched(`[menu,collaborators,location]`)
       .findById(outlet_venue_id);
     if (venue === undefined) return res.status(400).json("invalid");
-    if (!venue.is_venue_active) return res.status(400).json("inactive");
+    // if (!venue.is_venue_active) return res.status(400).json("inactive");
 
-    const { stats } = venue;
-    if (stats && stats.data && stats.data.length > 0) {
-      const { data } = stats;
-      data.push(countObject);
-      await models.OutletVenue.query()
-        .update({ stats: { data } })
-        .findById(outlet_venue_id);
-    } else {
-      await models.OutletVenue.query()
-        .update({ stats: { data: [countObject] } })
-        .findById(outlet_venue_id);
+    if (venue.is_venue_active) {
+      const { stats } = venue;
+      if (stats && stats.data && stats.data.length > 0) {
+        const { data } = stats;
+        data.push(countObject);
+        await models.OutletVenue.query()
+          .update({ stats: { data } })
+          .findById(outlet_venue_id);
+      } else {
+        await models.OutletVenue.query()
+          .update({ stats: { data: [countObject] } })
+          .findById(outlet_venue_id);
+      }
     }
     return res.status(200).json(venue);
   } catch (error) {
