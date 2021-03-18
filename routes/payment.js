@@ -9,7 +9,11 @@ import VerifyRole from "../utils/verification_role";
 /* GET - Get a list of client organizations */
 router.post("/", paymentController.makePayment);
 router.post("/update-subsciption", paymentController.updateSubscription);
-router.post("/retrive-subscription", paymentController.retriveSubscriptionById);
+router.post(
+  "/retrive-subscription",
+  VerifyToken,
+  paymentController.retriveSubscriptionById
+);
 router.post("/get-coupon", paymentController.retriveCoupon);
 
 router.post(
