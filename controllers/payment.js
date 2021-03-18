@@ -123,15 +123,16 @@ const retriveSubscriptionById = async (req, res, next) => {
     const details = await chargebee.subscription
       .retrieve(subscription_id)
       .request();
-    if (details.subscription.status !== "active") {
-      if (details.subscription.status !== "in_trial") {
-        const user = await models.Account.query().findById(account_id);
-        if (!user)
-          return res.status(400).json("No user active with this account Id");
-        await models.OutletVenue.query()
-          .update({ is_venue_active: false })
-          .where({ account_id, is_venue_active: true });
-      }
+    if (
+      details.subscription.status !== "active" &&
+      details.subscription.status !== "in_trial"
+    ) {
+      const user = await models.Account.query().findById(account_id);
+      if (!user)
+        return res.status(400).json("No user active with this account Id");
+      await models.OutletVenue.query()
+        .update({ is_venue_active: false })
+        .where({ account_id, is_venue_active: true });
     }
     return res.status(200).json(details);
   } catch (e) {
