@@ -111,17 +111,7 @@ app.use("/api/payment", paymentRoute);
 app.use(function (req, res, next) {
   next(createError(404));
 });
-app.use(
-  Sentry.Handlers.errorHandler({
-    shouldHandleError(error) {
-      // Capture all 404 and 500 errors
-      if (error.status >= 400) {
-        return true;
-      }
-      return false;
-    },
-  })
-);
+app.use(Sentry.Handlers.errorHandler());
 // error handler
 app.use(function (err, req, res, next) {
   // set locals, only providing error in development
