@@ -506,6 +506,7 @@ const sendFotgotPasswordEmailTomati = (user, token) => {
       },
       locals: {
         email: user.email,
+        hrefResetUrl: `//${process.env.FRONT_END_TOMATI_HOST}:${process.env.FRONT_END_TOMATI_PORT}/reset?email=${user.email}&token=${token}`,
         resetUrl: `${process.env.SCHEMA}://${process.env.FRONT_END_TOMATI_HOST}:${process.env.FRONT_END_TOMATI_PORT}/reset?email=${user.email}&token=${token}`,
       },
     })
