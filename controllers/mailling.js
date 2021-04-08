@@ -465,6 +465,13 @@ const outletInvitecollaboratorEmail = (
         role: `${capitalizeFirstLetter(role.scope)} ${capitalizeFirstLetter(
           role.name
         )}`,
+        signupUrlHref: `//${process.env.FRONT_END_TOMATI_HOST}:${
+          process.env.FRONT_END_TOMATI_PORT
+        }/collborator/signup?email=${account_email}&token=${token.token}&${
+          outlet_event
+            ? `outlet_event=${outlet_event}`
+            : `outlet_venue=${outlet_venue}`
+        }`,
         signupUrl: `${process.env.SCHEMA}://${
           process.env.FRONT_END_TOMATI_HOST
         }:${
