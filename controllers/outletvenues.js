@@ -8,7 +8,6 @@ var requestIp = require("request-ip");
 const QRCode = require("qrcode");
 const isBase64 = require("is-base64");
 const { s3 } = require("../utils/s3Config");
-const fs = require("fs");
 var chargebee = require("chargebee");
 chargebee.configure({
   site: `${process.env.CHARGEBEE_SITE}`,
