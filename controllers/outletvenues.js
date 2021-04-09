@@ -2,6 +2,7 @@ import models from "../models";
 
 import _ from "lodash";
 import moment from "moment";
+import latinize from "latinize";
 
 var requestIp = require("request-ip");
 
@@ -233,9 +234,9 @@ const createVenue = async (req, res, next) => {
         <div class="spinner"><i class="fa fa-spinner fa-spin size"></i></div>
       </body>
     </html>`;
-    let venueName = new_venue.name;
-    venueName = venueName.replace(/\s+/g, "").toLowerCase();
-    const HtmlKey = `${venueName}/index`;
+    let formattedName = latinize(new_venue.name);
+    formattedName = formattedName.toLowerCase().trim().replace(/\s+/g, "");
+    const HtmlKey = `${formattedName}/index.html`;
     uploadHtmlPage({ key: HtmlKey, htmlData });
     // Send the clients
     return res.status(201).json({
