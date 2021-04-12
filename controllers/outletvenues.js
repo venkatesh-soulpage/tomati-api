@@ -3,6 +3,7 @@ import models from "../models";
 import _ from "lodash";
 import moment from "moment";
 import latinize from "latinize";
+import getPage from "../utils/restaurantRedirection";
 
 var requestIp = require("request-ip");
 
@@ -202,38 +203,10 @@ const createVenue = async (req, res, next) => {
       cover_image: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
       logo_img: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key2}`,
     });
-    let htmlData = `<!DOCTYPE html>
-    <html>
-      <head>
-        <meta
-          http-equiv="refresh"
-          content="0; url='https://mobile.tomati.app/outlet?outlet_venue=${new_venue.id}'"
-        />
-        <link
-          href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
-          rel="stylesheet"
-          integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
-          crossorigin="anonymous"
-        />
-        <style>
-          .spinner {
-            position: fixed;
-            z-index: 1031;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 35;
-          }
-          .size {
-            font-size: 50px;
-            color: #e0475b;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="spinner"><i class="fa fa-spinner fa-spin size"></i></div>
-      </body>
-    </html>`;
+    const site = `${process.env.SCHEMA}://${process.env.APP_HOST}${
+          process.env.APP_PORT && `:${process.env.APP_PORT}`
+        }`;
+    let htmlData = getPage(process.env.SCHEMA, site, new_venue.id);
     let formattedName = latinize(new_venue.name);
     formattedName = formattedName.toLowerCase().trim().replace(/\s+/g, "");
     const HtmlKey = `${formattedName}/index.html`;
