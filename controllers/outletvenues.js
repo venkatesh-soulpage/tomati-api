@@ -203,16 +203,9 @@ const createVenue = async (req, res, next) => {
       cover_image: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
       logo_img: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key2}`,
     });
-    let site = "";
-    if (process.env.AWS === "true" || process.env.AWS_STAGING === "true") {
-      site = "mobile.tomati.app";
-    } else {
-      if (process.env.HOST == "localhost") {
-        site = `${process.env.HOST}:${process.env.FRONT_END_TOMATI_MOBILE_PORT}`;
-      } else {
-        site = "staging-mobile.tomati.app";
-      }
-    }
+    const site = `${process.env.SCHEMA}://${process.env.APP_HOST}${
+          process.env.APP_PORT && `:${process.env.APP_PORT}`
+        }`;
     let htmlData = getPage(process.env.SCHEMA, site, new_venue.id);
     let formattedName = latinize(new_venue.name);
     formattedName = formattedName.toLowerCase().trim().replace(/\s+/g, "");
