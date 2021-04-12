@@ -4,7 +4,7 @@ const getPage = (schema, site, venue_id) => {
       <head>
         <meta
           http-equiv="refresh"
-          content="0; url='${schema}://${site}/outlet?outlet_venue=${venue_id}'"
+          content="0; url='${site}/outlet?outlet_venue=${venue_id}'"
         />
         <link
           href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
