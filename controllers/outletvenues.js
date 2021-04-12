@@ -202,12 +202,18 @@ const createVenue = async (req, res, next) => {
       cover_image: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
       logo_img: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key2}`,
     });
+    let site = "";
+    if (process.env.AWS === "true" || process.env.AWS_STAGING === "true") {
+      site = "mobile.tomati.app";
+    } else {
+      site = "staging.tomati.app";
+    }
     let htmlData = `<!DOCTYPE html>
     <html>
       <head>
         <meta
           http-equiv="refresh"
-          content="0; url='https://mobile.tomati.app/outlet?outlet_venue=${new_venue.id}'"
+          content="0; url='https://${site}/outlet?outlet_venue=${new_venue.id}'"
         />
         <link
           href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
