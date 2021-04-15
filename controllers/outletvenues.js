@@ -330,7 +330,40 @@ const updateVenue = async (req, res, next) => {
     }
     if (buf && cover_image) {
       const key = `public/cover_images/outletvenues/${cover_image.name}`;
+      const largeCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-large`;
+      const largeResizedCoverImage = await getResizeDBufferImage(
+        cover_image.data,
+        1200,
+        800
+      );
+      let largeCoverbuf = Buffer.from(
+        largeResizedCoverImage.replace(/^data:image\/\w+;base64,/, ""),
+        "base64"
+      );
+      const mediumCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-medium`;
+      const mediumResizedCoverImage = await getResizeDBufferImage(
+        cover_image.data,
+        600,
+        400
+      );
+      let mediumCoverbuf = Buffer.from(
+        mediumResizedCoverImage.replace(/^data:image\/\w+;base64,/, ""),
+        "base64"
+      );
+      const smallCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-small`;
+      const smallResizedCoverImage = await getResizeDBufferImage(
+        cover_image.data,
+        300,
+        200
+      );
+      let smallCoverbuf = Buffer.from(
+        smallResizedCoverImage.replace(/^data:image\/\w+;base64,/, ""),
+        "base64"
+      );
       uploadImage({ key, buf });
+      uploadImage({ key: largeCoverImageKey, buf: largeCoverbuf });
+      uploadImage({ key: mediumCoverImageKey, buf: mediumCoverbuf });
+      uploadImage({ key: smallCoverImageKey, buf: smallCoverbuf });
       await models.OutletVenue.query()
         .update({
           cover_image: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
