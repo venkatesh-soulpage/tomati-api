@@ -140,24 +140,6 @@ const uploadHtmlPage = async (file_data) => {
     }
   });
 };
-const getResizeDBufferImage = async (ImageBuffer, width, height) => {
-  let parts = ImageBuffer.split(";");
-  let mimType = parts[0].split(":")[1];
-  let imageData = parts[1].split(",")[1];
-
-  var img = new Buffer.from(imageData, "base64");
-  try {
-    const resizedImageBuffer = await sharp(img)
-      .resize(width, height)
-      .toBuffer();
-    let resizedImageData = resizedImageBuffer.toString("base64");
-    let resizedBase64 = `data:${mimType};base64,${resizedImageData}`;
-    return resizedBase64;
-  } catch (error) {
-    return error;
-  }
-};
-
 const createVenue = async (req, res, next) => {
   try {
     const { account_id, scope } = req;
@@ -205,42 +187,18 @@ const createVenue = async (req, res, next) => {
     }
     const key = `public/cover_images/outletvenues/${cover_image.name}`;
     const largeCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-large`;
-    const largeResizedCoverImage = await getResizeDBufferImage(
-      cover_image.data,
-      1200,
-      800
-    );
-    let largeCoverbuf = Buffer.from(
-      largeResizedCoverImage.replace(/^data:image\/\w+;base64,/, ""),
-      "base64"
-    );
     const mediumCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-medium`;
-    const mediumResizedCoverImage = await getResizeDBufferImage(
-      cover_image.data,
-      600,
-      400
-    );
-    let mediumCoverbuf = Buffer.from(
-      mediumResizedCoverImage.replace(/^data:image\/\w+;base64,/, ""),
-      "base64"
-    );
     const smallCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-small`;
-    const smallResizedCoverImage = await getResizeDBufferImage(
-      cover_image.data,
-      300,
-      200
-    );
-    let smallCoverbuf = Buffer.from(
-      smallResizedCoverImage.replace(/^data:image\/\w+;base64,/, ""),
-      "base64"
-    );
+    const largeResizedImage = await sharp(buf).resize(1200, 800).toBuffer();
+    const mediumResizedImage = await sharp(buf).resize(600, 400).toBuffer();
+    const smallResizedImage = await sharp(buf).resize(300, 200).toBuffer();
     const key2 = `public/cover_images/outletvenues/${logo_image.name}`;
 
     uploadImage({ key, buf });
     uploadImage({ key: key2, buf: logobuf });
-    uploadImage({ key: largeCoverImageKey, buf: largeCoverbuf });
-    uploadImage({ key: mediumCoverImageKey, buf: mediumCoverbuf });
-    uploadImage({ key: smallCoverImageKey, buf: smallCoverbuf });
+    uploadImage({ key: largeCoverImageKey, buf: largeResizedImage });
+    uploadImage({ key: mediumCoverImageKey, buf: mediumResizedImage });
+    uploadImage({ key: smallCoverImageKey, buf: smallResizedImage });
 
     const new_venue = await models.OutletVenue.query().insert({
       name,
@@ -331,39 +289,15 @@ const updateVenue = async (req, res, next) => {
     if (buf && cover_image) {
       const key = `public/cover_images/outletvenues/${cover_image.name}`;
       const largeCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-large`;
-      const largeResizedCoverImage = await getResizeDBufferImage(
-        cover_image.data,
-        1200,
-        800
-      );
-      let largeCoverbuf = Buffer.from(
-        largeResizedCoverImage.replace(/^data:image\/\w+;base64,/, ""),
-        "base64"
-      );
       const mediumCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-medium`;
-      const mediumResizedCoverImage = await getResizeDBufferImage(
-        cover_image.data,
-        600,
-        400
-      );
-      let mediumCoverbuf = Buffer.from(
-        mediumResizedCoverImage.replace(/^data:image\/\w+;base64,/, ""),
-        "base64"
-      );
       const smallCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-small`;
-      const smallResizedCoverImage = await getResizeDBufferImage(
-        cover_image.data,
-        300,
-        200
-      );
-      let smallCoverbuf = Buffer.from(
-        smallResizedCoverImage.replace(/^data:image\/\w+;base64,/, ""),
-        "base64"
-      );
+      const largeResizedImage = await sharp(buf).resize(1200, 800).toBuffer();
+      const mediumResizedImage = await sharp(buf).resize(600, 400).toBuffer();
+      const smallResizedImage = await sharp(buf).resize(300, 200).toBuffer();
       uploadImage({ key, buf });
-      uploadImage({ key: largeCoverImageKey, buf: largeCoverbuf });
-      uploadImage({ key: mediumCoverImageKey, buf: mediumCoverbuf });
-      uploadImage({ key: smallCoverImageKey, buf: smallCoverbuf });
+      uploadImage({ key: largeCoverImageKey, buf: largeResizedImage });
+      uploadImage({ key: mediumCoverImageKey, buf: mediumResizedImage });
+      uploadImage({ key: smallCoverImageKey, buf: smallResizedImage });
       await models.OutletVenue.query()
         .update({
           cover_image: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
