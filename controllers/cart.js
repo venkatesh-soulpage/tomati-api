@@ -123,6 +123,41 @@ const getOrdersSummary = async (req, res, next) => {
   }
 };
 
+const getOrdersHistory = async (req, res, next) => {
+  try {
+    const { account_id } = req.params;
+
+    // Get brief
+    let cart = await models.Cart.query().where({ account_id }).first();
+
+    if (!cart) cart = await models.Cart.query().insert({ account_id });
+
+    const cart_items = await models.CartItem.query()
+      .withGraphFetched("[eventproduct, venueproduct]")
+      .where({
+        cart_id: cart.id,
+        ordered: true,
+      });
+    const data = _.map(cart_items, (i) =>
+      _.pick(
+        i,
+        "quantity",
+        "eventproduct",
+        "venueproduct",
+        "data",
+        "payment_type"
+      )
+    );
+
+    cart.items = data;
+    // Send the clientss
+    return res.status(200).send(cart);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
+
 const updateCartItems = async (req, res, next) => {
   try {
     const { cart_item } = req.params;
@@ -182,6 +217,7 @@ const cartController = {
   removeCartItem,
   getUserCart,
   getOrdersSummary,
+  getOrdersHistory,
   updateCartItems,
   updateBill,
   putCartUpdate,
