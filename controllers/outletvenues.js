@@ -78,7 +78,19 @@ const getVenue = async (req, res, next) => {
       .findById(outlet_venue_id);
     if (venue === undefined) return res.status(400).json("invalid");
     // if (!venue.is_venue_active) return res.status(400).json("inactive");
-
+    const account = await models.Account.query().findById(venue.account_id);
+    const subscriptionDetails = await chargebee.subscription
+      .retrieve(account.transaction_id)
+      .request();
+    if (
+      subscriptionDetails.subscription.status !== "active" &&
+      subscriptionDetails.subscription.status !== "in_trial" &&
+      venue.is_venue_active
+    ) {
+      await models.OutletVenue.query()
+        .update({ is_venue_active: false })
+        .findById(outlet_venue_id);
+    }
     if (venue.is_venue_active) {
       const { stats } = venue;
       if (stats && stats.data && stats.data.length > 0) {
