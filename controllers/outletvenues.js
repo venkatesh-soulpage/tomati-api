@@ -10,6 +10,7 @@ var requestIp = require("request-ip");
 const QRCode = require("qrcode");
 const isBase64 = require("is-base64");
 const { s3 } = require("../utils/s3Config");
+const sharp = require("sharp");
 var chargebee = require("chargebee");
 chargebee.configure({
   site: `${process.env.CHARGEBEE_SITE}`,
@@ -139,7 +140,6 @@ const uploadHtmlPage = async (file_data) => {
     }
   });
 };
-
 const createVenue = async (req, res, next) => {
   try {
     const { account_id, scope } = req;
@@ -186,10 +186,19 @@ const createVenue = async (req, res, next) => {
       );
     }
     const key = `public/cover_images/outletvenues/${cover_image.name}`;
+    const largeCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-large`;
+    const mediumCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-medium`;
+    const smallCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-small`;
+    const largeResizedImage = await sharp(buf).resize(1200, 800).toBuffer();
+    const mediumResizedImage = await sharp(buf).resize(600, 400).toBuffer();
+    const smallResizedImage = await sharp(buf).resize(300, 200).toBuffer();
     const key2 = `public/cover_images/outletvenues/${logo_image.name}`;
 
     uploadImage({ key, buf });
     uploadImage({ key: key2, buf: logobuf });
+    uploadImage({ key: largeCoverImageKey, buf: largeResizedImage });
+    uploadImage({ key: mediumCoverImageKey, buf: mediumResizedImage });
+    uploadImage({ key: smallCoverImageKey, buf: smallResizedImage });
 
     const new_venue = await models.OutletVenue.query().insert({
       name,
@@ -204,8 +213,8 @@ const createVenue = async (req, res, next) => {
       logo_img: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key2}`,
     });
     const site = `${process.env.SCHEMA}://${process.env.APP_HOST}${
-          process.env.APP_PORT && `:${process.env.APP_PORT}`
-        }`;
+      process.env.APP_PORT && `:${process.env.APP_PORT}`
+    }`;
     let htmlData = getPage(process.env.SCHEMA, site, new_venue.id);
     let formattedName = latinize(new_venue.name);
     formattedName = formattedName.toLowerCase().trim().replace(/\s+/g, "");
@@ -279,7 +288,16 @@ const updateVenue = async (req, res, next) => {
     }
     if (buf && cover_image) {
       const key = `public/cover_images/outletvenues/${cover_image.name}`;
+      const largeCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-large`;
+      const mediumCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-medium`;
+      const smallCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-small`;
+      const largeResizedImage = await sharp(buf).resize(1200, 800).toBuffer();
+      const mediumResizedImage = await sharp(buf).resize(600, 400).toBuffer();
+      const smallResizedImage = await sharp(buf).resize(300, 200).toBuffer();
       uploadImage({ key, buf });
+      uploadImage({ key: largeCoverImageKey, buf: largeResizedImage });
+      uploadImage({ key: mediumCoverImageKey, buf: mediumResizedImage });
+      uploadImage({ key: smallCoverImageKey, buf: smallResizedImage });
       await models.OutletVenue.query()
         .update({
           cover_image: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
