@@ -21,12 +21,6 @@ router.get(
   VerifyToken,
   cartController.getOrdersSummary
 );
-router.get(
-  "/:account_id/orders-history",
-  VerifyToken,
-  cartController.getOrdersHistory
-);
-
 router.put("/:account_id/close-bill", VerifyToken, cartController.updateBill);
 
 router.put("/put-cart-update", VerifyToken, cartController.putCartUpdate);
