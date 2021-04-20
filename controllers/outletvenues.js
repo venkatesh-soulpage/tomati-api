@@ -104,10 +104,8 @@ const getVenue = async (req, res, next) => {
           .update({ stats: { data: [countObject] } })
           .findById(outlet_venue_id);
       }
-      return res.status(200).json(venue);
-    } else {
-      return res.status(400).json("inactive");
     }
+    return res.status(200).json(venue);
   } catch (error) {
     console.log(error);
     return res.status(500).json(JSON.stringify(error));
