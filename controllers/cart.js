@@ -182,7 +182,6 @@ const cartController = {
   removeCartItem,
   getUserCart,
   getOrdersSummary,
-  getOrdersHistory,
   updateCartItems,
   updateBill,
   putCartUpdate,
