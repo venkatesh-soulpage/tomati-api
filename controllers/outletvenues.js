@@ -107,7 +107,7 @@ const getVenue = async (req, res, next) => {
       .withGraphFetched(`[menu,collaborators,location]`)
       .findById(outlet_venue_id);
 
-    if (req.headers["qr_scan"]) {
+    if (req.headers["qr_scan"] || req.headers["accept-language"]) {
       const { stats } = venue;
       if (stats && stats.data && stats.data.length > 0) {
         const { data } = stats;
