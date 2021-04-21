@@ -40,7 +40,6 @@ const getUserVenues = async (req, res, next) => {
       if (!req.body.account_id)
         return res.status(400).json("Admin has no access to create menus");
       const venues = await models.OutletVenue.query()
-        .withGraphFetched(`[menu]`)
         .orderBy("created_at", "desc")
         .where("account_id", req.body.account_id);
       return res.status(200).send(venues);
@@ -53,7 +52,6 @@ const getUserVenues = async (req, res, next) => {
     );
     // Get brief
     const venues = await models.OutletVenue.query()
-      .withGraphFetched(`[menu]`)
       .orderBy("created_at", "desc")
       .where("account_id", account_id);
     return res.status(200).send(venues);
@@ -73,25 +71,43 @@ const getVenue = async (req, res, next) => {
 
     if (!outlet_venue_id) return res.status(400).json("Invalid ID");
 
-    const venue = await models.OutletVenue.query()
-      .withGraphFetched(`[menu,collaborators,location]`)
-      .findById(outlet_venue_id);
+    let venue = await models.OutletVenue.query().findById(outlet_venue_id);
     if (venue === undefined) return res.status(400).json("invalid");
-    // if (!venue.is_venue_active) return res.status(400).json("inactive");
     const account = await models.Account.query().findById(venue.account_id);
-    const subscriptionDetails = await chargebee.subscription
+
+    const { subscription } = await chargebee.subscription
       .retrieve(account.transaction_id)
       .request();
+    const freeMenu = await subscription.addons.find(
+      (item) => item.id === "free-menu"
+    );
+    const managerActiveMenus = await models.OutletVenue.query().where({
+      is_venue_active: true,
+      account_id: account.id,
+    });
+
     if (
-      subscriptionDetails.subscription.status !== "active" &&
-      subscriptionDetails.subscription.status !== "in_trial" &&
+      !["active", "in_trial"].includes(subscription.status) &&
       venue.is_venue_active
     ) {
       await models.OutletVenue.query()
         .update({ is_venue_active: false })
         .findById(outlet_venue_id);
+    } else if (
+      ["active", "in_trial"].includes(subscription.status) &&
+      managerActiveMenus.length <= freeMenu.quantity &&
+      !venue.is_venue_active
+    ) {
+      await models.OutletVenue.query()
+        .update({ is_venue_active: true })
+        .findById(outlet_venue_id);
     }
-    if (venue.is_venue_active) {
+
+    venue = await models.OutletVenue.query()
+      .withGraphFetched(`[menu,collaborators,location]`)
+      .findById(outlet_venue_id);
+
+    if (req.headers["qr_scan"]) {
       const { stats } = venue;
       if (stats && stats.data && stats.data.length > 0) {
         const { data } = stats;
