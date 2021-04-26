@@ -44,12 +44,6 @@ const getUserVenues = async (req, res, next) => {
         .where("account_id", req.body.account_id);
       return res.status(200).send(venues);
     }
-    const subscriptionDetails = await chargebee.subscription
-      .retrieve(user.transaction_id)
-      .request();
-    const menuAddon = subscriptionDetails.subscription.addons.find(
-      (addon) => addon.id === "free-menu"
-    );
     // Get brief
     const venues = await models.OutletVenue.query()
       .orderBy("created_at", "desc")
@@ -95,11 +89,19 @@ const getVenue = async (req, res, next) => {
         .findById(outlet_venue_id);
     } else if (
       ["active", "in_trial"].includes(subscription.status) &&
-      managerActiveMenus.length <= freeMenu.quantity &&
+      managerActiveMenus.length < freeMenu.quantity &&
       !venue.is_venue_active
     ) {
       await models.OutletVenue.query()
         .update({ is_venue_active: true })
+        .findById(outlet_venue_id);
+    } else if (
+      ["active", "in_trial"].includes(subscription.status) &&
+      managerActiveMenus.length > freeMenu.quantity &&
+      venue.is_venue_active
+    ) {
+      await models.OutletVenue.query()
+        .update({ is_venue_active: false })
         .findById(outlet_venue_id);
     }
 
