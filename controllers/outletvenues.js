@@ -441,13 +441,32 @@ const inactivateMenu = async (req, res, next) => {
     if (!user)
       return res.status(400).json("No user active with this account Id");
     //TODO admin can change active-inavtive state funtionality needed
-    // if (user.is_admin) {
-    //   const venues = await models.OutletVenue.query()
-    //     .withGraphFetched(`[menu]`)
-    //     .orderBy("created_at", "desc")
-    //     .where("account_id", req.body.account_id);
-    //   return res.status(200).send(venues);
-    // }
+    if (user.is_admin) {
+      const venue = await models.OutletVenue.query().findById(venue_id);
+      const activeVenues = await models.OutletVenue.query().where({
+        account_id: venue.account_id,
+        is_venue_active: true,
+      });
+      const manager = await models.Account.query().findById(venue.account_id);
+      const subscriptionDetails = await chargebee.subscription
+        .retrieve(manager.transaction_id)
+        .request();
+      const menuAddon = subscriptionDetails.subscription.addons.find(
+        (addon) => addon.id === "free-menu"
+      );
+      if (status && activeVenues.length >= menuAddon.quantity) {
+        return res.status(400).json({
+          status: false,
+          message: "Cannot actiavate more venues than subscription limit",
+        });
+      }
+      await models.OutletVenue.query()
+        .update({
+          is_venue_active: status,
+        })
+        .findById(venue_id);
+      return res.status(200).send(`updated successfully`);
+    }
     //TODO restrict the number of times user can change status to menuAddon.quantity
     const subscriptionDetails = await chargebee.subscription
       .retrieve(user.transaction_id)
