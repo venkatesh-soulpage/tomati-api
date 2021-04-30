@@ -536,16 +536,23 @@ const updateMenuStatusByPlan = async (req, res, next) => {
       .where({ account_id });
     const activeMenus = _.filter(venues, ["is_venue_active", true]);
     const inactiveMenus = _.filter(venues, ["is_venue_active", false]);
-    if (menuAddon.quantity < activeMenus.length) {
-      const activeMenusIds = _.map(
-        _.slice(activeMenus, 0, menuAddon.quantity),
-        "id"
-      );
+    const activeMenusIds = _.map(
+      _.slice(activeMenus, 0, menuAddon.quantity),
+      "id"
+    );
+    //cancellation
+    if(!["active", "in_trial"].includes(subscriptionDetails.subscription.status)){
+      await models.OutletVenue.query()
+      .update({ is_venue_active: false })
+      .where({ account_id, is_venue_active: true });
+    } else if (menuAddon.quantity < activeMenus.length) {
+      
       await models.OutletVenue.query()
         .update({ is_venue_active: false })
         .where({ account_id, is_venue_active: true })
         .whereNotIn("id", activeMenusIds);
-    } else {
+    } 
+    else {
       const inactiveMenusIds = _.map(
         _.slice(inactiveMenus, 0, menuAddon.quantity - activeMenus.length),
         "id"
