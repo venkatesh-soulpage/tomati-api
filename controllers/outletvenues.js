@@ -539,8 +539,12 @@ const updateMenuStatusByPlan = async (req, res, next) => {
     const venues = await models.OutletVenue.query()
       .orderBy("created_at", "desc")
       .where({ account_id });
-    const activeMenus = _.filter(venues, ["is_venue_active", true]);
-    const inactiveMenus = _.filter(venues, ["is_venue_active", false]);
+    const activeMenus = await models.OutletVenue.query()
+      .orderBy("created_at", "desc")
+      .where({ account_id, is_venue_active: true });
+    const inactiveMenus = await models.OutletVenue.query()
+      .orderBy("created_at", "desc")
+      .where({ account_id, is_venue_active: false });
     const activeMenusIds = _.map(
       _.slice(activeMenus, 0, menuAddon.quantity),
       "id"
@@ -552,22 +556,37 @@ const updateMenuStatusByPlan = async (req, res, next) => {
       await models.OutletVenue.query()
         .update({ is_venue_active: false })
         .where({ account_id, is_venue_active: true });
-    } else if (menuAddon.quantity < activeMenus.length) {
-      await models.OutletVenue.query()
-        .update({ is_venue_active: false })
-        .where({ account_id, is_venue_active: true })
-        .whereNotIn("id", activeMenusIds);
-    } else {
-      // write condition for upgrade and reactivation
-      const inactiveMenusIds = _.map(
-        _.slice(inactiveMenus, 0, menuAddon.quantity - activeMenus.length),
-        "id"
-      );
-      await models.OutletVenue.query()
-        .update({ is_venue_active: true })
-        .where({ account_id, is_venue_active: false })
-        .whereIn("id", inactiveMenusIds);
     }
+    if (!user.previous_plan) {
+      await models.Account.query()
+        .update({ previous_plan: subscriptionDetails.subscription.plan_id })
+        .findById(account_id);
+    }
+    if (
+      user.previous_plan !== null &&
+      subscriptionDetails.subscription.plan_id !== user.previous_plan
+    ) {
+      if (menuAddon.quantity < activeMenus.length) {
+        await models.OutletVenue.query()
+          .update({ is_venue_active: false })
+          .where({ account_id, is_venue_active: true })
+          .whereNotIn("id", activeMenusIds);
+      } else {
+        const inactiveMenusIds = _.map(
+          _.slice(inactiveMenus, 0, menuAddon.quantity - activeMenus.length),
+          "id"
+        );
+        await models.OutletVenue.query()
+          .update({ is_venue_active: true })
+          .where({ account_id, is_venue_active: false })
+          .whereIn("id", inactiveMenusIds);
+      }
+    }
+
+    await models.Account.query()
+      .update({ previous_plan: subscriptionDetails.subscription.plan_id })
+      .findById(account_id);
+
     return res.status(202).json("RESPONSE SUCCESS");
   } catch (e) {
     console.log(e);
