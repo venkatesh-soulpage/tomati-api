@@ -536,9 +536,6 @@ const updateMenuStatusByPlan = async (req, res, next) => {
     const menuAddon = subscriptionDetails.subscription.addons.find(
       (addon) => addon.id === "free-menu"
     );
-    const venues = await models.OutletVenue.query()
-      .orderBy("created_at", "desc")
-      .where({ account_id });
     const activeMenus = await models.OutletVenue.query()
       .orderBy("created_at", "desc")
       .where({ account_id, is_venue_active: true });
@@ -562,9 +559,16 @@ const updateMenuStatusByPlan = async (req, res, next) => {
         .update({ previous_plan: subscriptionDetails.subscription.plan_id })
         .findById(account_id);
     }
+    if (!user.previous_status) {
+      await models.Account.query()
+        .update({ previous_status: subscriptionDetails.subscription.status })
+        .findById(account_id);
+    }
     if (
       user.previous_plan !== null &&
-      subscriptionDetails.subscription.plan_id !== user.previous_plan
+      subscriptionDetails.subscription.plan_id !== user.previous_plan &&
+      user.previous_status !== null &&
+      subscriptionDetails.subscription.plan_id !== user.previous_status
     ) {
       if (menuAddon.quantity < activeMenus.length) {
         await models.OutletVenue.query()
