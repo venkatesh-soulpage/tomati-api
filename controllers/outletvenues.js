@@ -565,10 +565,10 @@ const updateMenuStatusByPlan = async (req, res, next) => {
         .findById(account_id);
     }
     if (
-      user.previous_plan !== null &&
-      subscriptionDetails.subscription.plan_id !== user.previous_plan &&
-      user.previous_status !== null &&
-      subscriptionDetails.subscription.plan_id !== user.previous_status
+      (user.previous_plan !== null &&
+        subscriptionDetails.subscription.plan_id !== user.previous_plan) ||
+      (user.previous_status !== null &&
+        subscriptionDetails.subscription.status !== user.previous_status)
     ) {
       if (menuAddon.quantity < activeMenus.length) {
         await models.OutletVenue.query()
