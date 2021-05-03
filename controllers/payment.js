@@ -140,6 +140,34 @@ const retriveSubscriptionById = async (req, res, next) => {
     return res.status(500).json(JSON.stringify(e));
   }
 };
+const cancelSubscriptionById = async (req, res, next) => {
+  try {
+    const { subscription_id } = req.body;
+    if (!subscription_id) return res.status(400).send("Invalid payload");
+    const details = await chargebee.subscription
+      .retrieve(subscription_id)
+      .request();
+    let detailsUpdate;
+    if (details.subscription.status === "cancelled") {
+      detailsUpdate = await chargebee.subscription
+        .reactivate(subscription_id, {
+          invoice_immediately: true,
+        })
+        .request();
+    } else {
+      detailsUpdate = await chargebee.subscription
+        .cancel(subscription_id, {
+          credit_option_for_current_term_charges: "prorate",
+          end_of_term: false,
+        })
+        .request();
+    }
+    return res.status(200).json(detailsUpdate);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
 
 const retriveCoupon = async (req, res, next) => {
   try {
@@ -274,6 +302,7 @@ const paymentController = {
   makePayment,
   updateSubscription,
   retriveSubscriptionById,
+  cancelSubscriptionById,
   retriveCoupon,
   getSubscriptionDetails,
   updateSubscriptionThroughCheckout,

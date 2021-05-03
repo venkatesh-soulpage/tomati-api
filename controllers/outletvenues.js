@@ -521,10 +521,15 @@ const inactivateMenu = async (req, res, next) => {
 
 const updateMenuStatusByPlan = async (req, res, next) => {
   try {
-    const { account_id } = req;
-    const user = await models.Account.query().findById(account_id);
+    // const { account_id } = req;
+    let account_id = req.account_id;
+    let user = await models.Account.query().findById(account_id);
     if (!user)
       return res.status(400).json("No user active with this account Id");
+    if (user.is_admin) {
+      account_id = req.body.account_id;
+    }
+    user = await models.Account.query().findById(account_id);
     const subscriptionDetails = await chargebee.subscription
       .retrieve(user.transaction_id)
       .request();
@@ -541,18 +546,19 @@ const updateMenuStatusByPlan = async (req, res, next) => {
       "id"
     );
     //cancellation
-    if(!["active", "in_trial"].includes(subscriptionDetails.subscription.status)){
+    if (
+      !["active", "in_trial"].includes(subscriptionDetails.subscription.status)
+    ) {
       await models.OutletVenue.query()
-      .update({ is_venue_active: false })
-      .where({ account_id, is_venue_active: true });
+        .update({ is_venue_active: false })
+        .where({ account_id, is_venue_active: true });
     } else if (menuAddon.quantity < activeMenus.length) {
-      
       await models.OutletVenue.query()
         .update({ is_venue_active: false })
         .where({ account_id, is_venue_active: true })
         .whereNotIn("id", activeMenusIds);
-    } 
-    else {
+    } else {
+      // write condition for upgrade and reactivation
       const inactiveMenusIds = _.map(
         _.slice(inactiveMenus, 0, menuAddon.quantity - activeMenus.length),
         "id"
