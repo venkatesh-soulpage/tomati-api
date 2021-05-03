@@ -142,23 +142,37 @@ const retriveSubscriptionById = async (req, res, next) => {
 };
 const cancelSubscriptionById = async (req, res, next) => {
   try {
-    const { subscription_id } = req.body;
+    const { subscription_id, status } = req.body;
     if (!subscription_id) return res.status(400).send("Invalid payload");
     const details = await chargebee.subscription
       .retrieve(subscription_id)
       .request();
     let detailsUpdate;
-    if (details.subscription.status === "cancelled") {
+    if (status === "Reactivate") {
       detailsUpdate = await chargebee.subscription
         .reactivate(subscription_id, {
           invoice_immediately: true,
         })
         .request();
-    } else {
+    } else if (status === "Cancel") {
       detailsUpdate = await chargebee.subscription
         .cancel(subscription_id, {
           credit_option_for_current_term_charges: "prorate",
           end_of_term: false,
+        })
+        .request();
+    } else if (status === "Pause") {
+      detailsUpdate = await chargebee.subscription
+        .pause(subscription_id, {
+          pause_option: "immediately",
+          unbilled_charges_handling: "invoice",
+        })
+        .request();
+    } else if (status === "Resume") {
+      detailsUpdate = await chargebee.subscription
+        .resume(subscription_id, {
+          resume_option: "immediately",
+          unpaid_invoices_handling: "schedule_payment_collection",
         })
         .request();
     }
