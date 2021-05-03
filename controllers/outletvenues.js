@@ -590,6 +590,9 @@ const updateMenuStatusByPlan = async (req, res, next) => {
     await models.Account.query()
       .update({ previous_plan: subscriptionDetails.subscription.plan_id })
       .findById(account_id);
+    await models.Account.query()
+      .update({ previous_status: subscriptionDetails.subscription.status })
+      .findById(account_id);
 
     return res.status(202).json("RESPONSE SUCCESS");
   } catch (e) {
