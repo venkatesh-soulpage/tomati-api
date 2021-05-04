@@ -521,47 +521,77 @@ const inactivateMenu = async (req, res, next) => {
 
 const updateMenuStatusByPlan = async (req, res, next) => {
   try {
-    const { account_id } = req;
-    const user = await models.Account.query().findById(account_id);
+    // const { account_id } = req;
+    let account_id = req.account_id;
+    let user = await models.Account.query().findById(account_id);
     if (!user)
       return res.status(400).json("No user active with this account Id");
+    if (user.is_admin) {
+      account_id = req.body.account_id;
+    }
+    user = await models.Account.query().findById(account_id);
     const subscriptionDetails = await chargebee.subscription
       .retrieve(user.transaction_id)
       .request();
     const menuAddon = subscriptionDetails.subscription.addons.find(
       (addon) => addon.id === "free-menu"
     );
-    const venues = await models.OutletVenue.query()
+    const activeMenus = await models.OutletVenue.query()
       .orderBy("created_at", "desc")
-      .where({ account_id });
-    const activeMenus = _.filter(venues, ["is_venue_active", true]);
-    const inactiveMenus = _.filter(venues, ["is_venue_active", false]);
+      .where({ account_id, is_venue_active: true });
+    const inactiveMenus = await models.OutletVenue.query()
+      .orderBy("created_at", "desc")
+      .where({ account_id, is_venue_active: false });
     const activeMenusIds = _.map(
       _.slice(activeMenus, 0, menuAddon.quantity),
       "id"
     );
     //cancellation
-    if(!["active", "in_trial"].includes(subscriptionDetails.subscription.status)){
-      await models.OutletVenue.query()
-      .update({ is_venue_active: false })
-      .where({ account_id, is_venue_active: true });
-    } else if (menuAddon.quantity < activeMenus.length) {
-      
+    if (
+      !["active", "in_trial"].includes(subscriptionDetails.subscription.status)
+    ) {
       await models.OutletVenue.query()
         .update({ is_venue_active: false })
-        .where({ account_id, is_venue_active: true })
-        .whereNotIn("id", activeMenusIds);
-    } 
-    else {
-      const inactiveMenusIds = _.map(
-        _.slice(inactiveMenus, 0, menuAddon.quantity - activeMenus.length),
-        "id"
-      );
-      await models.OutletVenue.query()
-        .update({ is_venue_active: true })
-        .where({ account_id, is_venue_active: false })
-        .whereIn("id", inactiveMenusIds);
+        .where({ account_id, is_venue_active: true });
     }
+    if (!user.previous_plan || !user.previous_status) {
+      await models.Account.query()
+        .update({
+          previous_plan: subscriptionDetails.subscription.plan_id,
+          previous_status: subscriptionDetails.subscription.status,
+        })
+        .findById(account_id);
+    }
+    user = await models.Account.query().findById(account_id);
+    if (
+      (user.previous_plan !== null &&
+        subscriptionDetails.subscription.plan_id !== user.previous_plan) ||
+      (user.previous_status !== null &&
+        subscriptionDetails.subscription.status !== user.previous_status)
+    ) {
+      if (menuAddon.quantity < activeMenus.length) {
+        await models.OutletVenue.query()
+          .update({ is_venue_active: false })
+          .where({ account_id, is_venue_active: true })
+          .whereNotIn("id", activeMenusIds);
+      } else {
+        const inactiveMenusIds = _.map(
+          _.slice(inactiveMenus, 0, menuAddon.quantity - activeMenus.length),
+          "id"
+        );
+        await models.OutletVenue.query()
+          .update({ is_venue_active: true })
+          .where({ account_id, is_venue_active: false })
+          .whereIn("id", inactiveMenusIds);
+      }
+      await models.Account.query()
+        .update({ previous_plan: subscriptionDetails.subscription.plan_id })
+        .findById(account_id);
+      await models.Account.query()
+        .update({ previous_status: subscriptionDetails.subscription.status })
+        .findById(account_id);
+    }
+
     return res.status(202).json("RESPONSE SUCCESS");
   } catch (e) {
     console.log(e);

@@ -14,6 +14,11 @@ router.post(
   VerifyToken,
   paymentController.retriveSubscriptionById
 );
+router.post(
+  "/cancel-subscription",
+  VerifyToken,
+  paymentController.cancelSubscriptionById
+);
 router.post("/get-coupon", paymentController.retriveCoupon);
 
 router.post(
