@@ -564,6 +564,7 @@ const updateMenuStatusByPlan = async (req, res, next) => {
         .update({ previous_status: subscriptionDetails.subscription.status })
         .findById(account_id);
     }
+    user = await models.Account.query().findById(account_id);
     if (
       (user.previous_plan !== null &&
         subscriptionDetails.subscription.plan_id !== user.previous_plan) ||
