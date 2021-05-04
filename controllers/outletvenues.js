@@ -554,14 +554,12 @@ const updateMenuStatusByPlan = async (req, res, next) => {
         .update({ is_venue_active: false })
         .where({ account_id, is_venue_active: true });
     }
-    if (!user.previous_plan) {
+    if (!user.previous_plan || !user.previous_status) {
       await models.Account.query()
-        .update({ previous_plan: subscriptionDetails.subscription.plan_id })
-        .findById(account_id);
-    }
-    if (!user.previous_status) {
-      await models.Account.query()
-        .update({ previous_status: subscriptionDetails.subscription.status })
+        .update({
+          previous_plan: subscriptionDetails.subscription.plan_id,
+          previous_status: subscriptionDetails.subscription.status,
+        })
         .findById(account_id);
     }
     user = await models.Account.query().findById(account_id);
