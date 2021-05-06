@@ -1,6 +1,8 @@
 exports.up = function (knex) {
   return knex.schema.alterTable("outletvenuemenus", (table) => {
-    table.json("sides");
+    table.json("free_sides");
+    table.json("paid_sides");
+    table.integer("maximum_sides");
   });
 };
 
