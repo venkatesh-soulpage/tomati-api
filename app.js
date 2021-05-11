@@ -37,6 +37,7 @@ var statistics = require("./routes/statistics");
 var plansRoute = require("./routes/plans");
 var subscriptionsRoute = require("./routes/subscription");
 var paymentRoute = require("./routes/payment");
+var productCategoryRoute = require("./routes/product_category");
 
 var app = express();
 Sentry.init({
@@ -105,6 +106,7 @@ app.use("/api/statistics", statistics);
 app.use("/api/plans", plansRoute);
 app.use("/api/subscriptions", subscriptionsRoute);
 app.use("/api/payment", paymentRoute);
+app.use("/api/productcategory", productCategoryRoute);
 
 // check
 // catch 404 and forward to error handler
