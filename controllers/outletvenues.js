@@ -420,7 +420,9 @@ const createVenueMenu = async (req, res, next) => {
       generateQRCode(outlet_venue_id);
     }
 
-    _.map(req.body, (item, index) => {
+    _.map(req.body, async (item, index) => {
+      item["outlet_venue_id"] = outlet_venue_id;
+
       const menu = await models.OutletVenueMenu.query().insert(item);
       const { product_categories } = item;
 
@@ -429,7 +431,7 @@ const createVenueMenu = async (req, res, next) => {
         (product, index) => {
           return {
             menu_product_id: menu.id,
-            menu_product_category: prodduct,
+            menu_product_category: product,
             outlet_venue_id,
           };
         }

@@ -108,7 +108,7 @@ app.use("/api/plans", plansRoute);
 app.use("/api/subscriptions", subscriptionsRoute);
 app.use("/api/payment", paymentRoute);
 app.use("/api/productcategories", productCategoryRoute);
-app.use("/api/venue-menue", outletVenueMenuRoute);
+app.use("/api/venue-menu", outletVenueMenuRoute);
 
 // check
 // catch 404 and forward to error handler

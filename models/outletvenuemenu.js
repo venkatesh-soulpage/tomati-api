@@ -7,7 +7,7 @@ export default class OutletVenueMenu extends Model {
   }
   static get relationMappings() {
     return {
-      product_category: {
+      product_categories: {
         relation: Model.HasManyRelation,
         modelClass: models.MenuProductCategory,
         join: {
