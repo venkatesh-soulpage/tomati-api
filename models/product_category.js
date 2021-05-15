@@ -3,6 +3,6 @@ import models from "../models";
 
 export default class ProductCategory extends Model {
   static get tableName() {
-    return "product_category";
+    return "product_categories";
   }
 }

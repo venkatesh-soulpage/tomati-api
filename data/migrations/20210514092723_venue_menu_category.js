@@ -1,5 +1,5 @@
 exports.up = function (knex) {
-  return knex.schema.createTable("menu_product_category", (table) => {
+  return knex.schema.createTable("menu_product_categories", (table) => {
     table.increments("id").primary();
     table.integer("menu_product_id").references("outletvenuemenus.id");
     table.integer("menu_product_category").references("product_category.id");
@@ -10,5 +10,5 @@ exports.up = function (knex) {
 };
 
 exports.down = function (knex) {
-  knex.schema.dropTable("menue_product_category");
+  knex.schema.dropTable("menu_product_categories");
 };
