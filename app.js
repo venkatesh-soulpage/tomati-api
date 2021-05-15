@@ -38,6 +38,7 @@ var plansRoute = require("./routes/plans");
 var subscriptionsRoute = require("./routes/subscription");
 var paymentRoute = require("./routes/payment");
 var productCategoryRoute = require("./routes/product_category");
+var outletVenueMenuRoute = require("./routes/outletvenue_menu");
 
 var app = express();
 Sentry.init({
@@ -107,6 +108,7 @@ app.use("/api/plans", plansRoute);
 app.use("/api/subscriptions", subscriptionsRoute);
 app.use("/api/payment", paymentRoute);
 app.use("/api/productcategory", productCategoryRoute);
+app.use("/api/venue-menue", outletVenueMenuRoute);
 
 // check
 // catch 404 and forward to error handler
