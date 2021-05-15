@@ -107,7 +107,7 @@ app.use("/api/statistics", statistics);
 app.use("/api/plans", plansRoute);
 app.use("/api/subscriptions", subscriptionsRoute);
 app.use("/api/payment", paymentRoute);
-app.use("/api/productcategory", productCategoryRoute);
+app.use("/api/productcategories", productCategoryRoute);
 app.use("/api/venue-menue", outletVenueMenuRoute);
 
 // check

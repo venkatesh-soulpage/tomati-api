@@ -11,11 +11,7 @@ router.post(
   VerifyToken,
   productCategoryController.createproductCategory
 );
-router.get(
-  "/getproductcategories",
-  VerifyToken,
-  productCategoryController.getProductCategories
-);
+router.get("/", productCategoryController.getProductCategories);
 router.delete(
   "/:category_id",
   VerifyToken,
