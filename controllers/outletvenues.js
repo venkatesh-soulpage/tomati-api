@@ -406,23 +406,55 @@ const createVenueMenu = async (req, res, next) => {
     const { account_id, scope } = req;
     const { outlet_venue_id } = req.params;
 
-    for (let item of req.body) {
-      item.outlet_venue_id = outlet_venue_id;
-    }
-
     const menu = await models.OutletVenueMenu.query().where({
       outlet_venue_id,
     });
 
-    if (menu.length > 0)
+    if (menu.length > 0) {
+      await models.MenueProductCategory.query()
+        .delete()
+        .where({ outlet_venue_id });
       await models.OutletVenueMenu.query().delete().where({ outlet_venue_id });
-    else {
+    } else {
       generateQRCode(outlet_venue_id);
     }
-
-    const new_venue = await models.OutletVenueMenu.query().insertGraph(
-      req.body
-    );
+    for (let item of req.body) {
+      let product = await models.OutletVenueMenu.query().insert({
+        name: item.name,
+        price: item.price,
+        description: item.description,
+        menu_category: item.menu_category,
+        product_category: item.product_category,
+        product_type: item.product_type,
+        actual_name: item.actual_name,
+        portfolio: item.portfolio,
+        ingredient_1: item.ingredient_1,
+        ingredient_1_quantity: item.ingredient_1_quantity,
+        ingredient_2: item.ingredient_2,
+        ingredient_2_quantity: item.ingredient_2_quantity,
+        ingredient_3: item.ingredient_3,
+        ingredient_3_quantity: item.ingredient_3_quantity,
+        ingredient_4: item.ingredient_4,
+        ingredient_4_quantity: item.ingredient_4_quantity,
+        ingredient_5: item.ingredient_5,
+        ingredient_5_quantity: item.ingredient_5_quantity,
+        outlet_venue_id: outlet_venue_id,
+        outlet_category: item.outlet_category,
+        free_sides: item.free_sides,
+        paid_sides: item.paid_sides,
+        maximum_sides: item.maximum_sides,
+      });
+      if (item.products_category) {
+        for (let pro of item.products_category) {
+          let product_category =
+            await models.MenueProductCategory.query().insert({
+              menue_product_id: product.id,
+              menue_product_category: pro,
+              outlet_venue_id,
+            });
+        }
+      }
+    }
 
     // Send the clients
     return res.status(201).json("VenueMenu Created Successfully");
@@ -561,6 +593,7 @@ const updateMenuStatusByPlan = async (req, res, next) => {
           previous_status: subscriptionDetails.subscription.status,
         })
         .findById(account_id);
+      return res.status(200).json("RESPONSE SUCCESS");
     }
     user = await models.Account.query().findById(account_id);
     if (
