@@ -12,6 +12,7 @@ const isBase64 = require("is-base64");
 const { s3 } = require("../utils/s3Config");
 const sharp = require("sharp");
 var chargebee = require("chargebee");
+
 chargebee.configure({
   site: `${process.env.CHARGEBEE_SITE}`,
   api_key: `${process.env.CHARGEBEE_API_KEY}`,
@@ -411,50 +412,34 @@ const createVenueMenu = async (req, res, next) => {
     });
 
     if (menu.length > 0) {
-      await models.MenueProductCategory.query()
+      await models.MenuProductCategory.query()
         .delete()
         .where({ outlet_venue_id });
       await models.OutletVenueMenu.query().delete().where({ outlet_venue_id });
     } else {
       generateQRCode(outlet_venue_id);
     }
-    for (let item of req.body) {
-      let product = await models.OutletVenueMenu.query().insert({
-        name: item.name,
-        price: item.price,
-        description: item.description,
-        menu_category: item.menu_category,
-        product_category: item.product_category,
-        product_type: item.product_type,
-        actual_name: item.actual_name,
-        portfolio: item.portfolio,
-        ingredient_1: item.ingredient_1,
-        ingredient_1_quantity: item.ingredient_1_quantity,
-        ingredient_2: item.ingredient_2,
-        ingredient_2_quantity: item.ingredient_2_quantity,
-        ingredient_3: item.ingredient_3,
-        ingredient_3_quantity: item.ingredient_3_quantity,
-        ingredient_4: item.ingredient_4,
-        ingredient_4_quantity: item.ingredient_4_quantity,
-        ingredient_5: item.ingredient_5,
-        ingredient_5_quantity: item.ingredient_5_quantity,
-        outlet_venue_id: outlet_venue_id,
-        outlet_category: item.outlet_category,
-        free_sides: item.free_sides,
-        paid_sides: item.paid_sides,
-        maximum_sides: item.maximum_sides,
-      });
-      if (item.products_category) {
-        for (let pro of item.products_category) {
-          let product_category =
-            await models.MenueProductCategory.query().insert({
-              menue_product_id: product.id,
-              menue_product_category: pro,
-              outlet_venue_id,
-            });
+
+    _.map(req.body, async (item, index) => {
+      item["outlet_venue_id"] = outlet_venue_id;
+
+      const menu = await models.OutletVenueMenu.query().insert(item);
+      const { product_categories } = item;
+
+      const product_category_data = _.map(
+        product_categories,
+        (product, index) => {
+          return {
+            menu_product_id: menu.id,
+            menu_product_category: product,
+            outlet_venue_id,
+          };
         }
-      }
-    }
+      );
+      await models.MenuProductCategory.query().insertGraph(
+        product_category_data
+      );
+    });
 
     // Send the clients
     return res.status(201).json("VenueMenu Created Successfully");

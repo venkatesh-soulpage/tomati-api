@@ -1,8 +1,8 @@
 import Model from "./model";
 import models from "../models";
 
-export default class MenueProductCategory extends Model {
+export default class MenuProductCategory extends Model {
   static get tableName() {
-    return "menue_product_category";
+    return "menu_product_categories";
   }
 }
