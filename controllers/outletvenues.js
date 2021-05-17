@@ -617,6 +617,101 @@ const updateMenuStatusByPlan = async (req, res, next) => {
   }
 };
 
+const searchOutletVenue = async (req, res) => {
+  try {
+    const searchTerm = req.params.searchTerm;
+    const filteredByProductName = await models.OutletVenueMenu.query()
+      .where("name", "ilike", `%${searchTerm}%`)
+      .distinct("outlet_venue_id");
+    const filteredByProductCategory = await models.OutletVenueMenu.query()
+      .where("product_category", "ilike", `%${searchTerm}%`)
+      .distinct("outlet_venue_id");
+    const filteredByMenuCategory = await models.OutletVenueMenu.query()
+      .where("menu_category", "ilike", `%${searchTerm}%`)
+      .distinct("outlet_venue_id");
+    const searchedProductCategories =
+      await models.ProductCategory.query().where(
+        "name",
+        "ilike",
+        `%${searchTerm}%`
+      );
+    const serachedProductVenuesIDS = _.map(
+      searchedProductCategories,
+      (item) => {
+        return item.id;
+      }
+    );
+    const filteredByProductManagement = await models.MenuProductCategory.query()
+      .whereIn("menu_product_category", serachedProductVenuesIDS)
+      .distinct("outlet_venue_id");
+    let mergedProducts = _.unionBy(
+      filteredByProductCategory,
+      filteredByMenuCategory,
+      filteredByProductName,
+      filteredByProductManagement,
+      filteredByProductManagement,
+      "outlet_venue_id"
+    );
+    const searchedVenueIds = _.map(mergedProducts, (item) => {
+      return item.outlet_venue_id;
+    });
+    const venues = await models.OutletVenue.query().whereIn(
+      "id",
+      searchedVenueIds
+    );
+    return res.status(200).json(venues);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
+
+const searchVenueItems = async (req, res) => {
+  try {
+    const { venue_id, searchTerm } = req.params;
+    const filteredByProductName = await models.OutletVenueMenu.query()
+      .where("name", "ilike", `%${searchTerm}%`)
+      .andWhere("outlet_venue_id", venue_id);
+    const filteredByProductCategory = await models.OutletVenueMenu.query()
+      .where("product_category", "ilike", `%${searchTerm}%`)
+      .andWhere("outlet_venue_id", venue_id);
+    const filteredByMenuCategory = await models.OutletVenueMenu.query()
+      .where("menu_category", "ilike", `%${searchTerm}%`)
+      .andWhere("outlet_venue_id", venue_id);
+    const searchedProductCategories =
+      await models.ProductCategory.query().where(
+        "name",
+        "ilike",
+        `%${searchTerm}%`
+      );
+    const serachedProductVenuesIDS = _.map(
+      searchedProductCategories,
+      (item) => {
+        return item.id;
+      }
+    );
+    const serchMenuCategories = await models.MenuProductCategory.query()
+      .whereIn("menu_product_category", serachedProductVenuesIDS)
+      .andWhere("outlet_venue_id", venue_id);
+    const prodIds = _.map(serchMenuCategories, (item) => {
+      return item.menu_product_id;
+    });
+    const filteredByProductManagement =
+      await models.OutletVenueMenu.query().whereIn("id", prodIds);
+    let mergedProducts = _.unionBy(
+      filteredByProductCategory,
+      filteredByMenuCategory,
+      filteredByProductName,
+      filteredByProductManagement,
+      "id"
+    );
+    return res.json(mergedProducts);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
+
 const venuesController = {
   getVenues,
   getUserVenues,
@@ -627,6 +722,8 @@ const venuesController = {
   deleteVenue,
   inactivateMenu,
   updateMenuStatusByPlan,
+  searchOutletVenue,
+  searchVenueItems,
 };
 
 export default venuesController;
