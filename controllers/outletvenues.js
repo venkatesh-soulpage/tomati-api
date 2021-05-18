@@ -618,53 +618,77 @@ const updateMenuStatusByPlan = async (req, res, next) => {
 };
 const searchOutletVenue = async (req, res) => {
   try {
-    const searchTerm = req.params.searchTerm;
-    const dishes = await models.OutletVenueMenu.query()
-      .where("name", "ilike", `%${searchTerm}%`)
-      .orWhere("menu_category", "ilike", `%${searchTerm}%`)
-      .orWhere("product_category", "ilike", `%${searchTerm}%`);
-    const filteredVenuesInMenus = await models.OutletVenueMenu.query()
-      .where("name", "ilike", `%${searchTerm}%`)
-      .orWhere("menu_category", "ilike", `%${searchTerm}%`)
-      .orWhere("product_category", "ilike", `%${searchTerm}%`)
-      .distinct("outlet_venue_id");
-    const searchedVenues = await models.OutletVenue.query().where(
-      "name",
-      "ilike",
-      `%${searchTerm}%`
-    );
-    const searchedProductCategories =
-      await models.ProductCategory.query().where(
+    const { searchCategory, searchTerm } = req.params;
+    if (searchCategory === "restaurants") {
+      const filteredVenuesInMenus = await models.OutletVenueMenu.query()
+        .where("name", "ilike", `%${searchTerm}%`)
+        .orWhere("menu_category", "ilike", `%${searchTerm}%`)
+        .orWhere("product_category", "ilike", `%${searchTerm}%`)
+        .distinct("outlet_venue_id");
+      const searchedVenues = await models.OutletVenue.query().where(
         "name",
         "ilike",
         `%${searchTerm}%`
       );
-    const serachedProductVenuesIDS = _.map(
-      searchedProductCategories,
-      (item) => {
-        return item.id;
-      }
-    );
-    const serchMenuCategories =
-      await models.MenuProductCategory.query().whereIn(
-        "menu_product_category",
-        serachedProductVenuesIDS
+      const searchedProductCategories =
+        await models.ProductCategory.query().where(
+          "name",
+          "ilike",
+          `%${searchTerm}%`
+        );
+      const serachedProductVenuesIDS = _.map(
+        searchedProductCategories,
+        (item) => {
+          return item.id;
+        }
       );
-    const prodIds = _.map(serchMenuCategories, (item) => {
-      return item.menu_product_id;
-    });
-    const filteredByProductManagement =
-      await models.OutletVenueMenu.query().whereIn("id", prodIds);
-    let mergedDishes = _.unionBy(dishes, filteredByProductManagement, "id");
-    const venueIds = _.map(filteredVenuesInMenus, (item) => {
-      return item.outlet_venue_id;
-    });
-    const venueId = _.map(searchedVenues, (item) => {
-      return item.id;
-    });
-    const uniqueIds = _.union(venueId, venueIds);
-    const venues = await models.OutletVenue.query().whereIn("id", uniqueIds);
-    return res.status(200).json({ venues, dishes: mergedDishes });
+      const serchMenuCategories = await models.MenuProductCategory.query()
+        .whereIn("menu_product_category", serachedProductVenuesIDS)
+        .distinct("outlet_venue_id");
+      const venueIds = _.map(filteredVenuesInMenus, (item) => {
+        return item.outlet_venue_id;
+      });
+      const venueId = _.map(searchedVenues, (item) => {
+        return item.id;
+      });
+      const productMnagementFilteredIds = _.map(serchMenuCategories, (item) => {
+        return item.outlet_venue_id;
+      });
+      const uniqueIds = _.union(venueId, venueIds, productMnagementFilteredIds);
+      const venues = await models.OutletVenue.query().whereIn("id", uniqueIds);
+      return res.status(200).json(venues);
+    } else if (searchCategory === "dishes") {
+      const dishes = await models.OutletVenueMenu.query()
+        .where("name", "ilike", `%${searchTerm}%`)
+        .orWhere("menu_category", "ilike", `%${searchTerm}%`)
+        .orWhere("product_category", "ilike", `%${searchTerm}%`);
+      const searchedProductCategories =
+        await models.ProductCategory.query().where(
+          "name",
+          "ilike",
+          `%${searchTerm}%`
+        );
+      const serachedProductVenuesIDS = _.map(
+        searchedProductCategories,
+        (item) => {
+          return item.id;
+        }
+      );
+      const serchMenuCategories =
+        await models.MenuProductCategory.query().whereIn(
+          "menu_product_category",
+          serachedProductVenuesIDS
+        );
+      const prodIds = _.map(serchMenuCategories, (item) => {
+        return item.menu_product_id;
+      });
+      const filteredByProductManagement =
+        await models.OutletVenueMenu.query().whereIn("id", prodIds);
+      let mergedDishes = _.unionBy(dishes, filteredByProductManagement, "id");
+      return res.status(200).json(mergedDishes);
+    } else {
+      return res.status(400).json("Invalid seach category payload");
+    }
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e));
