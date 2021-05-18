@@ -619,7 +619,7 @@ const updateMenuStatusByPlan = async (req, res, next) => {
 const searchOutletVenue = async (req, res) => {
   try {
     const { searchCategory, searchTerm } = req.params;
-    if (searchCategory === "restaurants") {
+    if (searchCategory === "venues") {
       const filteredVenuesInMenus = await models.OutletVenueMenu.query()
         .where("name", "ilike", `%${searchTerm}%`)
         .orWhere("menu_category", "ilike", `%${searchTerm}%`)
