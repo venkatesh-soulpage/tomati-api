@@ -88,8 +88,6 @@ router.post(
   venuesController.updateMenuStatusByPlan
 );
 
-router.get("/venue/:searchTerm", venuesController.searchOutletVenue);
-
-router.get("/:venue_id/:searchTerm", venuesController.searchVenueItems);
+router.get("/search/:searchTerm", venuesController.searchOutletVenue);
 
 module.exports = router;
