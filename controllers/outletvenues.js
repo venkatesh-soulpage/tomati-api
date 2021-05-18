@@ -616,7 +616,7 @@ const updateMenuStatusByPlan = async (req, res, next) => {
     return res.status(500).json(JSON.stringify(e));
   }
 };
-const searchOutletVenue = async (req, res) => {
+const searchVenues = async (req, res) => {
   try {
     const { searchCategory, searchTerm } = req.params;
     if (searchCategory === "venues") {
@@ -705,7 +705,7 @@ const venuesController = {
   deleteVenue,
   inactivateMenu,
   updateMenuStatusByPlan,
-  searchOutletVenue,
+  searchVenues,
 };
 
 export default venuesController;
