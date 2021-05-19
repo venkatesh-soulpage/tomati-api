@@ -627,6 +627,18 @@ const updateMenuStatusByPlan = async (req, res, next) => {
 const searchVenues = async (req, res) => {
   try {
     const { searchCategory, searchTerm } = req.params;
+    const searchedProductCategories =
+      await models.ProductCategory.query().where(
+        "name",
+        "ilike",
+        `%${searchTerm}%`
+      );
+    const serachedProductVenuesIDS = _.map(
+      searchedProductCategories,
+      (item) => {
+        return item.id;
+      }
+    );
     if (searchCategory === "venues") {
       const filteredVenuesInMenus = await models.OutletVenueMenu.query()
         .where("name", "ilike", `%${searchTerm}%`)
@@ -637,18 +649,6 @@ const searchVenues = async (req, res) => {
         "name",
         "ilike",
         `%${searchTerm}%`
-      );
-      const searchedProductCategories =
-        await models.ProductCategory.query().where(
-          "name",
-          "ilike",
-          `%${searchTerm}%`
-        );
-      const serachedProductVenuesIDS = _.map(
-        searchedProductCategories,
-        (item) => {
-          return item.id;
-        }
       );
       const serchMenuCategories = await models.MenuProductCategory.query()
         .whereIn("menu_product_category", serachedProductVenuesIDS)
@@ -670,18 +670,6 @@ const searchVenues = async (req, res) => {
         .where("name", "ilike", `%${searchTerm}%`)
         .orWhere("menu_category", "ilike", `%${searchTerm}%`)
         .orWhere("product_category", "ilike", `%${searchTerm}%`);
-      const searchedProductCategories =
-        await models.ProductCategory.query().where(
-          "name",
-          "ilike",
-          `%${searchTerm}%`
-        );
-      const serachedProductVenuesIDS = _.map(
-        searchedProductCategories,
-        (item) => {
-          return item.id;
-        }
-      );
       const serchMenuCategories =
         await models.MenuProductCategory.query().whereIn(
           "menu_product_category",
