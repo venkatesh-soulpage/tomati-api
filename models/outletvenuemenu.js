@@ -15,6 +15,14 @@ export default class OutletVenueMenu extends Model {
           to: "outletvenuemenus.id",
         },
       },
+      product_tag: {
+        relation: Model.HasManyRelation,
+        modelClass: models.MenuProductCategory,
+        join: {
+          from: "menu_product_tags.menu_product_id",
+          to: "outletvenuemenus.id",
+        },
+      },
     };
   }
 }

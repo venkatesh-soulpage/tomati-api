@@ -38,6 +38,7 @@ var plansRoute = require("./routes/plans");
 var subscriptionsRoute = require("./routes/subscription");
 var paymentRoute = require("./routes/payment");
 var productCategoryRoute = require("./routes/product_category");
+var productTagRoute = require("./routes/product_tags");
 var outletVenueMenuRoute = require("./routes/outletvenue_menu");
 
 var app = express();
@@ -108,6 +109,7 @@ app.use("/api/plans", plansRoute);
 app.use("/api/subscriptions", subscriptionsRoute);
 app.use("/api/payment", paymentRoute);
 app.use("/api/productcategories", productCategoryRoute);
+app.use("/api/producttags", productTagRoute);
 app.use("/api/venue-menu", outletVenueMenuRoute);
 
 // check

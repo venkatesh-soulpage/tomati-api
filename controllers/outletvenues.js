@@ -424,7 +424,7 @@ const createVenueMenu = async (req, res, next) => {
       item["outlet_venue_id"] = outlet_venue_id;
 
       const menu = await models.OutletVenueMenu.query().insert(item);
-      const { product_categories } = item;
+      const { product_categories, product_tags } = item;
 
       const product_category_data = _.map(
         product_categories,
@@ -436,9 +436,17 @@ const createVenueMenu = async (req, res, next) => {
           };
         }
       );
+      const product_tag_data = _.map(product_tags, (product, index) => {
+        return {
+          menu_product_id: menu.id,
+          menu_product_tags: product,
+          outlet_venue_id,
+        };
+      });
       await models.MenuProductCategory.query().insertGraph(
         product_category_data
       );
+      await models.MenuProductTags.query().insertGraph(product_tag_data);
     });
 
     // Send the clients
