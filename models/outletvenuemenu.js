@@ -17,7 +17,7 @@ export default class OutletVenueMenu extends Model {
       },
       product_tag: {
         relation: Model.HasManyRelation,
-        modelClass: models.MenuProductCategory,
+        modelClass: models.MenuProductTags,
         join: {
           from: "menu_product_tags.menu_product_id",
           to: "outletvenuemenus.id",

@@ -415,6 +415,7 @@ const createVenueMenu = async (req, res, next) => {
       await models.MenuProductCategory.query()
         .delete()
         .where({ outlet_venue_id });
+      await models.MenuProductTags.query().delete().where({ outlet_venue_id });
       await models.OutletVenueMenu.query().delete().where({ outlet_venue_id });
     } else {
       generateQRCode(outlet_venue_id);
