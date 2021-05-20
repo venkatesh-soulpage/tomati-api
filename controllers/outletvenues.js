@@ -416,6 +416,7 @@ const createVenueMenu = async (req, res, next) => {
         .delete()
         .where({ outlet_venue_id });
       await models.MenuProductTags.query().delete().where({ outlet_venue_id });
+      await models.MenuCuisineType.query().delete().where({ outlet_venue_id });
       await models.OutletVenueMenu.query().delete().where({ outlet_venue_id });
     } else {
       generateQRCode(outlet_venue_id);
@@ -425,7 +426,7 @@ const createVenueMenu = async (req, res, next) => {
       item["outlet_venue_id"] = outlet_venue_id;
 
       const menu = await models.OutletVenueMenu.query().insert(item);
-      const { product_categories, product_tag } = item;
+      const { product_categories, product_tag, cuisine_type } = item;
 
       const product_category_data = _.map(
         product_categories,
@@ -444,10 +445,18 @@ const createVenueMenu = async (req, res, next) => {
           outlet_venue_id,
         };
       });
+      const cuisine_type_data = _.map(cuisine_type, (product, index) => {
+        return {
+          menu_product_id: menu.id,
+          menu_cuisine_type: product,
+          outlet_venue_id,
+        };
+      });
       await models.MenuProductCategory.query().insertGraph(
         product_category_data
       );
       await models.MenuProductTags.query().insertGraph(product_tag_data);
+      await models.MenuCuisineType.query().insertGraph(cuisine_type_data);
     });
 
     // Send the clients
@@ -625,19 +634,26 @@ const updateMenuStatusByPlan = async (req, res, next) => {
     return res.status(500).json(JSON.stringify(e));
   }
 };
+function arrayContainsArray(superset, subset) {
+  return subset.every(function (value) {
+    return superset.indexOf(value) >= 0;
+  });
+}
 const searchVenues = async (req, res) => {
   try {
     let {
-      searchTerm,
-      searchCategories,
-      searchTags,
-      searchVenues,
+      keyword,
+      product_categories,
+      product_tags,
+      product_cuisine_types,
       min_price,
       max_price,
     } = req.body;
+    const { venue_id } = req.params;
     let dishes = await models.OutletVenueMenu.query()
-      .withGraphFetched(`[product_categories,product_tag]`)
-      .where("name", "ilike", `%${searchTerm}%`)
+      .withGraphFetched(`[product_categories,product_tag,cuisine_type]`)
+      .where("outlet_venue_id", venue_id)
+      .andWhere("name", "ilike", `%${keyword}%`)
       .orderBy("id", "asc");
     dishes = _.map(dishes, (dish) => {
       return {
@@ -647,35 +663,30 @@ const searchVenues = async (req, res) => {
           "menu_product_category"
         ),
         product_tag: _.map(dish.product_tag, "menu_product_tags"),
+        cuisine_type: _.map(dish.cuisine_type, "menu_cuisine_type"),
       };
     });
-    if (searchCategories.length > 0) {
+    if (product_categories.length > 0) {
       dishes = _.filter(dishes, (dish) => {
         if (
-          _.intersection(searchCategories, dish.product_categories).length > 0
+          _.intersection(product_categories, dish.product_categories).length > 0
         )
           return dish;
       });
     }
-    if (searchTags.length > 0) {
+    if (product_tags.length > 0) {
       dishes = _.filter(dishes, (dish) => {
-        if (_.intersection(searchTags, dish.product_tag).length > 0)
+        return arrayContainsArray(dish.product_tag, product_tags);
+      });
+    }
+    if (product_cuisine_types.length > 0) {
+      dishes = _.filter(dishes, (dish) => {
+        if (_.intersection(product_cuisine_types, dish.cuisine_type).length > 0)
           return dish;
       });
     }
-    if (searchVenues.length > 0) {
-      dishes = _.filter(dishes, (dish) => {
-        return searchVenues.includes(dish.outlet_venue_id);
-      });
-    }
-    const venueIds = _.map(
-      _.unionBy(dishes, "outlet_venue_id"),
-      "outlet_venue_id"
-    );
-    const venues = await models.OutletVenue.query()
-      .whereIn("id", venueIds)
-      .orWhere("name", "ilike", `%${searchTerm}%`);
-    return res.status(200).json({ venues, dishes });
+
+    return res.status(200).json(dishes);
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e));
