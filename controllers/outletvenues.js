@@ -182,6 +182,10 @@ const createVenue = async (req, res, next) => {
       longitude,
       location_id,
       description,
+      start_time,
+      end_time,
+      delivery_flat_fee,
+      delivery_variable_fee,
     } = req.body;
     const venue = await models.OutletVenue.query().findOne("name", name);
     if (venue)
@@ -242,6 +246,10 @@ const createVenue = async (req, res, next) => {
       description,
       cover_image: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
       logo_img: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key2}`,
+      start_time,
+      end_time,
+      delivery_flat_fee,
+      delivery_variable_fee,
     });
     const site = `${process.env.SCHEMA}://${process.env.APP_HOST}${
       process.env.APP_PORT && `:${process.env.APP_PORT}`
@@ -641,19 +649,20 @@ function arrayContainsArray(superset, subset) {
 }
 const searchVenues = async (req, res) => {
   try {
-    let {
-      keyword,
-      product_categories,
-      product_tags,
-      product_cuisine_types,
-      min_price,
-      max_price,
-    } = req.body;
+    let { keyword, product_categories, product_tags, product_cuisine_types } =
+      req.body;
     const { venue_id } = req.params;
+    if (
+      _.isEmpty(req.body) ||
+      (!keyword &&
+        _.isEmpty(product_categories) &&
+        _.isEmpty(product_tags) &&
+        _.isEmpty(product_cuisine_types))
+    )
+      return res.status(400).json("Please input keyword");
     let dishes = await models.OutletVenueMenu.query()
       .withGraphFetched(`[product_categories,product_tag,cuisine_type]`)
       .where("outlet_venue_id", venue_id)
-      .andWhere("name", "ilike", `%${keyword}%`)
       .orderBy("id", "asc");
     dishes = _.map(dishes, (dish) => {
       return {
@@ -666,27 +675,34 @@ const searchVenues = async (req, res) => {
         cuisine_type: _.map(dish.cuisine_type, "menu_cuisine_type"),
       };
     });
-    if (product_categories.length > 0) {
+    if (keyword) {
       dishes = _.filter(dishes, (dish) => {
-        if (
-          _.intersection(product_categories, dish.product_categories).length > 0
-        )
-          return dish;
+        return _.includes(dish.name, keyword);
       });
     }
-    if (product_tags.length > 0) {
+    if (product_categories && !_.isEmpty(product_categories)) {
+      dishes = _.filter(dishes, (dish) => {
+        return (
+          _.intersection(product_categories, dish.product_categories).length > 0
+        );
+      });
+    }
+    if (product_tags && !_.isEmpty(product_tags)) {
       dishes = _.filter(dishes, (dish) => {
         return arrayContainsArray(dish.product_tag, product_tags);
       });
     }
-    if (product_cuisine_types.length > 0) {
+    if (product_cuisine_types && !_.isEmpty(product_cuisine_types)) {
       dishes = _.filter(dishes, (dish) => {
-        if (_.intersection(product_cuisine_types, dish.cuisine_type).length > 0)
-          return dish;
+        return (
+          _.intersection(product_cuisine_types, dish.cuisine_type).length > 0
+        );
       });
     }
-
-    return res.status(200).json(dishes);
+    return res.status(200).json({
+      dishes,
+      dishes_count: dishes.length,
+    });
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e));

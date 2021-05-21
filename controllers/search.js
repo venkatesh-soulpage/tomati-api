@@ -1,7 +1,5 @@
 import models from "../models";
-
 import _ from "lodash";
-
 //Tomati controllers
 function arrayContainsArray(superset, subset) {
   return subset.every(function (value) {
@@ -16,17 +14,20 @@ const search = async (req, res) => {
       product_tags,
       product_cuisine_types,
       search_venues,
-      min_price,
-      max_price,
     } = req.body;
-    let venues = await models.OutletVenue.query().orWhere(
-      "name",
-      "ilike",
-      `%${keyword}%`
-    );
+    if (
+      _.isEmpty(req.body) ||
+      (!keyword &&
+        _.isEmpty(product_categories) &&
+        _.isEmpty(product_tags) &&
+        _.isEmpty(search_venues) &&
+        _.isEmpty(product_cuisine_types))
+    )
+      return res.status(400).json("Please input keyword");
+    let venuesWithKeyword = [];
+    let venues = await models.OutletVenue.query().orderBy("id", "asc");
     let dishes = await models.OutletVenueMenu.query()
       .withGraphFetched(`[product_categories,product_tag,cuisine_type]`)
-      .where("name", "ilike", `%${keyword}%`)
       .orderBy("id", "asc");
     dishes = _.map(dishes, (dish) => {
       return {
@@ -39,47 +40,61 @@ const search = async (req, res) => {
         cuisine_type: _.map(dish.cuisine_type, "menu_cuisine_type"),
       };
     });
-    if (product_categories.length > 0) {
+    if (keyword) {
+      venuesWithKeyword = _.filter(venues, (venue) => {
+        return _.includes(venue.name, keyword);
+      });
       dishes = _.filter(dishes, (dish) => {
-        if (
-          _.intersection(product_categories, dish.product_categories).length > 0
-        )
-          return dish;
+        return _.includes(dish.name, keyword);
       });
     }
-    if (product_tags.length > 0) {
+    if (product_categories && !_.isEmpty(product_categories)) {
+      dishes = _.filter(dishes, (dish) => {
+        return _.isEmpty(
+          _.intersection(product_categories, dish.product_categories)
+        );
+      });
+    }
+    if (product_tags && !_.isEmpty(product_tags)) {
       dishes = _.filter(dishes, (dish) => {
         return arrayContainsArray(dish.product_tag, product_tags);
       });
     }
-    if (product_cuisine_types.length > 0) {
+    if (product_cuisine_types && !_.isEmpty(product_cuisine_types)) {
       dishes = _.filter(dishes, (dish) => {
-        if (_.intersection(product_cuisine_types, dish.cuisine_type).length > 0)
-          return dish;
+        return _.isEmpty(
+          _.intersection(product_cuisine_types, dish.cuisine_type)
+        );
       });
     }
-    if (search_venues.length > 0) {
+    if (search_venues && !_.isEmpty(search_venues)) {
       dishes = _.filter(dishes, (dish) => {
-        return search_venues.includes(dish.outlet_venue_id);
-      });
-
-      const venueIds = _.map(
-        _.unionBy(dishes, "outlet_venue_id"),
-        "outlet_venue_id"
-      );
-      venues = _.filter(venues, (venue) => {
-        return venueIds.includes(venue.id);
+        return _.includes(search_venues, dish.outlet_venue_id);
       });
     }
-    return res.status(200).json({ venues, dishes });
+    const venueIds = _.map(
+      _.unionBy(dishes, "outlet_venue_id"),
+      "outlet_venue_id"
+    );
+    const venuesWithDishes = _.filter(venues, (venue) => {
+      return _.includes(venueIds, venue.id);
+    });
+    venues = venuesWithKeyword;
+    if (!_.isEmpty(venuesWithDishes)) {
+      venues = _.unionBy(venuesWithKeyword, venuesWithDishes, "id");
+    }
+    return res.status(200).json({
+      venues,
+      dishes,
+      venues_count: venues.length,
+      dishes_count: dishes.length,
+    });
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e));
   }
 };
-
 const SearchController = {
   search,
 };
-
 export default SearchController;
