@@ -54,6 +54,10 @@ import Discount from "./discount";
 import MenuStatusCount from "./menu_status_count";
 import ProductCategory from "./product_category";
 import MenuProductCategory from "./menu_product_category";
+import ProductTags from "./product_tags";
+import MenuProductTags from "./menu_product_tags";
+import CuisineType from "./cuisine_type";
+import MenuCuisineType from "./menu_cuisine_type";
 
 export default {
   Location,
@@ -112,4 +116,8 @@ export default {
   MenuStatusCount,
   ProductCategory,
   MenuProductCategory,
+  ProductTags,
+  MenuProductTags,
+  CuisineType,
+  MenuCuisineType,
 };
