@@ -58,6 +58,7 @@ import ProductTags from "./product_tags";
 import MenuProductTags from "./menu_product_tags";
 import CuisineType from "./cuisine_type";
 import MenuCuisineType from "./menu_cuisine_type";
+import OutletBusinessHours from "./outlet_business_hours";
 
 export default {
   Location,
@@ -120,4 +121,5 @@ export default {
   MenuProductTags,
   CuisineType,
   MenuCuisineType,
+  OutletBusinessHours,
 };

@@ -107,7 +107,7 @@ const getVenue = async (req, res, next) => {
     }
 
     venue = await models.OutletVenue.query()
-      .withGraphFetched(`[menu,collaborators,location]`)
+      .withGraphFetched(`[menu,collaborators,location,business_hours]`)
       .findById(outlet_venue_id);
 
     if (req.headers["qr_scan"] || req.headers["accept-language"]) {
@@ -186,6 +186,8 @@ const createVenue = async (req, res, next) => {
       end_time,
       delivery_flat_fee,
       delivery_variable_fee,
+      business_hours,
+      time_zone,
     } = req.body;
     const venue = await models.OutletVenue.query().findOne("name", name);
     if (venue)
@@ -250,7 +252,12 @@ const createVenue = async (req, res, next) => {
       end_time,
       delivery_flat_fee,
       delivery_variable_fee,
+      time_zone,
     });
+    const businessHoursData = _.map(business_hours, (data) => {
+      return { ...data, outlet_venue_id: new_venue.id };
+    });
+    await models.OutletBusinessHours.query().insertGraph(businessHoursData);
     const site = `${process.env.SCHEMA}://${process.env.APP_HOST}${
       process.env.APP_PORT && `:${process.env.APP_PORT}`
     }`;
@@ -294,6 +301,10 @@ const updateVenue = async (req, res, next) => {
       location_id,
       latitude,
       longitude,
+      delivery_flat_fee,
+      delivery_variable_fee,
+      time_zone,
+      business_hours,
     } = req.body;
 
     let buf, cover_image;
@@ -352,9 +363,13 @@ const updateVenue = async (req, res, next) => {
         location_id,
         latitude,
         longitude,
+        time_zone,
+        delivery_flat_fee,
+        delivery_variable_fee,
         // account_id,
       })
       .where("id", outlet_venue_id);
+    await models.OutletBusinessHours.query().upsertGraph(business_hours);
     return res.status(200).json("Venue Updated Successfully");
   } catch (e) {
     console.log(e);

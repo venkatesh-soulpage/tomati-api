@@ -31,6 +31,14 @@ export default class OutletVenue extends Model {
           to: "outletvenues.id",
         },
       },
+      business_hours: {
+        relation: Model.HasManyRelation,
+        modelClass: models.OutletBusinessHours,
+        join: {
+          from: "outlet_business_hours.outlet_venue_id",
+          to: "outletvenues.id",
+        },
+      },
     };
   }
 }
