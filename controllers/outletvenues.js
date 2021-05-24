@@ -429,9 +429,30 @@ const createVenueMenu = async (req, res, next) => {
     } else {
       generateQRCode(outlet_venue_id);
     }
-
+    // let buf, product_image;
+    // if (req.files) {
+    //   product_image = req.files.product_image;
+    //   buf = product_image.data;
+    // } else if (req.body.product_image) {
+    //   product_image = req.body.product_image;
+    //   buf = Buffer.from(
+    //     product_image.data.replace(/^data:image\/\w+;base64,/, ""),
+    //     "base64"
+    //   );
+    // }
+    // const key = `public/cover_images/outletvenues/${product_image.name}`;
+    // await models.OutletVenueMenu.query().insert(req.body);
     _.map(req.body, async (item, index) => {
       item["outlet_venue_id"] = outlet_venue_id;
+      let buf, product_image;
+      product_image = item.product_image;
+      buf = Buffer.from(
+        product_image.data.replace(/^data:image\/\w+;base64,/, ""),
+        "base64"
+      );
+      let key = `public/cover_images/outletvenues/${product_image.name}`;
+      uploadImage({ key, buf });
+      item.product_image = `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`;
 
       const menu = await models.OutletVenueMenu.query().insert(item);
       const { product_categories, product_tag, cuisine_type } = item;
