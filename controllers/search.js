@@ -50,7 +50,7 @@ const search = async (req, res) => {
     }
     if (product_categories && !_.isEmpty(product_categories)) {
       dishes = _.filter(dishes, (dish) => {
-        return _.isEmpty(
+        return !_.isEmpty(
           _.intersection(product_categories, dish.product_categories)
         );
       });
@@ -62,7 +62,7 @@ const search = async (req, res) => {
     }
     if (product_cuisine_types && !_.isEmpty(product_cuisine_types)) {
       dishes = _.filter(dishes, (dish) => {
-        return _.isEmpty(
+        return !_.isEmpty(
           _.intersection(product_cuisine_types, dish.cuisine_type)
         );
       });

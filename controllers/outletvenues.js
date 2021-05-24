@@ -22,7 +22,9 @@ const getVenues = async (req, res, next) => {
   try {
     // Get brief
     const venues = await models.OutletVenue.query()
-      .withGraphFetched(`[menu]`)
+      .withGraphFetched(
+        `[menu.[product_categories,product_tag,cuisine_type,sides]]`
+      )
       .orderBy("created_at", "desc");
 
     // Send the clientss
@@ -107,7 +109,9 @@ const getVenue = async (req, res, next) => {
     }
 
     venue = await models.OutletVenue.query()
-      .withGraphFetched(`[menu,collaborators,location,business_hours]`)
+      .withGraphFetched(
+        `[menu.[product_categories,product_tag,cuisine_type,sides],collaborators,location,business_hours]`
+      )
       .findById(outlet_venue_id);
 
     if (req.headers["qr_scan"] || req.headers["accept-language"]) {
@@ -182,12 +186,11 @@ const createVenue = async (req, res, next) => {
       longitude,
       location_id,
       description,
-      start_time,
-      end_time,
       delivery_flat_fee,
       delivery_variable_fee,
       business_hours,
       time_zone,
+      delivery_radius,
     } = req.body;
     const venue = await models.OutletVenue.query().findOne("name", name);
     if (venue)
@@ -248,11 +251,10 @@ const createVenue = async (req, res, next) => {
       description,
       cover_image: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
       logo_img: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key2}`,
-      start_time,
-      end_time,
       delivery_flat_fee,
       delivery_variable_fee,
       time_zone,
+      delivery_radius,
     });
     const businessHoursData = _.map(business_hours, (data) => {
       return { ...data, outlet_venue_id: new_venue.id };
@@ -697,7 +699,7 @@ const searchVenues = async (req, res) => {
     )
       return res.status(400).json("Please input keyword");
     let dishes = await models.OutletVenueMenu.query()
-      .withGraphFetched(`[product_categories,product_tag,cuisine_type]`)
+      .withGraphFetched(`[product_categories,product_tag,cuisine_type,sides]`)
       .where("outlet_venue_id", venue_id)
       .orderBy("id", "asc");
     dishes = _.map(dishes, (dish) => {
@@ -718,8 +720,8 @@ const searchVenues = async (req, res) => {
     }
     if (product_categories && !_.isEmpty(product_categories)) {
       dishes = _.filter(dishes, (dish) => {
-        return (
-          _.intersection(product_categories, dish.product_categories).length > 0
+        return !_.isEmpty(
+          _.intersection(product_categories, dish.product_categories)
         );
       });
     }
@@ -730,8 +732,8 @@ const searchVenues = async (req, res) => {
     }
     if (product_cuisine_types && !_.isEmpty(product_cuisine_types)) {
       dishes = _.filter(dishes, (dish) => {
-        return (
-          _.intersection(product_cuisine_types, dish.cuisine_type).length > 0
+        return !_.isEmpty(
+          _.intersection(product_cuisine_types, dish.cuisine_type)
         );
       });
     }

@@ -1,13 +1,14 @@
 var express = require("express");
 var router = express.Router();
 import venuesController from "../controllers/outletvenues";
+import menueController from "../controllers/outletvenue_menu";
 import VerifyToken from "../utils/verification";
 import VerifyRole from "../utils/verification_role";
 
 /* GET - Get a list of client organizations */
 router.get(
   "/",
-  VerifyToken,
+  // VerifyToken,
   // VerifyRole([
   //   { scope: "OUTLET", role: "MANAGER" },
   //   { scope: "OUTLET", role: "OWNER" },
@@ -74,6 +75,56 @@ router.post(
   //   { scope: "OUTLET", role: "OWNER" },
   // ]),
   venuesController.createVenueMenu
+);
+
+router.get(
+  "/:outlet_venue_id/menu",
+  // VerifyToken,
+  // VerifyRole([
+  //   { scope: "OUTLET", role: "MANAGER" },
+  //   { scope: "OUTLET", role: "OWNER" },
+  // ]),
+  menueController.getVenueMenu
+);
+
+router.post(
+  "/:outlet_venue_id/menu/create-product",
+  VerifyToken,
+  // VerifyRole([
+  //   { scope: "OUTLET", role: "MANAGER" },
+  //   { scope: "OUTLET", role: "OWNER" },
+  // ]),
+  menueController.createVenueMenuProduct
+);
+
+router.put(
+  "/:outlet_venue_id/menu/:venue_menu_id",
+  VerifyToken,
+  // VerifyRole([
+  //   { scope: "OUTLET", role: "MANAGER" },
+  //   { scope: "OUTLET", role: "OWNER" },
+  // ]),
+  menueController.updateVenueMenuProduct
+);
+
+router.delete(
+  "/:outlet_venue_id/menu/:venue_menu_id",
+  VerifyToken,
+  // VerifyRole([
+  //   { scope: "OUTLET", role: "MANAGER" },
+  //   { scope: "OUTLET", role: "OWNER" },
+  // ]),
+  menueController.deleteVenueMenuProduct
+);
+
+router.get(
+  "/:outlet_venue_id/menu/:venue_menu_id",
+  // VerifyToken,
+  // VerifyRole([
+  //   { scope: "OUTLET", role: "MANAGER" },
+  //   { scope: "OUTLET", role: "OWNER" },
+  // ]),
+  menueController.getVenueMenuProduct
 );
 
 router.put(
