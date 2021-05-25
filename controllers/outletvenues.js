@@ -23,7 +23,7 @@ const getVenues = async (req, res, next) => {
     // Get brief
     const venues = await models.OutletVenue.query()
       .withGraphFetched(
-        `[menu.[product_categories,product_tag,cuisine_type,sides],collaborators,location,business_hours]`
+        `[menu.[product_categories,product_tag,cuisine_type,sides.[side_detail]],collaborators,location,business_hours]`
       )
       .orderBy("created_at", "desc");
 
@@ -50,7 +50,7 @@ const getUserVenues = async (req, res, next) => {
     // Get brief
     const venues = await models.OutletVenue.query()
       .withGraphFetched(
-        `[menu.[product_categories,product_tag,cuisine_type,sides],collaborators,location,business_hours]`
+        `[menu.[product_categories,product_tag,cuisine_type,sides.[side_detail]],collaborators,location,business_hours]`
       )
       .orderBy("created_at", "desc")
       .where("account_id", account_id);
@@ -113,7 +113,7 @@ const getVenue = async (req, res, next) => {
 
     venue = await models.OutletVenue.query()
       .withGraphFetched(
-        `[menu.[product_categories,product_tag,cuisine_type,sides],collaborators,location,business_hours]`
+        `[menu.[product_categories,product_tag,cuisine_type,sides.[side_detail]],collaborators,location,business_hours]`
       )
       .findById(outlet_venue_id);
 
@@ -722,7 +722,9 @@ const searchVenues = async (req, res) => {
       return res.status(400).json("Please input keyword");
     let venue = await models.OutletVenue.query().findById(venue_id);
     let dishes = await models.OutletVenueMenu.query()
-      .withGraphFetched(`[product_categories,product_tag,cuisine_type,sides]`)
+      .withGraphFetched(
+        `[product_categories,product_tag,cuisine_type,sides.[side_detail]]`
+      )
       .where("outlet_venue_id", venue_id)
       .orderBy("id", "asc");
     dishes = _.map(dishes, (dish) => {

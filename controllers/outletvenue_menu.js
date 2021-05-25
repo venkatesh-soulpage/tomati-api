@@ -9,7 +9,9 @@ const getVenueMenu = async (req, res, next) => {
     // Get brief
     const { outlet_venue_id } = req.params;
     const menu = await models.OutletVenueMenu.query()
-      .withGraphFetched("[product_categories,product_tag,cuisine_type,sides]")
+      .withGraphFetched(
+        "[product_categories,product_tag,cuisine_type,sides.[side_detail]]"
+      )
       .where("outlet_venue_id", outlet_venue_id);
 
     if (menu.length === 0) return res.status(400).send("Invalid venue id");
@@ -262,7 +264,9 @@ const getVenueMenuProduct = async (req, res, next) => {
     // Get brief
     const { venue_menu_id } = req.params;
     const menu = await models.OutletVenueMenu.query()
-      .withGraphFetched("[product_categories,product_tag,cuisine_type,sides]")
+      .withGraphFetched(
+        "[product_categories,product_tag,cuisine_type,sides.[side_detail]]"
+      )
       .findById(venue_menu_id);
     if (!menu) return res.status(400).send("Invalid venuemenu id");
 
