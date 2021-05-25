@@ -250,6 +250,9 @@ const deleteVenueMenuProduct = async (req, res, next) => {
     await models.MenuCuisineType.query()
       .delete()
       .where({ menu_product_id: venue_menu_id });
+    await models.MenuProductSides.query()
+      .delete()
+      .where({ menu_product_id: venue_menu_id });
     await models.OutletVenueMenu.query().where("id", venue_menu_id).delete();
     // Send the clientss
     return res.status(200).send("Deleted successfully");
