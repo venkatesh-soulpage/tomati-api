@@ -14,10 +14,14 @@ const search = async (req, res) => {
       product_tags,
       product_cuisine_types,
       search_venues,
+      minPrice,
+      maxPrice,
     } = req.body;
     if (
       _.isEmpty(req.body) ||
       (!keyword &&
+        !minPrice &&
+        !maxPrice &&
         _.isEmpty(product_categories) &&
         _.isEmpty(product_tags) &&
         _.isEmpty(search_venues) &&
@@ -26,11 +30,23 @@ const search = async (req, res) => {
       return res.status(400).json("Please input keyword");
     let venuesWithKeyword = [];
     let venues = await models.OutletVenue.query().orderBy("id", "asc");
-    let dishes = await models.OutletVenueMenu.query()
-      .withGraphFetched(
-        `[product_categories,product_tag,cuisine_type,sides.[side_detail]]`
-      )
-      .orderBy("id", "asc");
+    let dishes = [];
+    if (minPrice && maxPrice) {
+      dishes = await models.OutletVenueMenu.query()
+        .withGraphFetched(
+          `[product_categories,product_tag,cuisine_type,sides.[side_detail]]`
+        )
+        .where("price", ">=", minPrice)
+        .where("price", "<=", maxPrice)
+        .orderBy("id", "asc");
+    } else {
+      dishes = await models.OutletVenueMenu.query()
+        .withGraphFetched(
+          `[product_categories,product_tag,cuisine_type,sides.[side_detail]]`
+        )
+        .orderBy("id", "asc");
+    }
+
     dishes = _.map(dishes, (dish) => {
       return {
         ...dish,

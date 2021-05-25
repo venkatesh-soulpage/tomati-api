@@ -709,24 +709,45 @@ function arrayContainsArray(superset, subset) {
 }
 const searchVenues = async (req, res) => {
   try {
-    let { keyword, product_categories, product_tags, product_cuisine_types } =
-      req.body;
+    let {
+      keyword,
+      product_categories,
+      product_tags,
+      product_cuisine_types,
+      minPrice,
+      maxPrice,
+    } = req.body;
     const { venue_id } = req.params;
     if (
       _.isEmpty(req.body) ||
       (!keyword &&
+        !minPrice &&
+        !maxPrice &&
         _.isEmpty(product_categories) &&
         _.isEmpty(product_tags) &&
         _.isEmpty(product_cuisine_types))
     )
       return res.status(400).json("Please input keyword");
     let venue = await models.OutletVenue.query().findById(venue_id);
-    let dishes = await models.OutletVenueMenu.query()
-      .withGraphFetched(
-        `[product_categories,product_tag,cuisine_type,sides.[side_detail]]`
-      )
-      .where("outlet_venue_id", venue_id)
-      .orderBy("id", "asc");
+
+    let dishes = [];
+    if (minPrice && maxPrice) {
+      dishes = await models.OutletVenueMenu.query()
+        .withGraphFetched(
+          `[product_categories,product_tag,cuisine_type,sides.[side_detail]]`
+        )
+        .where("outlet_venue_id", venue_id)
+        .where("price", ">=", minPrice)
+        .where("price", "<=", maxPrice)
+        .orderBy("id", "asc");
+    } else {
+      dishes = await models.OutletVenueMenu.query()
+        .withGraphFetched(
+          `[product_categories,product_tag,cuisine_type,sides.[side_detail]]`
+        )
+        .where("outlet_venue_id", venue_id)
+        .orderBy("id", "asc");
+    }
     dishes = _.map(dishes, (dish) => {
       return {
         ...dish,
