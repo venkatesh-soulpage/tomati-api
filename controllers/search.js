@@ -42,10 +42,10 @@ const search = async (req, res) => {
     });
     if (keyword) {
       venuesWithKeyword = _.filter(venues, (venue) => {
-        return _.includes(venue.name, keyword);
+        return _.includes(venue.name.toLowerCase(), keyword.toLowerCase());
       });
       dishes = _.filter(dishes, (dish) => {
-        return _.includes(dish.name, keyword);
+        return _.includes(dish.name.toLowerCase(), keyword.toLowerCase());
       });
     }
     if (product_categories && !_.isEmpty(product_categories)) {
