@@ -19,15 +19,19 @@ const getProductCategories = async (req, res, next) => {
 
 const createproductCategory = async (req, res, next) => {
   try {
-    const { account_id } = req;
-    const user = await models.Account.query().findById(account_id);
-    if (!user.is_admin)
+    const { role } = req;
+    if (role !== "ADMIN")
       return res
         .status(400)
         .send("This user has no privileges to create category");
 
     const { name } = req.body;
     if (!name) return res.status(400).send("Invalid payload");
+    const category = await models.ProductCategory.query().findOne({ name });
+    if (category)
+      return res
+        .status(400)
+        .send("Category with same already exists please try other");
 
     await models.ProductCategory.query().insert({
       name,
@@ -41,19 +45,13 @@ const createproductCategory = async (req, res, next) => {
 
 const deleteProductCategory = async (req, res, next) => {
   try {
-    const { account_id } = req;
-
-    const user = await models.Account.query().findById(account_id);
-    if (!user.is_admin)
+    const { role } = req;
+    if (role !== "ADMIN")
       return res
         .status(400)
         .send("This user has no privileges to delete category");
 
     const { category_id } = req.params;
-
-    const category = await models.ProductCategory.query().findById(category_id);
-    if (!category) return res.status(400).send("Invalid category Id");
-
     await models.ProductCategory.query().deleteById(category_id);
     return res.status(200).send("Deleted Successfully");
   } catch (e) {
@@ -63,9 +61,8 @@ const deleteProductCategory = async (req, res, next) => {
 };
 const updateProductCategory = async (req, res, next) => {
   try {
-    const { account_id } = req;
-    const user = await models.Account.query().findById(account_id);
-    if (!user.is_admin)
+    const { role } = req;
+    if (role !== "ADMIN")
       return res
         .status(400)
         .send("This user has no privileges to update category");
@@ -74,10 +71,15 @@ const updateProductCategory = async (req, res, next) => {
     if (!name) return res.status(400).send("Invalid payload");
 
     const { category_id } = req.params;
-
-    const category = await models.ProductCategory.query().findById(category_id);
-    if (!category) return res.status(400).send("Invalid category Id");
-
+    const foundCategory = await models.ProductCategory.query().findById(
+      category_id
+    );
+    if (!foundCategory) return res.status(400).send("Invalid category id");
+    const category = await models.ProductCategory.query().findOne({ name });
+    if (category)
+      return res
+        .status(400)
+        .send("Category with same already exists please try other");
     await models.ProductCategory.query()
       .update({ name })
       .where("id", category_id);

@@ -19,16 +19,19 @@ const getCuisineTypes = async (req, res, next) => {
 
 const createCuisineType = async (req, res, next) => {
   try {
-    const { account_id } = req;
-    const user = await models.Account.query().findById(account_id);
-    if (!user.is_admin)
+    const { role } = req;
+    if (role !== "ADMIN")
       return res
         .status(400)
         .send("This user has no privileges to create cuisine");
 
     const { name } = req.body;
     if (!name) return res.status(400).send("Invalid payload");
-
+    const cuisine = await models.CuisineType.query().findOne({ name });
+    if (cuisine)
+      return res
+        .status(400)
+        .send("Cuisine name with same already exists please try other");
     await models.CuisineType.query().insert({
       name,
     });
@@ -41,19 +44,13 @@ const createCuisineType = async (req, res, next) => {
 
 const deleteCuisineType = async (req, res, next) => {
   try {
-    const { account_id } = req;
-
-    const user = await models.Account.query().findById(account_id);
-    if (!user.is_admin)
+    const { role } = req;
+    if (role !== "ADMIN")
       return res
         .status(400)
         .send("This user has no privileges to delete cuisine");
 
     const { cuisine_id } = req.params;
-
-    const cuisine = await models.CuisineType.query().findById(cuisine_id);
-    if (!cuisine) return res.status(400).send("Invalid cuisine Id");
-
     await models.CuisineType.query().deleteById(cuisine_id);
     return res.status(200).send("Deleted Successfully");
   } catch (e) {
@@ -63,9 +60,8 @@ const deleteCuisineType = async (req, res, next) => {
 };
 const updateCuisineType = async (req, res, next) => {
   try {
-    const { account_id } = req;
-    const user = await models.Account.query().findById(account_id);
-    if (!user.is_admin)
+    const { role } = req;
+    if (role !== "ADMIN")
       return res
         .status(400)
         .send("This user has no privileges to update cuisine");
@@ -74,9 +70,14 @@ const updateCuisineType = async (req, res, next) => {
     if (!name) return res.status(400).send("Invalid payload");
 
     const { cuisine_id } = req.params;
+    const foundCuisine = await models.CuisineType.query().findById(cuisine_id);
+    if (!foundCuisine) return res.status(400).send("Invalid cuisine id");
 
-    const cuisine = await models.CuisineType.query().findById(cuisine_id);
-    if (!cuisine) return res.status(400).send("Invalid cuisine Id");
+    const cuisine = await models.CuisineType.query().findOne({ name });
+    if (cuisine)
+      return res
+        .status(400)
+        .send("Cuisine name with same already exists please try other");
 
     await models.CuisineType.query().update({ name }).where("id", cuisine_id);
     return res.status(200).send("Updated Successfully");
