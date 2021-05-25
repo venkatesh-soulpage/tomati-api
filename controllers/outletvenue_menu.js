@@ -50,14 +50,18 @@ const createVenueMenuProduct = async (req, res, next) => {
     if (!venue) return res.status(400).send("Invalid venue id");
     const item = req.body;
     let buf, product_image;
-    product_image = item.product_image;
-    buf = Buffer.from(
-      product_image.data.replace(/^data:image\/\w+;base64,/, ""),
-      "base64"
-    );
-    let key = `public/cover_images/outletvenues/${product_image.name}`;
-    uploadImage({ key, buf });
-    item.product_image = `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`;
+    if (item.product_image) {
+      product_image = item.product_image;
+      buf = Buffer.from(
+        product_image.data.replace(/^data:image\/\w+;base64,/, ""),
+        "base64"
+      );
+    }
+    if (buf && product_image) {
+      let key = `public/cover_images/outletvenues/${product_image.name}`;
+      uploadImage({ key, buf });
+      item.product_image = `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`;
+    }
     item.outlet_venue_id = outlet_venue_id;
     const sides = item.product_sides;
     delete item.product_sides;

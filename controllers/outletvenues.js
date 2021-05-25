@@ -1,6 +1,6 @@
 import models from "../models";
 
-import _, { isEmpty } from "lodash";
+import _ from "lodash";
 import moment from "moment";
 import latinize from "latinize";
 import getPage from "../utils/restaurantRedirection";
@@ -480,14 +480,18 @@ const createVenueMenu = async (req, res, next) => {
     _.map(req.body, async (item, index) => {
       item["outlet_venue_id"] = outlet_venue_id;
       let buf, product_image;
-      product_image = item.product_image;
-      buf = Buffer.from(
-        product_image.data.replace(/^data:image\/\w+;base64,/, ""),
-        "base64"
-      );
-      let key = `public/cover_images/outletvenues/${product_image.name}`;
-      uploadImage({ key, buf });
-      item.product_image = `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`;
+      if (item.product_image) {
+        product_image = item.product_image;
+        buf = Buffer.from(
+          product_image.data.replace(/^data:image\/\w+;base64,/, ""),
+          "base64"
+        );
+      }
+      if (buf && product_image) {
+        let key = `public/cover_images/outletvenues/${product_image.name}`;
+        uploadImage({ key, buf });
+        item.product_image = `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`;
+      }
 
       const menu = await models.OutletVenueMenu.query().insert(item);
       const { product_categories, product_tag, cuisine_type } = item;

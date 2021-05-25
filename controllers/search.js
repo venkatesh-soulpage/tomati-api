@@ -83,6 +83,18 @@ const search = async (req, res) => {
     if (!_.isEmpty(venuesWithDishes)) {
       venues = _.unionBy(venuesWithKeyword, venuesWithDishes, "id");
     }
+    dishes = _.map(dishes, (dish) => {
+      return {
+        ...dish,
+        outlet_venue_name: _.find(venues, { id: dish.outlet_venue_id }).name,
+        outlet_venue_address: _.find(venues, { id: dish.outlet_venue_id })
+          .address,
+        outlet_venue_latitude: _.find(venues, { id: dish.outlet_venue_id })
+          .latitude,
+        outlet_venue_longitude: _.find(venues, { id: dish.outlet_venue_id })
+          .longitude,
+      };
+    });
     return res.status(200).json({
       venues,
       dishes,
