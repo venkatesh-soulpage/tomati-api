@@ -23,7 +23,7 @@ const getVenues = async (req, res, next) => {
     // Get brief
     const venues = await models.OutletVenue.query()
       .withGraphFetched(
-        `[menu.[product_categories,product_tag,cuisine_type,sides]]`
+        `[menu.[product_categories,product_tag,cuisine_type,sides],collaborators,location,business_hours]`
       )
       .orderBy("created_at", "desc");
 
@@ -49,6 +49,9 @@ const getUserVenues = async (req, res, next) => {
     }
     // Get brief
     const venues = await models.OutletVenue.query()
+      .withGraphFetched(
+        `[menu.[product_categories,product_tag,cuisine_type,sides],collaborators,location,business_hours]`
+      )
       .orderBy("created_at", "desc")
       .where("account_id", account_id);
     return res.status(200).send(venues);
@@ -292,7 +295,9 @@ const updateVenue = async (req, res, next) => {
 
     if (!outlet_venue_id || !outletvenue)
       return res.status(400).json("Invalid ID");
-
+    await models.OutletBusinessHours.query()
+      .delete()
+      .where({ outlet_venue_id });
     // if (_.size(req.body) < 1) return res.status(400).json("No Data to update");
 
     const {
@@ -371,7 +376,10 @@ const updateVenue = async (req, res, next) => {
         // account_id,
       })
       .where("id", outlet_venue_id);
-    await models.OutletBusinessHours.query().upsertGraph(business_hours);
+    const businessHoursData = _.map(business_hours, (data) => {
+      return { ...data, outlet_venue_id };
+    });
+    await models.OutletBusinessHours.query().insert(businessHoursData);
     return res.status(200).json("Venue Updated Successfully");
   } catch (e) {
     console.log(e);
@@ -389,11 +397,16 @@ const deleteVenue = async (req, res, next) => {
 
     if (!outlet_venue_id || !outletvenue)
       return res.status(400).json("Invalid ID");
-
-    await models.OutletVenueMenu.query()
-      .where("outlet_venue_id", outlet_venue_id)
-      .delete();
-
+    await models.MenuProductCategory.query()
+      .delete()
+      .where({ outlet_venue_id });
+    await models.MenuProductTags.query().delete().where({ outlet_venue_id });
+    await models.MenuCuisineType.query().delete().where({ outlet_venue_id });
+    await models.MenuProductSides.query().delete().where({ outlet_venue_id });
+    await models.OutletVenueMenu.query().delete().where({ outlet_venue_id });
+    await models.OutletBusinessHours.query()
+      .delete()
+      .where({ outlet_venue_id });
     await models.OutletVenue.query().deleteById(outlet_venue_id);
 
     return res.status(200).json("Succesfully Deleted");
@@ -715,7 +728,7 @@ const searchVenues = async (req, res) => {
     });
     if (keyword) {
       dishes = _.filter(dishes, (dish) => {
-        return _.includes(dish.name, keyword);
+        return _.includes(dish.name.toLowerCase(), keyword.toLowerCase());
       });
     }
     if (product_categories && !_.isEmpty(product_categories)) {
