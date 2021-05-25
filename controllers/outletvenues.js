@@ -23,7 +23,7 @@ const getVenues = async (req, res, next) => {
     // Get brief
     const venues = await models.OutletVenue.query()
       .withGraphFetched(
-        `[menu.[product_categories,product_tag,cuisine_type,sides],collaborators,location,business_hours]`
+        `[menu.[product_categories,product_tag,cuisine_type,sides.[side_detail]],collaborators,location,business_hours]`
       )
       .orderBy("created_at", "desc");
 
@@ -50,7 +50,7 @@ const getUserVenues = async (req, res, next) => {
     // Get brief
     const venues = await models.OutletVenue.query()
       .withGraphFetched(
-        `[menu.[product_categories,product_tag,cuisine_type,sides],collaborators,location,business_hours]`
+        `[menu.[product_categories,product_tag,cuisine_type,sides.[side_detail]],collaborators,location,business_hours]`
       )
       .orderBy("created_at", "desc")
       .where("account_id", account_id);
@@ -113,7 +113,7 @@ const getVenue = async (req, res, next) => {
 
     venue = await models.OutletVenue.query()
       .withGraphFetched(
-        `[menu.[product_categories,product_tag,cuisine_type,sides],collaborators,location,business_hours]`
+        `[menu.[product_categories,product_tag,cuisine_type,sides.[side_detail]],collaborators,location,business_hours]`
       )
       .findById(outlet_venue_id);
 
@@ -295,9 +295,6 @@ const updateVenue = async (req, res, next) => {
 
     if (!outlet_venue_id || !outletvenue)
       return res.status(400).json("Invalid ID");
-    await models.OutletBusinessHours.query()
-      .delete()
-      .where({ outlet_venue_id });
     // if (_.size(req.body) < 1) return res.status(400).json("No Data to update");
 
     const {
@@ -308,6 +305,7 @@ const updateVenue = async (req, res, next) => {
       location_id,
       latitude,
       longitude,
+      delivery_radius,
       delivery_flat_fee,
       delivery_variable_fee,
       time_zone,
@@ -371,15 +369,22 @@ const updateVenue = async (req, res, next) => {
         latitude,
         longitude,
         time_zone,
+        delivery_radius,
         delivery_flat_fee,
         delivery_variable_fee,
         // account_id,
       })
       .where("id", outlet_venue_id);
-    const businessHoursData = _.map(business_hours, (data) => {
-      return { ...data, outlet_venue_id };
-    });
-    await models.OutletBusinessHours.query().insert(businessHoursData);
+
+    if (business_hours && !_.isEmpty(business_hours)) {
+      const businessHoursData = _.map(business_hours, (data) => {
+        return { ...data, outlet_venue_id };
+      });
+      await models.OutletBusinessHours.query()
+        .delete()
+        .where({ outlet_venue_id });
+      await models.OutletBusinessHours.query().insert(businessHoursData);
+    }
     return res.status(200).json("Venue Updated Successfully");
   } catch (e) {
     console.log(e);
@@ -475,14 +480,18 @@ const createVenueMenu = async (req, res, next) => {
     _.map(req.body, async (item, index) => {
       item["outlet_venue_id"] = outlet_venue_id;
       let buf, product_image;
-      product_image = item.product_image;
-      buf = Buffer.from(
-        product_image.data.replace(/^data:image\/\w+;base64,/, ""),
-        "base64"
-      );
-      let key = `public/cover_images/outletvenues/${product_image.name}`;
-      uploadImage({ key, buf });
-      item.product_image = `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`;
+      if (item.product_image) {
+        product_image = item.product_image;
+        buf = Buffer.from(
+          product_image.data.replace(/^data:image\/\w+;base64,/, ""),
+          "base64"
+        );
+      }
+      if (buf && product_image) {
+        let key = `public/cover_images/outletvenues/${product_image.name}`;
+        uploadImage({ key, buf });
+        item.product_image = `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`;
+      }
 
       const menu = await models.OutletVenueMenu.query().insert(item);
       const { product_categories, product_tag, cuisine_type } = item;
@@ -700,21 +709,45 @@ function arrayContainsArray(superset, subset) {
 }
 const searchVenues = async (req, res) => {
   try {
-    let { keyword, product_categories, product_tags, product_cuisine_types } =
-      req.body;
+    let {
+      keyword,
+      product_categories,
+      product_tags,
+      product_cuisine_types,
+      minPrice,
+      maxPrice,
+    } = req.body;
     const { venue_id } = req.params;
     if (
       _.isEmpty(req.body) ||
       (!keyword &&
+        !minPrice &&
+        !maxPrice &&
         _.isEmpty(product_categories) &&
         _.isEmpty(product_tags) &&
         _.isEmpty(product_cuisine_types))
     )
       return res.status(400).json("Please input keyword");
-    let dishes = await models.OutletVenueMenu.query()
-      .withGraphFetched(`[product_categories,product_tag,cuisine_type,sides]`)
-      .where("outlet_venue_id", venue_id)
-      .orderBy("id", "asc");
+    let venue = await models.OutletVenue.query().findById(venue_id);
+
+    let dishes = [];
+    if (minPrice && maxPrice) {
+      dishes = await models.OutletVenueMenu.query()
+        .withGraphFetched(
+          `[product_categories,product_tag,cuisine_type,sides.[side_detail]]`
+        )
+        .where("outlet_venue_id", venue_id)
+        .where("price", ">=", minPrice)
+        .where("price", "<=", maxPrice)
+        .orderBy("id", "asc");
+    } else {
+      dishes = await models.OutletVenueMenu.query()
+        .withGraphFetched(
+          `[product_categories,product_tag,cuisine_type,sides.[side_detail]]`
+        )
+        .where("outlet_venue_id", venue_id)
+        .orderBy("id", "asc");
+    }
     dishes = _.map(dishes, (dish) => {
       return {
         ...dish,
@@ -750,6 +783,16 @@ const searchVenues = async (req, res) => {
         );
       });
     }
+
+    dishes = _.map(dishes, (dish) => {
+      return {
+        ...dish,
+        outlet_venue_name: venue.name,
+        outlet_venue_address: venue.address,
+        outlet_venue_latitude: venue.latitude,
+        outlet_venue_longitude: venue.longitude,
+      };
+    });
     return res.status(200).json({
       dishes,
       dishes_count: dishes.length,

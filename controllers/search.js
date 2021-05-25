@@ -14,10 +14,14 @@ const search = async (req, res) => {
       product_tags,
       product_cuisine_types,
       search_venues,
+      minPrice,
+      maxPrice,
     } = req.body;
     if (
       _.isEmpty(req.body) ||
       (!keyword &&
+        !minPrice &&
+        !maxPrice &&
         _.isEmpty(product_categories) &&
         _.isEmpty(product_tags) &&
         _.isEmpty(search_venues) &&
@@ -26,9 +30,23 @@ const search = async (req, res) => {
       return res.status(400).json("Please input keyword");
     let venuesWithKeyword = [];
     let venues = await models.OutletVenue.query().orderBy("id", "asc");
-    let dishes = await models.OutletVenueMenu.query()
-      .withGraphFetched(`[product_categories,product_tag,cuisine_type]`)
-      .orderBy("id", "asc");
+    let dishes = [];
+    if (minPrice && maxPrice) {
+      dishes = await models.OutletVenueMenu.query()
+        .withGraphFetched(
+          `[product_categories,product_tag,cuisine_type,sides.[side_detail]]`
+        )
+        .where("price", ">=", minPrice)
+        .where("price", "<=", maxPrice)
+        .orderBy("id", "asc");
+    } else {
+      dishes = await models.OutletVenueMenu.query()
+        .withGraphFetched(
+          `[product_categories,product_tag,cuisine_type,sides.[side_detail]]`
+        )
+        .orderBy("id", "asc");
+    }
+
     dishes = _.map(dishes, (dish) => {
       return {
         ...dish,
@@ -83,6 +101,18 @@ const search = async (req, res) => {
     if (!_.isEmpty(venuesWithDishes)) {
       venues = _.unionBy(venuesWithKeyword, venuesWithDishes, "id");
     }
+    dishes = _.map(dishes, (dish) => {
+      return {
+        ...dish,
+        outlet_venue_name: _.find(venues, { id: dish.outlet_venue_id }).name,
+        outlet_venue_address: _.find(venues, { id: dish.outlet_venue_id })
+          .address,
+        outlet_venue_latitude: _.find(venues, { id: dish.outlet_venue_id })
+          .latitude,
+        outlet_venue_longitude: _.find(venues, { id: dish.outlet_venue_id })
+          .longitude,
+      };
+    });
     return res.status(200).json({
       venues,
       dishes,
