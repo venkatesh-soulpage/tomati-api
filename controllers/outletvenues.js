@@ -720,6 +720,7 @@ const searchVenues = async (req, res) => {
         _.isEmpty(product_cuisine_types))
     )
       return res.status(400).json("Please input keyword");
+    let venue = await models.OutletVenue.query().findById(venue_id);
     let dishes = await models.OutletVenueMenu.query()
       .withGraphFetched(`[product_categories,product_tag,cuisine_type,sides]`)
       .where("outlet_venue_id", venue_id)
@@ -759,6 +760,16 @@ const searchVenues = async (req, res) => {
         );
       });
     }
+
+    dishes = _.map(dishes, (dish) => {
+      return {
+        ...dish,
+        outlet_venue_name: venue.name,
+        outlet_venue_address: venue.address,
+        outlet_venue_latitude: venue.latitude,
+        outlet_venue_longitude: venue.longitude,
+      };
+    });
     return res.status(200).json({
       dishes,
       dishes_count: dishes.length,
