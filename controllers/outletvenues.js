@@ -1,6 +1,6 @@
 import models from "../models";
 
-import _ from "lodash";
+import _, { isEmpty } from "lodash";
 import moment from "moment";
 import latinize from "latinize";
 import getPage from "../utils/restaurantRedirection";
@@ -295,9 +295,6 @@ const updateVenue = async (req, res, next) => {
 
     if (!outlet_venue_id || !outletvenue)
       return res.status(400).json("Invalid ID");
-    await models.OutletBusinessHours.query()
-      .delete()
-      .where({ outlet_venue_id });
     // if (_.size(req.body) < 1) return res.status(400).json("No Data to update");
 
     const {
@@ -308,6 +305,7 @@ const updateVenue = async (req, res, next) => {
       location_id,
       latitude,
       longitude,
+      delivery_radius,
       delivery_flat_fee,
       delivery_variable_fee,
       time_zone,
@@ -371,15 +369,22 @@ const updateVenue = async (req, res, next) => {
         latitude,
         longitude,
         time_zone,
+        delivery_radius,
         delivery_flat_fee,
         delivery_variable_fee,
         // account_id,
       })
       .where("id", outlet_venue_id);
-    const businessHoursData = _.map(business_hours, (data) => {
-      return { ...data, outlet_venue_id };
-    });
-    await models.OutletBusinessHours.query().insert(businessHoursData);
+
+    if (business_hours && !_.isEmpty(business_hours)) {
+      const businessHoursData = _.map(business_hours, (data) => {
+        return { ...data, outlet_venue_id };
+      });
+      await models.OutletBusinessHours.query()
+        .delete()
+        .where({ outlet_venue_id });
+      await models.OutletBusinessHours.query().insert(businessHoursData);
+    }
     return res.status(200).json("Venue Updated Successfully");
   } catch (e) {
     console.log(e);
