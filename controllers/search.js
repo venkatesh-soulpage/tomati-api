@@ -113,11 +113,16 @@ const search = async (req, res) => {
           .longitude,
       };
     });
+
+    if (req.originalUrl === "/api/search/count") {
+      return res.status(200).json({
+        venues_count: venues.length,
+        dishes_count: dishes.length,
+      });
+    }
     return res.status(200).json({
       venues,
       dishes,
-      venues_count: venues.length,
-      dishes_count: dishes.length,
     });
   } catch (e) {
     console.log(e);

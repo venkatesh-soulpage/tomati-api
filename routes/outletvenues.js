@@ -141,4 +141,15 @@ router.post(
 
 router.post("/:venue_id/search", venuesController.searchVenues);
 
+router.post("/:venue_id/search/count", venuesController.searchVenues);
+
+router.post(
+  "/distance",
+  // VerifyToken,
+  // VerifyRole([
+  //   { scope: "OUTLET", role: "MANAGER" },
+  //   { scope: "OUTLET", role: "OWNER" },
+  // ]),
+  venuesController.getVenuesDistance
+);
 module.exports = router;

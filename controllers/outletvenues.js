@@ -18,6 +18,26 @@ chargebee.configure({
   api_key: `${process.env.CHARGEBEE_API_KEY}`,
 });
 
+const distance = (lat1, lon1, lat2, lon2) => {
+  if (lat1 == lat2 && lon1 == lon2) {
+    return 0;
+  } else {
+    var radlat1 = (Math.PI * lat1) / 180;
+    var radlat2 = (Math.PI * lat2) / 180;
+    var theta = lon1 - lon2;
+    var radtheta = (Math.PI * theta) / 180;
+    var dist =
+      Math.sin(radlat1) * Math.sin(radlat2) +
+      Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+    if (dist > 1) {
+      dist = 1;
+    }
+    dist = Math.acos(dist);
+    dist = ((dist * 180) / Math.PI) * 60 * 1.1515 * 1.609344;
+
+    return dist;
+  }
+};
 const getVenues = async (req, res, next) => {
   try {
     // Get brief
@@ -730,7 +750,7 @@ const searchVenues = async (req, res) => {
     )
       return res.status(400).json("Please input keyword");
     let venue = await models.OutletVenue.query().findById(venue_id);
-
+    if (!venue) return res.status(400).json("Invalid venue Id");
     let dishes = [];
     if (minPrice && maxPrice) {
       dishes = await models.OutletVenueMenu.query()
@@ -794,16 +814,46 @@ const searchVenues = async (req, res) => {
         outlet_venue_longitude: venue.longitude,
       };
     });
+    if (req.originalUrl === `/api/outletvenues/${venue_id}/search/count`) {
+      return res.status(200).json({
+        dishes_count: dishes.length,
+      });
+    }
     return res.status(200).json({
       dishes,
-      dishes_count: dishes.length,
     });
   } catch (e) {
     console.log(e);
     return res.status(500).json(JSON.stringify(e));
   }
 };
+const getVenuesDistance = async (req, res, next) => {
+  try {
+    const { latitude, longitude, range } = req.body;
 
+    // Get brief
+    const venues = await models.OutletVenue.query();
+    let venuesDistance = _.map(venues, (venue) => {
+      venue.distance = distance(
+        venue.latitude,
+        venue.longitude,
+        latitude,
+        longitude
+      );
+      return venue;
+    });
+    if (range) {
+      venuesDistance = _.filter(venues, (venue) => {
+        return range - venue.distance >= 0;
+      });
+    }
+    // Send the clientss
+    return res.status(200).send(venuesDistance);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
 const venuesController = {
   getVenues,
   getUserVenues,
@@ -815,6 +865,7 @@ const venuesController = {
   inactivateMenu,
   updateMenuStatusByPlan,
   searchVenues,
+  getVenuesDistance,
 };
 
 export default venuesController;
