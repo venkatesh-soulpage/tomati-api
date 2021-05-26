@@ -5,5 +5,6 @@ import VerifyToken from "../utils/verification";
 
 /* GET - Get a list of client organizations */
 router.post("/", SearchController.search);
+router.post("/count", SearchController.search);
 
 module.exports = router;
