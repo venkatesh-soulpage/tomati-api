@@ -842,7 +842,7 @@ const getVenuesDistance = async (req, res, next) => {
       );
       return venue;
     });
-    if (range) {
+    if (range >= 0) {
       venuesDistance = _.filter(venues, (venue) => {
         return range - venue.distance >= 0;
       });
