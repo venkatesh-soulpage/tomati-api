@@ -31,7 +31,7 @@ const search = async (req, res) => {
     let venuesWithKeyword = [];
     let venues = await models.OutletVenue.query().orderBy("id", "asc");
     let dishes = [];
-    if (minPrice && maxPrice) {
+    if (minPrice >= 0 && maxPrice >= 0) {
       dishes = await models.OutletVenueMenu.query()
         .withGraphFetched(
           `[product_categories,product_tag,cuisine_type,sides.[side_detail]]`
