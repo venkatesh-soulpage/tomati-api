@@ -752,7 +752,7 @@ const searchVenues = async (req, res) => {
     let venue = await models.OutletVenue.query().findById(venue_id);
     if (!venue) return res.status(400).json("Invalid venue Id");
     let dishes = [];
-    if (minPrice && maxPrice) {
+    if (minPrice >= 0 && maxPrice >= 0) {
       dishes = await models.OutletVenueMenu.query()
         .withGraphFetched(
           `[product_categories,product_tag,cuisine_type,sides.[side_detail]]`
@@ -842,7 +842,7 @@ const getVenuesDistance = async (req, res, next) => {
       );
       return venue;
     });
-    if (range) {
+    if (range >= 0) {
       venuesDistance = _.filter(venues, (venue) => {
         return range - venue.distance >= 0;
       });
