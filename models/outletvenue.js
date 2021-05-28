@@ -5,6 +5,18 @@ export default class OutletVenue extends Model {
   static get tableName() {
     return "outletvenues";
   }
+
+  static get jsonSchema() {
+    return {
+      type: "object",
+      properties: {
+        delivery_options: {
+          type: "array",
+          items: { type: "object" },
+        },
+      },
+    };
+  }
   static get relationMappings() {
     return {
       menu: {

@@ -153,7 +153,7 @@ const updateVenueMenuProduct = async (req, res, next) => {
       menu_category,
       product_category,
       maximum_sides,
-      preperation_time,
+      preparation_time,
       product_categories,
       product_tag,
       cuisine_type,
@@ -170,7 +170,7 @@ const updateVenueMenuProduct = async (req, res, next) => {
         menu_category,
         product_category,
         maximum_sides,
-        preperation_time,
+        preparation_time,
         is_published,
       })
       .where("id", venue_menu_id);

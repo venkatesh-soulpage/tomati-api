@@ -276,7 +276,7 @@ const createVenue = async (req, res, next) => {
       delivery_variable_fee,
       time_zone,
       delivery_radius,
-      delivery_options: { delivery_options },
+      delivery_options,
       is_flat_fee_active,
       is_variable_fee_active,
     });
