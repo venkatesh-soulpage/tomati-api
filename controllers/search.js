@@ -1,4 +1,5 @@
 import models from "../models";
+const { appendProductDetails } = require("../utils/commonFunctions");
 import _ from "lodash";
 //Tomati controllers
 function arrayContainsArray(superset, subset) {
@@ -47,29 +48,7 @@ const search = async (req, res) => {
         .orderBy("id", "asc");
     }
 
-    dishes = _.map(dishes, (dish) => {
-      return {
-        ...dish,
-        product_categories: _.map(dish.product_categories, (item) => {
-          return {
-            name: item.category_detail.name,
-            id: item.category_detail.id,
-          };
-        }),
-        product_tag: _.map(dish.product_tag, (item) => {
-          return {
-            name: item.tag_detail.name,
-            id: item.tag_detail.id,
-          };
-        }),
-        cuisine_type: _.map(dish.cuisine_type, (item) => {
-          return {
-            name: item.cuisine_detail.name,
-            id: item.cuisine_detail.id,
-          };
-        }),
-      };
-    });
+    dishes = appendProductDetails(dishes);
     if (keyword) {
       venuesWithKeyword = _.filter(venues, (venue) => {
         return _.includes(venue.name.toLowerCase(), keyword.toLowerCase());
@@ -119,20 +98,6 @@ const search = async (req, res) => {
     dishes = _.map(dishes, (dish) => {
       return {
         ...dish,
-        free_sides: _.map(dish.free_sides, (item) => {
-          return {
-            id: item.side_detail.id,
-            name: item.side_detail.name,
-            price: item.side_detail.price,
-          };
-        }),
-        paid_sides: _.map(dish.paid_sides, (item) => {
-          return {
-            id: item.side_detail.id,
-            name: item.side_detail.name,
-            price: item.side_detail.price,
-          };
-        }),
         outlet_venue_name: _.find(venues, { id: dish.outlet_venue_id }).name,
         outlet_venue_address: _.find(venues, { id: dish.outlet_venue_id })
           .address,

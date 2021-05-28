@@ -1,4 +1,8 @@
 import models from "../models";
+const {
+  appendProductDetails,
+  desiredValues,
+} = require("../utils/commonFunctions");
 const { s3 } = require("../utils/s3Config");
 import _ from "lodash";
 
@@ -8,13 +12,15 @@ const getVenueMenu = async (req, res, next) => {
   try {
     // Get brief
     const { outlet_venue_id } = req.params;
-    const menu = await models.OutletVenueMenu.query()
+    let menu = await models.OutletVenueMenu.query()
       .withGraphFetched(
         "[product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]]"
       )
       .where("outlet_venue_id", outlet_venue_id);
 
     if (menu.length === 0) return res.status(400).send("Invalid venue id");
+
+    menu = appendProductDetails(menu);
 
     // Send the clientss
     return res.status(200).send(menu);
@@ -299,6 +305,13 @@ const getVenueMenuProduct = async (req, res, next) => {
       )
       .findById(venue_menu_id);
     if (!menu) return res.status(400).send("Invalid venuemenu id");
+
+    menu.free_sides = _.map(menu.free_sides, (item) => {
+      return desiredValues(item.side_detail);
+    });
+    menu.paid_sides = _.map(menu.paid_sides, (item) => {
+      return desiredValues(item.side_detail);
+    });
 
     // Send the clientss
     return res.status(200).send(menu);
