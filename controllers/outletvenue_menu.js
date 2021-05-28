@@ -10,7 +10,7 @@ const getVenueMenu = async (req, res, next) => {
     const { outlet_venue_id } = req.params;
     const menu = await models.OutletVenueMenu.query()
       .withGraphFetched(
-        "[product_categories,product_tag,cuisine_type,sides.[side_detail]]"
+        "[product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]]"
       )
       .where("outlet_venue_id", outlet_venue_id);
 
@@ -65,8 +65,10 @@ const createVenueMenuProduct = async (req, res, next) => {
       item.product_image = `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`;
     }
     item.outlet_venue_id = outlet_venue_id;
-    const sides = item.product_sides;
-    delete item.product_sides;
+    const free_sides = item.free_sides;
+    delete item.free_sides;
+    const paid_sides = item.paid_sides;
+    delete item.paid_sides;
     const menu = await models.OutletVenueMenu.query().insert(item);
     const { product_categories, product_tag, cuisine_type } = item;
     const product_category_data = _.map(
@@ -93,19 +95,25 @@ const createVenueMenuProduct = async (req, res, next) => {
         outlet_venue_id: outlet_venue_id,
       };
     });
-    const sides_data = _.map(sides, (product, index) => {
+    const free_sides_data = _.map(free_sides, (product, index) => {
       return {
         menu_product_id: menu.id,
-        product_side_id: product.product_side_id,
-        is_free_side: product.is_free_side,
-        is_paid_side: product.is_paid_side,
+        product_side_id: product,
+        outlet_venue_id: outlet_venue_id,
+      };
+    });
+    const paid_sides_data = _.map(paid_sides, (product, index) => {
+      return {
+        menu_product_id: menu.id,
+        product_side_id: product,
         outlet_venue_id: outlet_venue_id,
       };
     });
     await models.MenuProductCategory.query().insert(product_category_data);
     await models.MenuProductTags.query().insert(product_tag_data);
     await models.MenuCuisineType.query().insert(cuisine_type_data);
-    await models.MenuProductSides.query().insert(sides_data);
+    await models.MenuProductFreeSides.query().insert(free_sides_data);
+    await models.MenuProductPaidSides.query().insert(paid_sides_data);
     // Send the clientss
     return res.status(200).send("Created Successfully");
   } catch (e) {
@@ -145,12 +153,13 @@ const updateVenueMenuProduct = async (req, res, next) => {
       menu_category,
       product_category,
       maximum_sides,
-      preperation_time,
+      preparation_time,
       product_categories,
       product_tag,
       cuisine_type,
-      product_sides,
       is_published,
+      free_sides,
+      paid_sides,
     } = req.body;
 
     await models.OutletVenueMenu.query()
@@ -161,7 +170,7 @@ const updateVenueMenuProduct = async (req, res, next) => {
         menu_category,
         product_category,
         maximum_sides,
-        preperation_time,
+        preparation_time,
         is_published,
       })
       .where("id", venue_menu_id);
@@ -211,20 +220,31 @@ const updateVenueMenuProduct = async (req, res, next) => {
       await models.MenuCuisineType.query().insert(cuisine_type_data);
     }
 
-    if (product_sides && !_.isEmpty(product_sides)) {
-      const sides_data = _.map(product_sides, (product, index) => {
+    if (free_sides && !_.isEmpty(free_sides)) {
+      const sides_data = _.map(free_sides, (product, index) => {
         return {
           menu_product_id: menu.id,
-          product_side_id: product.product_side_id,
-          is_free_side: product.is_free_side,
-          is_paid_side: product.is_paid_side,
+          product_side_id: product,
           outlet_venue_id: menu.outlet_venue_id,
         };
       });
-      await models.MenuProductSides.query()
+      await models.MenuProductFreeSides.query()
         .delete()
         .where({ menu_product_id: venue_menu_id });
-      await models.MenuProductSides.query().insert(sides_data);
+      await models.MenuProductFreeSides.query().insert(sides_data);
+    }
+    if (paid_sides && !_.isEmpty(paid_sides)) {
+      const sides_data = _.map(paid_sides, (product, index) => {
+        return {
+          menu_product_id: menu.id,
+          product_side_id: product,
+          outlet_venue_id: menu.outlet_venue_id,
+        };
+      });
+      await models.MenuProductPaidSides.query()
+        .delete()
+        .where({ menu_product_id: venue_menu_id });
+      await models.MenuProductPaidSides.query().insert(sides_data);
     }
     // Send the clientss
     return res.status(200).send("Updated successfully");
@@ -250,7 +270,10 @@ const deleteVenueMenuProduct = async (req, res, next) => {
     await models.MenuCuisineType.query()
       .delete()
       .where({ menu_product_id: venue_menu_id });
-    await models.MenuProductSides.query()
+    await models.MenuProductFreeSides.query()
+      .delete()
+      .where({ menu_product_id: venue_menu_id });
+    await models.MenuProductPaidSides.query()
       .delete()
       .where({ menu_product_id: venue_menu_id });
     await models.OutletVenueMenu.query().where("id", venue_menu_id).delete();
@@ -268,7 +291,7 @@ const getVenueMenuProduct = async (req, res, next) => {
     const { venue_menu_id } = req.params;
     const menu = await models.OutletVenueMenu.query()
       .withGraphFetched(
-        "[product_categories,product_tag,cuisine_type,sides.[side_detail]]"
+        "[product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]]"
       )
       .findById(venue_menu_id);
     if (!menu) return res.status(400).send("Invalid venuemenu id");

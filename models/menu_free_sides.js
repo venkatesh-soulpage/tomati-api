@@ -1,8 +1,8 @@
 import Model from "./model";
-import models from "../models";
-export default class MenuProductSides extends Model {
+import models from ".";
+export default class MenuProductFreeSides extends Model {
   static get tableName() {
-    return "menu_product_sides";
+    return "menu_product_free_sides";
   }
   static get relationMappings() {
     return {
@@ -10,7 +10,7 @@ export default class MenuProductSides extends Model {
         relation: Model.HasOneRelation,
         modelClass: models.OutletVenueMenu,
         join: {
-          from: "menu_product_sides.product_side_id",
+          from: "menu_product_free_sides.product_side_id",
           to: "outletvenuemenus.id",
         },
       },
