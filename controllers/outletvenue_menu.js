@@ -160,6 +160,8 @@ const updateVenueMenuProduct = async (req, res, next) => {
       is_published,
       free_sides,
       paid_sides,
+      product_options,
+      currency,
     } = req.body;
 
     await models.OutletVenueMenu.query()
@@ -172,6 +174,8 @@ const updateVenueMenuProduct = async (req, res, next) => {
         maximum_sides,
         preparation_time,
         is_published,
+        product_options,
+        currency,
       })
       .where("id", venue_menu_id);
 
