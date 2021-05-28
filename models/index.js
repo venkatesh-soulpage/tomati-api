@@ -59,7 +59,8 @@ import MenuProductTags from "./menu_product_tags";
 import CuisineType from "./cuisine_type";
 import MenuCuisineType from "./menu_cuisine_type";
 import OutletBusinessHours from "./outlet_business_hours";
-import MenuProductSides from "./menu_sides";
+import MenuProductFreeSides from "./menu_free_sides";
+import MenuProductPaidSides from "./menu_paid_sides";
 
 export default {
   Location,
@@ -123,5 +124,6 @@ export default {
   CuisineType,
   MenuCuisineType,
   OutletBusinessHours,
-  MenuProductSides,
+  MenuProductFreeSides,
+  MenuProductPaidSides,
 };
