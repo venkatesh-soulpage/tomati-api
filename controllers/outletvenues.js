@@ -43,7 +43,7 @@ const getVenues = async (req, res, next) => {
     // Get brief
     const venues = await models.OutletVenue.query()
       .withGraphFetched(
-        `[menu.[product_categories,product_tag,cuisine_type,sides.[side_detail]],collaborators,location,business_hours]`
+        `[menu.[product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
       )
       .orderBy("created_at", "desc");
 
@@ -70,7 +70,7 @@ const getUserVenues = async (req, res, next) => {
     // Get brief
     const venues = await models.OutletVenue.query()
       .withGraphFetched(
-        `[menu.[product_categories,product_tag,cuisine_type,sides.[side_detail]],collaborators,location,business_hours]`
+        `[menu.[product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
       )
       .orderBy("created_at", "desc")
       .where("account_id", account_id);
@@ -133,7 +133,7 @@ const getVenue = async (req, res, next) => {
 
     venue = await models.OutletVenue.query()
       .withGraphFetched(
-        `[menu.[product_categories,product_tag,cuisine_type,sides.[side_detail]],collaborators,location,business_hours]`
+        `[menu.[product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
       )
       .findById(outlet_venue_id);
 
@@ -214,6 +214,9 @@ const createVenue = async (req, res, next) => {
       business_hours,
       time_zone,
       delivery_radius,
+      delivery_options,
+      is_flat_fee_active,
+      is_variable_fee_active,
     } = req.body;
     const venue = await models.OutletVenue.query().findOne("name", name);
     if (venue)
@@ -222,15 +225,10 @@ const createVenue = async (req, res, next) => {
         .json(
           "Venue with this name already exists. Please try with another name"
         );
+
     let buf, cover_image;
     let logobuf, logo_image;
-    const account = await models.Account.query()
-      .withGraphFetched(`[plan]`)
-      .where("id", account_id);
-    const venues_of_account_holder = await models.OutletVenue.query().where(
-      "account_id",
-      account_id
-    );
+
     if (req.files) {
       cover_image = req.files.cover_image;
       buf = cover_image.data;
@@ -278,6 +276,9 @@ const createVenue = async (req, res, next) => {
       delivery_variable_fee,
       time_zone,
       delivery_radius,
+      delivery_options: { delivery_options },
+      is_flat_fee_active,
+      is_variable_fee_active,
     });
     const businessHoursData = _.map(business_hours, (data) => {
       return { ...data, outlet_venue_id: new_venue.id };
@@ -330,6 +331,9 @@ const updateVenue = async (req, res, next) => {
       delivery_variable_fee,
       time_zone,
       business_hours,
+      delivery_options,
+      is_flat_fee_active,
+      is_variable_fee_active,
     } = req.body;
 
     let buf, cover_image;
@@ -392,6 +396,9 @@ const updateVenue = async (req, res, next) => {
         delivery_radius,
         delivery_flat_fee,
         delivery_variable_fee,
+        delivery_options: { delivery_options },
+        is_flat_fee_active,
+        is_variable_fee_active,
         // account_id,
       })
       .where("id", outlet_venue_id);
@@ -427,7 +434,12 @@ const deleteVenue = async (req, res, next) => {
       .where({ outlet_venue_id });
     await models.MenuProductTags.query().delete().where({ outlet_venue_id });
     await models.MenuCuisineType.query().delete().where({ outlet_venue_id });
-    await models.MenuProductSides.query().delete().where({ outlet_venue_id });
+    await models.MenuProductFreeSides.query()
+      .delete()
+      .where({ outlet_venue_id });
+    await models.MenuProductPaidSides.query()
+      .delete()
+      .where({ outlet_venue_id });
     await models.OutletVenueMenu.query().delete().where({ outlet_venue_id });
     await models.OutletBusinessHours.query()
       .delete()
@@ -469,6 +481,12 @@ const createVenueMenu = async (req, res, next) => {
   try {
     const { account_id, scope } = req;
     const { outlet_venue_id } = req.params;
+    const outletvenue = await models.OutletVenue.query().findById(
+      outlet_venue_id
+    );
+
+    if (!outlet_venue_id || !outletvenue)
+      return res.status(400).json("Invalid ID");
 
     const menu = await models.OutletVenueMenu.query().where({
       outlet_venue_id,
@@ -480,24 +498,17 @@ const createVenueMenu = async (req, res, next) => {
         .where({ outlet_venue_id });
       await models.MenuProductTags.query().delete().where({ outlet_venue_id });
       await models.MenuCuisineType.query().delete().where({ outlet_venue_id });
-      await models.MenuProductSides.query().delete().where({ outlet_venue_id });
+      await models.MenuProductFreeSides.query()
+        .delete()
+        .where({ outlet_venue_id });
+      await models.MenuProductPaidSides.query()
+        .delete()
+        .where({ outlet_venue_id });
       await models.OutletVenueMenu.query().delete().where({ outlet_venue_id });
     } else {
       generateQRCode(outlet_venue_id);
     }
-    // let buf, product_image;
-    // if (req.files) {
-    //   product_image = req.files.product_image;
-    //   buf = product_image.data;
-    // } else if (req.body.product_image) {
-    //   product_image = req.body.product_image;
-    //   buf = Buffer.from(
-    //     product_image.data.replace(/^data:image\/\w+;base64,/, ""),
-    //     "base64"
-    //   );
-    // }
-    // const key = `public/cover_images/outletvenues/${product_image.name}`;
-    // await models.OutletVenueMenu.query().insert(req.body);
+
     _.map(req.body, async (item, index) => {
       item["outlet_venue_id"] = outlet_venue_id;
       let buf, product_image;
@@ -752,10 +763,10 @@ const searchVenues = async (req, res) => {
     let venue = await models.OutletVenue.query().findById(venue_id);
     if (!venue) return res.status(400).json("Invalid venue Id");
     let dishes = [];
-    if (minPrice >= 0 && maxPrice >= 0) {
+    if (_.isNumber(minPrice) && _.isNumber(maxPrice)) {
       dishes = await models.OutletVenueMenu.query()
         .withGraphFetched(
-          `[product_categories,product_tag,cuisine_type,sides.[side_detail]]`
+          `[product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
         )
         .where("outlet_venue_id", venue_id)
         .where("price", ">=", minPrice)
@@ -764,7 +775,7 @@ const searchVenues = async (req, res) => {
     } else {
       dishes = await models.OutletVenueMenu.query()
         .withGraphFetched(
-          `[product_categories,product_tag,cuisine_type,sides.[side_detail]]`
+          `[product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
         )
         .where("outlet_venue_id", venue_id)
         .orderBy("id", "asc");
@@ -772,12 +783,24 @@ const searchVenues = async (req, res) => {
     dishes = _.map(dishes, (dish) => {
       return {
         ...dish,
-        product_categories: _.map(
-          dish.product_categories,
-          "menu_product_category"
-        ),
-        product_tag: _.map(dish.product_tag, "menu_product_tags"),
-        cuisine_type: _.map(dish.cuisine_type, "menu_cuisine_type"),
+        product_categories: _.map(dish.product_categories, (item) => {
+          return {
+            name: item.category_detail.name,
+            id: item.category_detail.id,
+          };
+        }),
+        product_tag: _.map(dish.product_tag, (item) => {
+          return {
+            name: item.tag_detail.name,
+            id: item.tag_detail.id,
+          };
+        }),
+        cuisine_type: _.map(dish.cuisine_type, (item) => {
+          return {
+            name: item.cuisine_detail.name,
+            id: item.cuisine_detail.id,
+          };
+        }),
       };
     });
     if (keyword) {
@@ -788,19 +811,22 @@ const searchVenues = async (req, res) => {
     if (product_categories && !_.isEmpty(product_categories)) {
       dishes = _.filter(dishes, (dish) => {
         return !_.isEmpty(
-          _.intersection(product_categories, dish.product_categories)
+          _.intersection(
+            product_categories,
+            _.map(dish.product_categories, "id")
+          )
         );
       });
     }
     if (product_tags && !_.isEmpty(product_tags)) {
       dishes = _.filter(dishes, (dish) => {
-        return arrayContainsArray(dish.product_tag, product_tags);
+        return arrayContainsArray(_.map(dish.product_tag, "id"), product_tags);
       });
     }
     if (product_cuisine_types && !_.isEmpty(product_cuisine_types)) {
       dishes = _.filter(dishes, (dish) => {
         return !_.isEmpty(
-          _.intersection(product_cuisine_types, dish.cuisine_type)
+          _.intersection(product_cuisine_types, _.map(dish.cuisine_type, "id"))
         );
       });
     }
@@ -808,6 +834,20 @@ const searchVenues = async (req, res) => {
     dishes = _.map(dishes, (dish) => {
       return {
         ...dish,
+        free_sides: _.map(dish.free_sides, (item) => {
+          return {
+            id: item.side_detail.id,
+            name: item.side_detail.name,
+            price: item.side_detail.price,
+          };
+        }),
+        paid_sides: _.map(dish.paid_sides, (item) => {
+          return {
+            id: item.side_detail.id,
+            name: item.side_detail.name,
+            price: item.side_detail.price,
+          };
+        }),
         outlet_venue_name: venue.name,
         outlet_venue_address: venue.address,
         outlet_venue_latitude: venue.latitude,

@@ -31,10 +31,10 @@ const search = async (req, res) => {
     let venuesWithKeyword = [];
     let venues = await models.OutletVenue.query().orderBy("id", "asc");
     let dishes = [];
-    if (minPrice >= 0 && maxPrice >= 0) {
+    if (_.isNumber(minPrice) && _.isNumber(maxPrice)) {
       dishes = await models.OutletVenueMenu.query()
         .withGraphFetched(
-          `[product_categories,product_tag,cuisine_type,sides.[side_detail]]`
+          `[product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
         )
         .where("price", ">=", minPrice)
         .where("price", "<=", maxPrice)
@@ -42,7 +42,7 @@ const search = async (req, res) => {
     } else {
       dishes = await models.OutletVenueMenu.query()
         .withGraphFetched(
-          `[product_categories,product_tag,cuisine_type,sides.[side_detail]]`
+          `[product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
         )
         .orderBy("id", "asc");
     }
@@ -50,12 +50,24 @@ const search = async (req, res) => {
     dishes = _.map(dishes, (dish) => {
       return {
         ...dish,
-        product_categories: _.map(
-          dish.product_categories,
-          "menu_product_category"
-        ),
-        product_tag: _.map(dish.product_tag, "menu_product_tags"),
-        cuisine_type: _.map(dish.cuisine_type, "menu_cuisine_type"),
+        product_categories: _.map(dish.product_categories, (item) => {
+          return {
+            name: item.category_detail.name,
+            id: item.category_detail.id,
+          };
+        }),
+        product_tag: _.map(dish.product_tag, (item) => {
+          return {
+            name: item.tag_detail.name,
+            id: item.tag_detail.id,
+          };
+        }),
+        cuisine_type: _.map(dish.cuisine_type, (item) => {
+          return {
+            name: item.cuisine_detail.name,
+            id: item.cuisine_detail.id,
+          };
+        }),
       };
     });
     if (keyword) {
@@ -69,19 +81,22 @@ const search = async (req, res) => {
     if (product_categories && !_.isEmpty(product_categories)) {
       dishes = _.filter(dishes, (dish) => {
         return !_.isEmpty(
-          _.intersection(product_categories, dish.product_categories)
+          _.intersection(
+            product_categories,
+            _.map(dish.product_categories, "id")
+          )
         );
       });
     }
     if (product_tags && !_.isEmpty(product_tags)) {
       dishes = _.filter(dishes, (dish) => {
-        return arrayContainsArray(dish.product_tag, product_tags);
+        return arrayContainsArray(_.map(dish.product_tag, "id"), product_tags);
       });
     }
     if (product_cuisine_types && !_.isEmpty(product_cuisine_types)) {
       dishes = _.filter(dishes, (dish) => {
         return !_.isEmpty(
-          _.intersection(product_cuisine_types, dish.cuisine_type)
+          _.intersection(product_cuisine_types, _.map(dish.cuisine_type, "id"))
         );
       });
     }
@@ -104,6 +119,20 @@ const search = async (req, res) => {
     dishes = _.map(dishes, (dish) => {
       return {
         ...dish,
+        free_sides: _.map(dish.free_sides, (item) => {
+          return {
+            id: item.side_detail.id,
+            name: item.side_detail.name,
+            price: item.side_detail.price,
+          };
+        }),
+        paid_sides: _.map(dish.paid_sides, (item) => {
+          return {
+            id: item.side_detail.id,
+            name: item.side_detail.name,
+            price: item.side_detail.price,
+          };
+        }),
         outlet_venue_name: _.find(venues, { id: dish.outlet_venue_id }).name,
         outlet_venue_address: _.find(venues, { id: dish.outlet_venue_id })
           .address,
