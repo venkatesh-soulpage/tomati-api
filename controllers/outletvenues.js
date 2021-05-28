@@ -396,7 +396,7 @@ const updateVenue = async (req, res, next) => {
         delivery_radius,
         delivery_flat_fee,
         delivery_variable_fee,
-        delivery_options: { delivery_options },
+        delivery_options,
         is_flat_fee_active,
         is_variable_fee_active,
         // account_id,
