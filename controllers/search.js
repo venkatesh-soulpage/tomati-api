@@ -95,6 +95,7 @@ const search = async (req, res) => {
     if (!_.isEmpty(venuesWithDishes)) {
       venues = _.unionBy(venuesWithKeyword, venuesWithDishes, "id");
     }
+    _.forEach(venues, (v) => delete v.stats);
     dishes = _.map(dishes, (dish) => {
       return {
         ...dish,
