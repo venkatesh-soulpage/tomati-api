@@ -1,4 +1,9 @@
 import models from "../models";
+const {
+  appendProductDetails,
+  desiredValues,
+  outletMenueKeys,
+} = require("../utils/commonFunctions");
 const { s3 } = require("../utils/s3Config");
 import _ from "lodash";
 
@@ -8,13 +13,15 @@ const getVenueMenu = async (req, res, next) => {
   try {
     // Get brief
     const { outlet_venue_id } = req.params;
-    const menu = await models.OutletVenueMenu.query()
+    let menu = await models.OutletVenueMenu.query()
       .withGraphFetched(
         "[product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]]"
       )
       .where("outlet_venue_id", outlet_venue_id);
 
     if (menu.length === 0) return res.status(400).send("Invalid venue id");
+
+    menu = appendProductDetails(menu);
 
     // Send the clientss
     return res.status(200).send(menu);
@@ -51,6 +58,16 @@ const createVenueMenuProduct = async (req, res, next) => {
     const venue = await models.OutletVenue.query().findById(outlet_venue_id);
     if (!venue) return res.status(400).send("Invalid venue id");
     const item = req.body;
+    const diff = _.difference(_.keys(item), [
+      ...outletMenueKeys,
+      "free_sides",
+      "paid_sides",
+    ]);
+    if (diff.length > 0) {
+      return res
+        .status(400)
+        .send(`Payload Invalid. Should not contain ${diff.toString()} fields `);
+    }
     let buf, product_image;
     if (item.product_image) {
       product_image = item.product_image;
@@ -299,6 +316,13 @@ const getVenueMenuProduct = async (req, res, next) => {
       )
       .findById(venue_menu_id);
     if (!menu) return res.status(400).send("Invalid venuemenu id");
+
+    menu.free_sides = _.map(menu.free_sides, (item) => {
+      return desiredValues(item.side_detail);
+    });
+    menu.paid_sides = _.map(menu.paid_sides, (item) => {
+      return desiredValues(item.side_detail);
+    });
 
     // Send the clientss
     return res.status(200).send(menu);

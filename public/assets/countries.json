@@ -3,72 +3,84 @@
     "name": "Angola",
     "is_country": true,
     "parent_location": null,
-    "currency": "AOA"
+    "currency": "AOA",
+    "currency_symbol": "Kz"
   },
   {
     "name": "Brazil",
     "is_country": true,
     "parent_location": null,
-    "currency": "BRL"
+    "currency": "BRL",
+    "currency_symbol": "R$"
   },
   {
     "name": "Colombia",
     "is_country": true,
     "parent_location": null,
-    "currency": "COP"
+    "currency": "COP",
+    "currency_symbol": "$"
   },
   {
     "name": "France",
     "is_country": true,
     "parent_location": null,
-    "currency": "EUR"
+    "currency": "EUR",
+    "currency_symbol": "€"
   },
   {
     "name": "Ghana",
     "is_country": true,
     "parent_location": null,
-    "currency": "GHS"
+    "currency": "GHS",
+    "currency_symbol": "GH₵"
   },
   {
     "name": "Kenya",
     "is_country": true,
     "parent_location": null,
-    "currency": "KES"
+    "currency": "KES",
+    "currency_symbol": "KSh"
   },
   {
     "name": "Nigeria",
     "is_country": true,
     "parent_location": null,
-    "currency": "NGN"
+    "currency": "NGN",
+    "currency_symbol": "₦"
   },
   {
     "name": "Poland",
     "is_country": true,
     "parent_location": null,
-    "currency": "PLN"
+    "currency": "PLN",
+    "currency_symbol": "zł"
   },
   {
     "name": "South Africa",
     "is_country": true,
     "parent_location": null,
-    "currency": "ZAR"
+    "currency": "ZAR",
+    "currency_symbol": "R"
   },
   {
     "name": "Spain",
     "is_country": true,
     "parent_location": null,
-    "currency": "EUR"
+    "currency": "EUR",
+    "currency_symbol": "€"
   },
   {
     "name": "United Arab Emirates",
     "is_country": true,
     "parent_location": null,
-    "currency": "AED"
+    "currency": "AED",
+    "currency_symbol": "د.إ"
   },
   {
     "name": "United Kingdom",
     "is_country": true,
     "parent_location": null,
-    "currency": "GBP"
+    "currency": "GBP",
+    "currency_symbol": "£"
   }
 ]

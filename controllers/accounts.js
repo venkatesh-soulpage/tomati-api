@@ -1242,7 +1242,7 @@ const login = async (req, res, next) => {
       .first();
     // Return if the account doesn't exist
     if (!account)
-      return res.status(401).json("Incorrect password or email").send();
+      return res.status(401).json("No account with this email").send();
     if (!account.is_email_verified)
       return res.status(401).json("Please verify your email").send();
 

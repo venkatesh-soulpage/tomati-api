@@ -1,5 +1,8 @@
 import models from "../models";
-
+const {
+  appendProductDetails,
+  outletMenueKeys,
+} = require("../utils/commonFunctions");
 import _ from "lodash";
 import moment from "moment";
 import latinize from "latinize";
@@ -41,12 +44,17 @@ const distance = (lat1, lon1, lat2, lon2) => {
 const getVenues = async (req, res, next) => {
   try {
     // Get brief
-    const venues = await models.OutletVenue.query()
+    let venues = await models.OutletVenue.query()
       .withGraphFetched(
         `[menu.[product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
       )
       .orderBy("created_at", "desc");
-
+    venues = _.map(venues, (venue) => {
+      return {
+        ...venue,
+        menu: appendProductDetails(venue.menu),
+      };
+    });
     // Send the clientss
     return res.status(200).send(venues);
   } catch (e) {
@@ -68,12 +76,18 @@ const getUserVenues = async (req, res, next) => {
       return res.status(200).send(venues);
     }
     // Get brief
-    const venues = await models.OutletVenue.query()
+    let venues = await models.OutletVenue.query()
       .withGraphFetched(
         `[menu.[product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
       )
       .orderBy("created_at", "desc")
       .where("account_id", account_id);
+    venues = _.map(venues, (venue) => {
+      return {
+        ...venue,
+        menu: appendProductDetails(venue.menu),
+      };
+    });
     return res.status(200).send(venues);
   } catch (e) {
     console.log(e);
@@ -151,6 +165,7 @@ const getVenue = async (req, res, next) => {
           .findById(outlet_venue_id);
       }
     }
+    venue.menu = appendProductDetails(venue.menu);
     return res.status(200).json(venue);
   } catch (error) {
     console.log(error);
@@ -234,32 +249,40 @@ const createVenue = async (req, res, next) => {
       buf = cover_image.data;
       logo_image = req.files.logo_img;
       logobuf = logo_image.data;
-    } else if (req.body.cover_image) {
+    }
+    if (req.body.cover_image) {
       cover_image = req.body.cover_image;
-      logo_image = req.body.logo_img;
       buf = Buffer.from(
         cover_image.data.replace(/^data:image\/\w+;base64,/, ""),
         "base64"
       );
+    }
+    if (req.body.logo_img) {
+      logo_image = req.body.logo_img;
       logobuf = Buffer.from(
         logo_image.data.replace(/^data:image\/\w+;base64,/, ""),
         "base64"
       );
     }
-    const key = `public/cover_images/outletvenues/${cover_image.name}`;
-    const largeCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-large`;
-    const mediumCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-medium`;
-    const smallCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-small`;
-    const largeResizedImage = await sharp(buf).resize(1200, 800).toBuffer();
-    const mediumResizedImage = await sharp(buf).resize(600, 400).toBuffer();
-    const smallResizedImage = await sharp(buf).resize(300, 200).toBuffer();
-    const key2 = `public/cover_images/outletvenues/${logo_image.name}`;
-
-    uploadImage({ key, buf });
-    uploadImage({ key: key2, buf: logobuf });
-    uploadImage({ key: largeCoverImageKey, buf: largeResizedImage });
-    uploadImage({ key: mediumCoverImageKey, buf: mediumResizedImage });
-    uploadImage({ key: smallCoverImageKey, buf: smallResizedImage });
+    if (buf && cover_image) {
+      const key = `public/cover_images/outletvenues/${cover_image.name}`;
+      const largeCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-large`;
+      const mediumCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-medium`;
+      const smallCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-small`;
+      const largeResizedImage = await sharp(buf).resize(1200, 800).toBuffer();
+      const mediumResizedImage = await sharp(buf).resize(600, 400).toBuffer();
+      const smallResizedImage = await sharp(buf).resize(300, 200).toBuffer();
+      uploadImage({ key, buf });
+      uploadImage({ key: largeCoverImageKey, buf: largeResizedImage });
+      uploadImage({ key: mediumCoverImageKey, buf: mediumResizedImage });
+      uploadImage({ key: smallCoverImageKey, buf: smallResizedImage });
+      cover_image = `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`;
+    }
+    if (logobuf && logo_image) {
+      const key2 = `public/cover_images/outletvenues/${logo_image.name}`;
+      uploadImage({ key: key2, buf: logobuf });
+      logo_image = `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key2}`;
+    }
 
     const new_venue = await models.OutletVenue.query().insert({
       name,
@@ -270,8 +293,8 @@ const createVenue = async (req, res, next) => {
       account_id,
       location_id,
       description,
-      cover_image: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
-      logo_img: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key2}`,
+      cover_image,
+      logo_img: logo_image,
       delivery_flat_fee,
       delivery_variable_fee,
       time_zone,
@@ -343,13 +366,15 @@ const updateVenue = async (req, res, next) => {
       buf = cover_image.data;
       logo_image = req.files.logo_img;
       logobuf = logo_image.data;
-    } else if (req.body.logo_img) {
+    }
+    if (req.body.logo_img) {
       logo_image = req.body.logo_img;
       logobuf = Buffer.from(
         logo_image.data.replace(/^data:image\/\w+;base64,/, ""),
         "base64"
       );
-    } else if (req.body.cover_image) {
+    }
+    if (req.body.cover_image) {
       cover_image = req.body.cover_image;
       buf = Buffer.from(
         cover_image.data.replace(/^data:image\/\w+;base64,/, ""),
@@ -429,6 +454,13 @@ const deleteVenue = async (req, res, next) => {
 
     if (!outlet_venue_id || !outletvenue)
       return res.status(400).json("Invalid ID");
+
+    await models.OutletWaiter.query().delete().where({
+      outletvenue_id: outlet_venue_id,
+    });
+    await models.CollaboratorInvitation.query().delete().where({
+      venue_id: outlet_venue_id,
+    });
     await models.MenuProductCategory.query()
       .delete()
       .where({ outlet_venue_id });
@@ -487,6 +519,13 @@ const createVenueMenu = async (req, res, next) => {
 
     if (!outlet_venue_id || !outletvenue)
       return res.status(400).json("Invalid ID");
+
+    const diff = _.difference(_.keys(req.body[0]), outletMenueKeys);
+    if (diff.length > 0) {
+      return res
+        .status(400)
+        .send(`Payload Invalid. Should not contain ${diff.toString()} field `);
+    }
 
     const menu = await models.OutletVenueMenu.query().where({
       outlet_venue_id,
@@ -780,29 +819,8 @@ const searchVenues = async (req, res) => {
         .where("outlet_venue_id", venue_id)
         .orderBy("id", "asc");
     }
-    dishes = _.map(dishes, (dish) => {
-      return {
-        ...dish,
-        product_categories: _.map(dish.product_categories, (item) => {
-          return {
-            name: item.category_detail.name,
-            id: item.category_detail.id,
-          };
-        }),
-        product_tag: _.map(dish.product_tag, (item) => {
-          return {
-            name: item.tag_detail.name,
-            id: item.tag_detail.id,
-          };
-        }),
-        cuisine_type: _.map(dish.cuisine_type, (item) => {
-          return {
-            name: item.cuisine_detail.name,
-            id: item.cuisine_detail.id,
-          };
-        }),
-      };
-    });
+    dishes = appendProductDetails(dishes);
+
     if (keyword) {
       dishes = _.filter(dishes, (dish) => {
         return _.includes(dish.name.toLowerCase(), keyword.toLowerCase());
@@ -834,20 +852,6 @@ const searchVenues = async (req, res) => {
     dishes = _.map(dishes, (dish) => {
       return {
         ...dish,
-        free_sides: _.map(dish.free_sides, (item) => {
-          return {
-            id: item.side_detail.id,
-            name: item.side_detail.name,
-            price: item.side_detail.price,
-          };
-        }),
-        paid_sides: _.map(dish.paid_sides, (item) => {
-          return {
-            id: item.side_detail.id,
-            name: item.side_detail.name,
-            price: item.side_detail.price,
-          };
-        }),
         outlet_venue_name: venue.name,
         outlet_venue_address: venue.address,
         outlet_venue_latitude: venue.latitude,
