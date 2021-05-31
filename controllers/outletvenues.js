@@ -1,5 +1,8 @@
 import models from "../models";
-const { appendProductDetails } = require("../utils/commonFunctions");
+const {
+  appendProductDetails,
+  outletMenueKeys,
+} = require("../utils/commonFunctions");
 import _ from "lodash";
 import moment from "moment";
 import latinize from "latinize";
@@ -516,6 +519,13 @@ const createVenueMenu = async (req, res, next) => {
 
     if (!outlet_venue_id || !outletvenue)
       return res.status(400).json("Invalid ID");
+
+    const diff = _.difference(_.keys(req.body[0]), outletMenueKeys);
+    if (diff.length > 0) {
+      return res
+        .status(400)
+        .send(`Payload Invalid. Should not contain ${diff.toString()} field `);
+    }
 
     const menu = await models.OutletVenueMenu.query().where({
       outlet_venue_id,

@@ -2,6 +2,7 @@ import models from "../models";
 const {
   appendProductDetails,
   desiredValues,
+  outletMenueKeys,
 } = require("../utils/commonFunctions");
 const { s3 } = require("../utils/s3Config");
 import _ from "lodash";
@@ -49,37 +50,7 @@ const uploadImage = async (file_data) => {
     }
   });
 };
-const outletMenueKeys = [
-  "name",
-  "price",
-  "description",
-  "menu_category",
-  "product_category",
-  "product_type",
-  "actual_name",
-  "portfolio",
-  "ingredient_1",
-  "ingredient_1_quantity",
-  "ingredient_2",
-  "ingredient_2_quantity",
-  "ingredient_3",
-  "ingredient_3_quantity",
-  "ingredient_4",
-  "ingredient_4_quantity",
-  "ingredient_5",
-  "ingredient_5_quantity",
-  "outlet_category",
-  "maximum_sides",
-  "preparation_time",
-  "currency",
-  "product_options",
-  "product_image",
-  "product_categories",
-  "product_tag",
-  "cuisine_type",
-  "free_sides",
-  "paid_sides",
-];
+
 const createVenueMenuProduct = async (req, res, next) => {
   try {
     // Get brief
@@ -87,7 +58,11 @@ const createVenueMenuProduct = async (req, res, next) => {
     const venue = await models.OutletVenue.query().findById(outlet_venue_id);
     if (!venue) return res.status(400).send("Invalid venue id");
     const item = req.body;
-    const diff = _.difference(_.keys(item), outletMenueKeys);
+    const diff = _.difference(_.keys(item), [
+      ...outletMenueKeys,
+      "free_sides",
+      "paid_sides",
+    ]);
     if (diff.length > 0) {
       return res
         .status(400)
