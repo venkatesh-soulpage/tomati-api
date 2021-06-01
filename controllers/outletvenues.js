@@ -787,6 +787,7 @@ const searchVenues = async (req, res) => {
       product_cuisine_types,
       minPrice,
       maxPrice,
+      delivery_options,
     } = req.body;
     const { venue_id } = req.params;
     if (
@@ -796,6 +797,7 @@ const searchVenues = async (req, res) => {
         !maxPrice &&
         _.isEmpty(product_categories) &&
         _.isEmpty(product_tags) &&
+        _.isEmpty(delivery_options) &&
         _.isEmpty(product_cuisine_types))
     )
       return res.status(400).json("Please input keyword");
@@ -820,6 +822,19 @@ const searchVenues = async (req, res) => {
         .orderBy("id", "asc");
     }
     dishes = appendProductDetails(dishes);
+
+    if (
+      delivery_options &&
+      !_.isEmpty(delivery_options) &&
+      _.isEmpty(
+        _.intersection(
+          _.map(delivery_options, "option"),
+          _.map(venue.delivery_options, "option")
+        )
+      )
+    ) {
+      dishes = [];
+    }
 
     if (keyword) {
       dishes = _.filter(dishes, (dish) => {

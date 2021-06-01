@@ -17,6 +17,7 @@ const search = async (req, res) => {
       search_venues,
       minPrice,
       maxPrice,
+      delivery_options,
     } = req.body;
     if (
       _.isEmpty(req.body) ||
@@ -26,6 +27,7 @@ const search = async (req, res) => {
         _.isEmpty(product_categories) &&
         _.isEmpty(product_tags) &&
         _.isEmpty(search_venues) &&
+        _.isEmpty(delivery_options) &&
         _.isEmpty(product_cuisine_types))
     )
       return res.status(400).json("Please input keyword");
@@ -95,6 +97,22 @@ const search = async (req, res) => {
     if (!_.isEmpty(venuesWithDishes)) {
       venues = _.unionBy(venuesWithKeyword, venuesWithDishes, "id");
     }
+
+    if (delivery_options && !_.isEmpty(delivery_options)) {
+      venues = _.filter(venues, (venue) => {
+        return !_.isEmpty(
+          _.intersection(
+            _.map(delivery_options, "option"),
+            _.map(venue.delivery_options, "option")
+          )
+        );
+      });
+    }
+
+    if (_.isEmpty(venues)) {
+      dishes = [];
+    }
+
     _.forEach(venues, (v) => delete v.stats);
     dishes = _.map(dishes, (dish) => {
       return {
