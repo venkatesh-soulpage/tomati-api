@@ -1,5 +1,5 @@
 import models from "../models";
-const { appendProductDetails } = require("../utils/commonFunctions");
+const { appendProductDetails, distance } = require("../utils/commonFunctions");
 import _ from "lodash";
 //Tomati controllers
 function arrayContainsArray(superset, subset) {
@@ -18,12 +18,18 @@ const search = async (req, res) => {
       minPrice,
       maxPrice,
       delivery_options,
+      latitude,
+      longitude,
+      range,
     } = req.body;
     if (
       _.isEmpty(req.body) ||
       (!keyword &&
         !minPrice &&
         !maxPrice &&
+        !latitude &&
+        !longitude &&
+        !range &&
         _.isEmpty(product_categories) &&
         _.isEmpty(product_tags) &&
         _.isEmpty(search_venues) &&
@@ -68,6 +74,64 @@ const search = async (req, res) => {
         return _.includes(dish.name.toLowerCase(), keyword.toLowerCase());
       });
     }
+    const venueIds = _.map(
+      _.unionBy(dishes, "outlet_venue_id"),
+      "outlet_venue_id"
+    );
+    const venuesWithDishes = _.filter(venues, (venue) => {
+      return _.includes(venueIds, venue.id);
+    });
+    venues = venuesWithKeyword;
+    if (!_.isEmpty(venuesWithDishes)) {
+      venues = _.unionBy(venuesWithKeyword, venuesWithDishes, "id");
+    }
+    if (search_venues && !_.isEmpty(search_venues)) {
+      dishes = _.filter(dishes, (dish) => {
+        return _.includes(search_venues, dish.outlet_venue_id);
+      });
+      venues = _.filter(venues, (venue) => {
+        return _.includes(search_venues, venue.id);
+      });
+    }
+    if (delivery_options && !_.isEmpty(delivery_options)) {
+      venues = _.filter(venues, (venue) => {
+        return !_.isEmpty(
+          _.intersection(
+            _.map(delivery_options, "option"),
+            _.map(venue.delivery_options, "option")
+          )
+        );
+      });
+      dishes = _.filter(dishes, (dish) => {
+        return !_.isEmpty(
+          _.intersection(
+            _.map(delivery_options, "option"),
+            _.map(dish.outlet_venue.delivery_options, "option")
+          )
+        );
+      });
+    }
+    if (latitude && longitude && range) {
+      venues = _.filter(venues, (venue) => {
+        venue.distance = distance(
+          venue.latitude,
+          venue.longitude,
+          latitude,
+          longitude
+        );
+        return range - venue.distance >= 0;
+      });
+      dishes = _.filter(dishes, (dish) => {
+        dish.outlet_venue.distance = distance(
+          dish.outlet_venue.latitude,
+          dish.outlet_venue.longitude,
+          latitude,
+          longitude
+        );
+        return range - dish.outlet_venue.distance >= 0;
+      });
+    }
+
     if (product_categories && !_.isEmpty(product_categories)) {
       dishes = _.filter(dishes, (dish) => {
         return !_.isEmpty(
@@ -90,41 +154,6 @@ const search = async (req, res) => {
         );
       });
     }
-    if (search_venues && !_.isEmpty(search_venues)) {
-      dishes = _.filter(dishes, (dish) => {
-        return _.includes(search_venues, dish.outlet_venue_id);
-      });
-    }
-    const venueIds = _.map(
-      _.unionBy(dishes, "outlet_venue_id"),
-      "outlet_venue_id"
-    );
-    const venuesWithDishes = _.filter(venues, (venue) => {
-      return _.includes(venueIds, venue.id);
-    });
-    venues = venuesWithKeyword;
-    if (!_.isEmpty(venuesWithDishes)) {
-      venues = _.unionBy(venuesWithKeyword, venuesWithDishes, "id");
-    }
-
-    if (delivery_options && !_.isEmpty(delivery_options)) {
-      venues = _.filter(venues, (venue) => {
-        return !_.isEmpty(
-          _.intersection(
-            _.map(delivery_options, "option"),
-            _.map(venue.delivery_options, "option")
-          )
-        );
-      });
-      dishes = _.filter(dishes, (dish) => {
-        return !_.isEmpty(
-          _.intersection(
-            _.map(delivery_options, "option"),
-            _.map(dish.outlet_venue.delivery_options, "option")
-          )
-        );
-      });
-    }
 
     _.forEach(venues, (v) => delete v.stats);
 
@@ -143,6 +172,7 @@ const search = async (req, res) => {
     return res.status(500).json(JSON.stringify(e));
   }
 };
+
 const SearchController = {
   search,
 };
