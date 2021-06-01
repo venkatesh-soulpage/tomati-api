@@ -46,7 +46,7 @@ const getVenues = async (req, res, next) => {
     // Get brief
     let venues = await models.OutletVenue.query()
       .withGraphFetched(
-        `[menu.[product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
+        `[menu.[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
       )
       .orderBy("created_at", "desc");
     venues = _.map(venues, (venue) => {
@@ -78,7 +78,7 @@ const getUserVenues = async (req, res, next) => {
     // Get brief
     let venues = await models.OutletVenue.query()
       .withGraphFetched(
-        `[menu.[product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
+        `[menu.[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
       )
       .orderBy("created_at", "desc")
       .where("account_id", account_id);
@@ -147,7 +147,7 @@ const getVenue = async (req, res, next) => {
 
     venue = await models.OutletVenue.query()
       .withGraphFetched(
-        `[menu.[product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
+        `[menu.[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
       )
       .findById(outlet_venue_id);
 
@@ -807,7 +807,7 @@ const searchVenues = async (req, res) => {
     if (_.isNumber(minPrice) && _.isNumber(maxPrice)) {
       dishes = await models.OutletVenueMenu.query()
         .withGraphFetched(
-          `[product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
+          `[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
         )
         .where("outlet_venue_id", venue_id)
         .where("price", ">=", minPrice)
@@ -816,7 +816,7 @@ const searchVenues = async (req, res) => {
     } else {
       dishes = await models.OutletVenueMenu.query()
         .withGraphFetched(
-          `[product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
+          `[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
         )
         .where("outlet_venue_id", venue_id)
         .orderBy("id", "asc");
@@ -864,15 +864,6 @@ const searchVenues = async (req, res) => {
       });
     }
 
-    dishes = _.map(dishes, (dish) => {
-      return {
-        ...dish,
-        outlet_venue_name: venue.name,
-        outlet_venue_address: venue.address,
-        outlet_venue_latitude: venue.latitude,
-        outlet_venue_longitude: venue.longitude,
-      };
-    });
     if (req.originalUrl === `/api/outletvenues/${venue_id}/search/count`) {
       return res.status(200).json({
         dishes_count: dishes.length,
