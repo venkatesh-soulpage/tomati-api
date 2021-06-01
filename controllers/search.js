@@ -31,13 +31,22 @@ const search = async (req, res) => {
         _.isEmpty(product_cuisine_types))
     )
       return res.status(400).json("Please input keyword");
+    if (
+      delivery_options &&
+      !_.isEmpty(delivery_options) &&
+      delivery_options.length > 1
+    ) {
+      return res.status(400).json("Multiple Delivery Options are not accepted");
+    }
     let venuesWithKeyword = [];
-    let venues = await models.OutletVenue.query().orderBy("id", "asc");
+    let venues = await models.OutletVenue.query()
+      .withGraphFetched(`[location]`)
+      .orderBy("id", "asc");
     let dishes = [];
     if (_.isNumber(minPrice) && _.isNumber(maxPrice)) {
       dishes = await models.OutletVenueMenu.query()
         .withGraphFetched(
-          `[product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
+          `[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
         )
         .where("price", ">=", minPrice)
         .where("price", "<=", maxPrice)
@@ -45,7 +54,7 @@ const search = async (req, res) => {
     } else {
       dishes = await models.OutletVenueMenu.query()
         .withGraphFetched(
-          `[product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
+          `[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
         )
         .orderBy("id", "asc");
     }
@@ -107,19 +116,17 @@ const search = async (req, res) => {
           )
         );
       });
-    }
-
-    if (_.isEmpty(venues)) {
-      dishes = [];
+      dishes = _.filter(dishes, (dish) => {
+        return !_.isEmpty(
+          _.intersection(
+            _.map(delivery_options, "option"),
+            _.map(dish.outlet_venue.delivery_options, "option")
+          )
+        );
+      });
     }
 
     _.forEach(venues, (v) => delete v.stats);
-    dishes = _.map(dishes, (dish) => {
-      return {
-        ...dish,
-        outlet_venue: _.find(venues, { id: dish.outlet_venue_id }),
-      };
-    });
 
     if (req.originalUrl === "/api/search/count") {
       return res.status(200).json({

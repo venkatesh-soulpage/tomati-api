@@ -51,6 +51,7 @@ const desiredValues = (detail) => {
 };
 const appendProductDetails = (menu) => {
   return _.map(menu, (product) => {
+    delete product.outlet_venue.stats;
     return {
       ...product,
       product_categories: _.map(product.product_categories, (item) => {

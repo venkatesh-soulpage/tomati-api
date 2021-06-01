@@ -58,6 +58,22 @@ export default class OutletVenueMenu extends Model {
           to: "outletvenuemenus.id",
         },
       },
+      outlet_venue: {
+        relation: Model.HasOneRelation,
+        modelClass: models.OutletVenue,
+        join: {
+          from: "outletvenues.id",
+          to: "outletvenuemenus.outlet_venue_id",
+        },
+      },
+      location: {
+        relation: Model.HasOneRelation,
+        modelClass: models.Location,
+        join: {
+          from: "locations.id",
+          to: "outletvenuemenus.outlet_venue_id",
+        },
+      },
     };
   }
 }
