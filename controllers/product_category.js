@@ -25,16 +25,24 @@ const createproductCategory = async (req, res, next) => {
         .status(400)
         .send("This user has no privileges to create category");
 
-    const { name } = req.body;
+    const { name, sequence } = req.body;
     if (!name) return res.status(400).send("Invalid payload");
     const category = await models.ProductCategory.query().findOne({ name });
+    const category_sequence = await models.ProductCategory.query().findOne({
+      sequence,
+    });
     if (category)
       return res
         .status(400)
-        .send("Category with same already exists please try other");
+        .send("Category with same name already exists please try other");
+    if (category_sequence)
+      return res
+        .status(400)
+        .send("Category with same sequence already exists please try other");
 
     await models.ProductCategory.query().insert({
       name,
+      sequence,
     });
     return res.status(200).send("Created Successfully");
   } catch (e) {
@@ -67,7 +75,7 @@ const updateProductCategory = async (req, res, next) => {
         .status(400)
         .send("This user has no privileges to update category");
 
-    const { name } = req.body;
+    const { name, sequence } = req.body;
     if (!name) return res.status(400).send("Invalid payload");
 
     const { category_id } = req.params;
@@ -76,12 +84,19 @@ const updateProductCategory = async (req, res, next) => {
     );
     if (!foundCategory) return res.status(400).send("Invalid category id");
     const category = await models.ProductCategory.query().findOne({ name });
+    const category_sequence = await models.ProductCategory.query().findOne({
+      sequence,
+    });
     if (category)
       return res
         .status(400)
-        .send("Category with same already exists please try other");
+        .send("Category with same name already exists please try other");
+    if (category_sequence)
+      return res
+        .status(400)
+        .send("Category with same sequence already exists please try other");
     await models.ProductCategory.query()
-      .update({ name })
+      .update({ name, sequence })
       .where("id", category_id);
     return res.status(200).send("Updated Successfully");
   } catch (e) {
