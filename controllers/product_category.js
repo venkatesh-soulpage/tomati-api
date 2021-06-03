@@ -26,7 +26,7 @@ const createproductCategory = async (req, res, next) => {
         .send("This user has no privileges to create category");
 
     const { name, sequence } = req.body;
-    if (!name) return res.status(400).send("Invalid payload");
+    if (!name || !sequence) return res.status(400).send("Invalid payload");
     const category = await models.ProductCategory.query().findOne({ name });
     const category_sequence = await models.ProductCategory.query().findOne({
       sequence,
@@ -76,17 +76,19 @@ const updateProductCategory = async (req, res, next) => {
         .send("This user has no privileges to update category");
 
     const { name, sequence } = req.body;
-    if (!name) return res.status(400).send("Invalid payload");
 
     const { category_id } = req.params;
     const foundCategory = await models.ProductCategory.query().findById(
       category_id
     );
     if (!foundCategory) return res.status(400).send("Invalid category id");
-    const category = await models.ProductCategory.query().findOne({ name });
-    const category_sequence = await models.ProductCategory.query().findOne({
-      sequence,
-    });
+    const category =
+      name && (await models.ProductCategory.query().findOne({ name }));
+    const category_sequence =
+      sequence &&
+      (await models.ProductCategory.query().findOne({
+        sequence,
+      }));
     if (category)
       return res
         .status(400)
