@@ -51,6 +51,11 @@ const deleteCuisineType = async (req, res, next) => {
         .send("This user has no privileges to delete cuisine");
 
     const { cuisine_id } = req.params;
+    const cuisine_type = await models.CuisineType.query().findById(cuisine_id);
+    if (!cuisine_type) return res.status(400).send("Invalid payload");
+    await models.MenuCuisineType.query()
+      .delete()
+      .where({ menu_cuisine_type: cuisine_id });
     await models.CuisineType.query().deleteById(cuisine_id);
     return res.status(200).send("Deleted Successfully");
   } catch (e) {

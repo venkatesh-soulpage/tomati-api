@@ -60,6 +60,11 @@ const deleteProductCategory = async (req, res, next) => {
         .send("This user has no privileges to delete category");
 
     const { category_id } = req.params;
+    const category = await models.ProductCategory.query().findById(category_id);
+    if (!category) return res.status(400).send("Invalid payload");
+    await models.MenuProductCategory.query()
+      .delete()
+      .where({ menu_product_category: category_id });
     await models.ProductCategory.query().deleteById(category_id);
     return res.status(200).send("Deleted Successfully");
   } catch (e) {

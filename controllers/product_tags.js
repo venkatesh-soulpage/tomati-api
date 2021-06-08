@@ -48,7 +48,11 @@ const deleteProductTag = async (req, res, next) => {
       return res.status(400).send("This user has no privileges to delete tag");
 
     const { tag_id } = req.params;
-
+    const tag = await models.ProductTags.query().findById(tag_id);
+    if (!tag) return res.status(400).send("Invalid payload");
+    await models.MenuProductTags.query()
+      .delete()
+      .where({ menu_product_tags: tag_id });
     await models.ProductTags.query().deleteById(tag_id);
     return res.status(200).send("Deleted Successfully");
   } catch (e) {

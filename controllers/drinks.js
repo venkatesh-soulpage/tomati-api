@@ -51,6 +51,9 @@ const deleteDrink = async (req, res, next) => {
         .send("This user has no privileges to delete drink");
 
     const { drink_id } = req.params;
+    const founddrink = await models.Drinks.query().findById(drink_id);
+    if (!founddrink) return res.status(400).send("Invalid payload");
+    await models.MenuDrinks.query().delete().where({ menu_drinks: drink_id });
     await models.Drinks.query().deleteById(drink_id);
     return res.status(200).send("Deleted Successfully");
   } catch (e) {
