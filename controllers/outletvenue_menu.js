@@ -31,28 +31,6 @@ const getVenueMenu = async (req, res, next) => {
   }
 };
 
-const updateVenueMenu = async (req, res, next) => {
-  try {
-    // Get brief
-    const { outlet_venue_id } = req.params;
-    let menu = await models.OutletVenueMenu.query().where(
-      "outlet_venue_id",
-      outlet_venue_id
-    );
-
-    if (menu.length === 0) return res.status(400).send("Invalid venue id");
-    await models.OutletVenueMenu.query()
-      .update({ is_published: true })
-      .where("outlet_venue_id", outlet_venue_id);
-
-    // Send the clientss
-    return res.status(200).send("Updated Successfully");
-  } catch (e) {
-    console.log(e);
-    return res.status(500).json(JSON.stringify(e));
-  }
-};
-
 const uploadImage = async (file_data) => {
   const { key, buf } = file_data;
 
@@ -388,7 +366,6 @@ const planController = {
   updateVenueMenuProduct,
   deleteVenueMenuProduct,
   getVenueMenuProduct,
-  updateVenueMenu,
 };
 
 export default planController;

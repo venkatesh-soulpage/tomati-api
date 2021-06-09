@@ -86,15 +86,6 @@ router.get(
   // ]),
   menueController.getVenueMenu
 );
-router.put(
-  "/:outlet_venue_id/menu",
-  VerifyToken,
-  // VerifyRole([
-  //   { scope: "OUTLET", role: "MANAGER" },
-  //   { scope: "OUTLET", role: "OWNER" },
-  // ]),
-  menueController.updateVenueMenu
-);
 
 router.post(
   "/:outlet_venue_id/menu/create-product",
