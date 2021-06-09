@@ -15,7 +15,7 @@ const getVenueMenu = async (req, res, next) => {
     const { outlet_venue_id } = req.params;
     let menu = await models.OutletVenueMenu.query()
       .withGraphFetched(
-        "[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]]"
+        "[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]]"
       )
       .where("outlet_venue_id", outlet_venue_id);
 
@@ -87,7 +87,7 @@ const createVenueMenuProduct = async (req, res, next) => {
     const paid_sides = item.paid_sides;
     delete item.paid_sides;
     const menu = await models.OutletVenueMenu.query().insert(item);
-    const { product_categories, product_tag, cuisine_type } = item;
+    const { product_categories, product_tag, cuisine_type, drinks } = item;
     const product_category_data = _.map(
       product_categories,
       (product, index) => {
@@ -112,6 +112,13 @@ const createVenueMenuProduct = async (req, res, next) => {
         outlet_venue_id: outlet_venue_id,
       };
     });
+    const drinks_data = _.map(drinks, (product, index) => {
+      return {
+        menu_product_id: menu.id,
+        menu_drinks: product,
+        outlet_venue_id: outlet_venue_id,
+      };
+    });
     const free_sides_data = _.map(free_sides, (product, index) => {
       return {
         menu_product_id: menu.id,
@@ -129,6 +136,7 @@ const createVenueMenuProduct = async (req, res, next) => {
     await models.MenuProductCategory.query().insert(product_category_data);
     await models.MenuProductTags.query().insert(product_tag_data);
     await models.MenuCuisineType.query().insert(cuisine_type_data);
+    await models.MenuDrinks.query().insert(drinks_data);
     await models.MenuProductFreeSides.query().insert(free_sides_data);
     await models.MenuProductPaidSides.query().insert(paid_sides_data);
     // Send the clientss
@@ -174,6 +182,7 @@ const updateVenueMenuProduct = async (req, res, next) => {
       product_categories,
       product_tag,
       cuisine_type,
+      drinks,
       is_published,
       free_sides,
       paid_sides,
@@ -241,6 +250,20 @@ const updateVenueMenuProduct = async (req, res, next) => {
       await models.MenuCuisineType.query().insert(cuisine_type_data);
     }
 
+    if (drinks && !_.isEmpty(drinks)) {
+      const drinks_data = _.map(drinks, (product, index) => {
+        return {
+          menu_product_id: menu.id,
+          menu_drinks: product,
+          outlet_venue_id: menu.outlet_venue_id,
+        };
+      });
+      await models.MenuDrinks.query()
+        .delete()
+        .where({ menu_product_id: venue_menu_id });
+      await models.MenuDrinks.query().insert(drinks_data);
+    }
+
     if (free_sides && !_.isEmpty(free_sides)) {
       const sides_data = _.map(free_sides, (product, index) => {
         return {
@@ -291,12 +314,17 @@ const deleteVenueMenuProduct = async (req, res, next) => {
     await models.MenuCuisineType.query()
       .delete()
       .where({ menu_product_id: venue_menu_id });
+    await models.MenuDrinks.query()
+      .delete()
+      .where({ menu_product_id: venue_menu_id });
     await models.MenuProductFreeSides.query()
       .delete()
-      .where({ menu_product_id: venue_menu_id });
+      .where({ menu_product_id: venue_menu_id })
+      .orWhere({ product_side_id: venue_menu_id });
     await models.MenuProductPaidSides.query()
       .delete()
-      .where({ menu_product_id: venue_menu_id });
+      .where({ menu_product_id: venue_menu_id })
+      .orWhere({ product_side_id: venue_menu_id });
     await models.OutletVenueMenu.query().where("id", venue_menu_id).delete();
     // Send the clientss
     return res.status(200).send("Deleted successfully");
@@ -312,7 +340,7 @@ const getVenueMenuProduct = async (req, res, next) => {
     const { venue_menu_id } = req.params;
     const menu = await models.OutletVenueMenu.query()
       .withGraphFetched(
-        "[product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]]"
+        "[product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]]"
       )
       .findById(venue_menu_id);
     if (!menu) return res.status(400).send("Invalid venuemenu id");

@@ -26,6 +26,7 @@ const outletMenueKeys = [
   "product_options",
   "product_image",
   "product_categories",
+  "drinks",
   "product_tag",
   "cuisine_type",
 ];
@@ -44,6 +45,7 @@ const desiredValues = (detail) => {
     "product_categories",
     "product_tag",
     "cuisine_type",
+    "drinks",
     "is_published",
     "product_options",
     "currency"
@@ -58,6 +60,7 @@ const appendProductDetails = (menu) => {
       product_categories: _.map(product.product_categories, (item) => {
         return {
           name: item.category_detail.name,
+          sequence: item.category_detail.sequence,
           id: item.category_detail.id,
         };
       }),
@@ -71,6 +74,12 @@ const appendProductDetails = (menu) => {
         return {
           name: item.cuisine_detail.name,
           id: item.cuisine_detail.id,
+        };
+      }),
+      drinks: _.map(product.drinks, (item) => {
+        return {
+          name: item.drinks_detail.name,
+          id: item.drinks_detail.id,
         };
       }),
       free_sides: _.map(product.free_sides, (item) => {

@@ -14,6 +14,7 @@ const search = async (req, res) => {
       product_categories,
       product_tags,
       product_cuisine_types,
+      drinks,
       search_venues,
       minPrice,
       maxPrice,
@@ -34,6 +35,7 @@ const search = async (req, res) => {
         _.isEmpty(product_tags) &&
         _.isEmpty(search_venues) &&
         _.isEmpty(delivery_options) &&
+        _.isEmpty(drinks) &&
         _.isEmpty(product_cuisine_types))
     )
       return res.status(400).json("Please input keyword");
@@ -52,7 +54,7 @@ const search = async (req, res) => {
     if (_.isNumber(minPrice) && _.isNumber(maxPrice)) {
       dishes = await models.OutletVenueMenu.query()
         .withGraphFetched(
-          `[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
+          `[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
         )
         .where("price", ">=", minPrice)
         .where("price", "<=", maxPrice)
@@ -60,7 +62,7 @@ const search = async (req, res) => {
     } else {
       dishes = await models.OutletVenueMenu.query()
         .withGraphFetched(
-          `[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
+          `[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
         )
         .orderBy("id", "asc");
     }
@@ -152,6 +154,11 @@ const search = async (req, res) => {
         return !_.isEmpty(
           _.intersection(product_cuisine_types, _.map(dish.cuisine_type, "id"))
         );
+      });
+    }
+    if (drinks && !_.isEmpty(drinks)) {
+      dishes = _.filter(dishes, (dish) => {
+        return !_.isEmpty(_.intersection(drinks, _.map(dish.drinks, "id")));
       });
     }
 

@@ -27,7 +27,7 @@ const getVenues = async (req, res, next) => {
     // Get brief
     let venues = await models.OutletVenue.query()
       .withGraphFetched(
-        `[menu.[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
+        `[menu.[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
       )
       .orderBy("created_at", "desc");
     venues = _.map(venues, (venue) => {
@@ -59,7 +59,7 @@ const getUserVenues = async (req, res, next) => {
     // Get brief
     let venues = await models.OutletVenue.query()
       .withGraphFetched(
-        `[menu.[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
+        `[menu.[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
       )
       .orderBy("created_at", "desc")
       .where("account_id", account_id);
@@ -128,7 +128,7 @@ const getVenue = async (req, res, next) => {
 
     venue = await models.OutletVenue.query()
       .withGraphFetched(
-        `[menu.[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
+        `[menu.[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
       )
       .findById(outlet_venue_id);
 
@@ -447,6 +447,7 @@ const deleteVenue = async (req, res, next) => {
       .where({ outlet_venue_id });
     await models.MenuProductTags.query().delete().where({ outlet_venue_id });
     await models.MenuCuisineType.query().delete().where({ outlet_venue_id });
+    await models.MenuDrinks.query().delete().where({ outlet_venue_id });
     await models.MenuProductFreeSides.query()
       .delete()
       .where({ outlet_venue_id });
@@ -518,6 +519,7 @@ const createVenueMenu = async (req, res, next) => {
         .where({ outlet_venue_id });
       await models.MenuProductTags.query().delete().where({ outlet_venue_id });
       await models.MenuCuisineType.query().delete().where({ outlet_venue_id });
+      await models.MenuDrinks.query().delete().where({ outlet_venue_id });
       await models.MenuProductFreeSides.query()
         .delete()
         .where({ outlet_venue_id });
@@ -546,7 +548,7 @@ const createVenueMenu = async (req, res, next) => {
       }
 
       const menu = await models.OutletVenueMenu.query().insert(item);
-      const { product_categories, product_tag, cuisine_type } = item;
+      const { product_categories, product_tag, cuisine_type, drinks } = item;
 
       const product_category_data = _.map(
         product_categories,
@@ -572,11 +574,19 @@ const createVenueMenu = async (req, res, next) => {
           outlet_venue_id,
         };
       });
+      const drinks_data = _.map(drinks, (product, index) => {
+        return {
+          menu_product_id: menu.id,
+          menu_drinks: product,
+          outlet_venue_id,
+        };
+      });
       await models.MenuProductCategory.query().insertGraph(
         product_category_data
       );
       await models.MenuProductTags.query().insertGraph(product_tag_data);
       await models.MenuCuisineType.query().insertGraph(cuisine_type_data);
+      await models.MenuDrinks.query().insertGraph(drinks_data);
     });
 
     // Send the clients
@@ -766,6 +776,7 @@ const searchVenues = async (req, res) => {
       product_categories,
       product_tags,
       product_cuisine_types,
+      drinks,
       minPrice,
       maxPrice,
       delivery_options,
@@ -779,6 +790,7 @@ const searchVenues = async (req, res) => {
         _.isEmpty(product_categories) &&
         _.isEmpty(product_tags) &&
         _.isEmpty(delivery_options) &&
+        _.isEmpty(drinks) &&
         _.isEmpty(product_cuisine_types))
     )
       return res.status(400).json("Please input keyword");
@@ -788,7 +800,7 @@ const searchVenues = async (req, res) => {
     if (_.isNumber(minPrice) && _.isNumber(maxPrice)) {
       dishes = await models.OutletVenueMenu.query()
         .withGraphFetched(
-          `[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
+          `[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
         )
         .where("outlet_venue_id", venue_id)
         .where("price", ">=", minPrice)
@@ -797,7 +809,7 @@ const searchVenues = async (req, res) => {
     } else {
       dishes = await models.OutletVenueMenu.query()
         .withGraphFetched(
-          `[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
+          `[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
         )
         .where("outlet_venue_id", venue_id)
         .orderBy("id", "asc");
@@ -842,6 +854,11 @@ const searchVenues = async (req, res) => {
         return !_.isEmpty(
           _.intersection(product_cuisine_types, _.map(dish.cuisine_type, "id"))
         );
+      });
+    }
+    if (drinks && !_.isEmpty(drinks)) {
+      dishes = _.filter(dishes, (dish) => {
+        return !_.isEmpty(_.intersection(drinks, _.map(dish.drinks, "id")));
       });
     }
 

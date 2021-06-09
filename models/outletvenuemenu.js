@@ -42,6 +42,14 @@ export default class OutletVenueMenu extends Model {
           to: "outletvenuemenus.id",
         },
       },
+      drinks: {
+        relation: Model.HasManyRelation,
+        modelClass: models.MenuDrinks,
+        join: {
+          from: "menu_drinks.menu_product_id",
+          to: "outletvenuemenus.id",
+        },
+      },
       free_sides: {
         relation: Model.HasManyRelation,
         modelClass: models.MenuProductFreeSides,
