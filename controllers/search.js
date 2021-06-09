@@ -68,25 +68,6 @@ const search = async (req, res) => {
     }
 
     dishes = appendProductDetails(dishes);
-    if (keyword) {
-      venuesWithKeyword = _.filter(venues, (venue) => {
-        return _.includes(venue.name.toLowerCase(), keyword.toLowerCase());
-      });
-      dishes = _.filter(dishes, (dish) => {
-        return _.includes(dish.name.toLowerCase(), keyword.toLowerCase());
-      });
-    }
-    const venueIds = _.map(
-      _.unionBy(dishes, "outlet_venue_id"),
-      "outlet_venue_id"
-    );
-    const venuesWithDishes = _.filter(venues, (venue) => {
-      return _.includes(venueIds, venue.id);
-    });
-    venues = venuesWithKeyword;
-    if (!_.isEmpty(venuesWithDishes)) {
-      venues = _.unionBy(venuesWithKeyword, venuesWithDishes, "id");
-    }
     if (search_venues && !_.isEmpty(search_venues)) {
       dishes = _.filter(dishes, (dish) => {
         return _.includes(search_venues, dish.outlet_venue_id);
@@ -133,6 +114,14 @@ const search = async (req, res) => {
         return range - dish.outlet_venue.distance >= 0;
       });
     }
+    if (keyword) {
+      venuesWithKeyword = _.filter(venues, (venue) => {
+        return _.includes(venue.name.toLowerCase(), keyword.toLowerCase());
+      });
+      dishes = _.filter(dishes, (dish) => {
+        return _.includes(dish.name.toLowerCase(), keyword.toLowerCase());
+      });
+    }
 
     if (product_categories && !_.isEmpty(product_categories)) {
       dishes = _.filter(dishes, (dish) => {
@@ -161,7 +150,17 @@ const search = async (req, res) => {
         return !_.isEmpty(_.intersection(drinks, _.map(dish.drinks, "id")));
       });
     }
-
+    const venueIds = _.map(
+      _.unionBy(dishes, "outlet_venue_id"),
+      "outlet_venue_id"
+    );
+    const venuesWithDishes = _.filter(venues, (venue) => {
+      return _.includes(venueIds, venue.id);
+    });
+    if (keyword) {
+      venues = _.unionBy(venuesWithKeyword, venuesWithDishes, "id");
+    }
+    venues = venuesWithDishes;
     _.forEach(venues, (v) => delete v.stats);
 
     if (req.originalUrl === "/api/search/count") {
