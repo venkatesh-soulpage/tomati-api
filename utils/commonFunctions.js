@@ -29,6 +29,7 @@ const outletMenueKeys = [
   "drinks",
   "product_tag",
   "cuisine_type",
+  "is_published",
 ];
 
 const desiredValues = (detail) => {
