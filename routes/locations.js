@@ -40,6 +40,13 @@ router.post(
   locationsController.createLocation
 );
 
+router.delete(
+  "/:location_id",
+  VerifyToken,
+  VerifyRole([{ scope: "ADMIN", role: "ADMIN" }]),
+  locationsController.deleteLocation
+);
+
 /* Update - Updatee a location rate */
 router.put(
   "/:location_id/rate",
