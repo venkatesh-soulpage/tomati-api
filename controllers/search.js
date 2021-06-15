@@ -16,8 +16,8 @@ const search = async (req, res) => {
       product_cuisine_types,
       drinks,
       search_venues,
-      minPrice,
-      maxPrice,
+      min_price,
+      max_price,
       delivery_options,
       latitude,
       longitude,
@@ -26,8 +26,8 @@ const search = async (req, res) => {
     if (
       _.isEmpty(req.body) ||
       (!keyword &&
-        !minPrice &&
-        !maxPrice &&
+        !min_price &&
+        !max_price &&
         !latitude &&
         !longitude &&
         !range &&
@@ -51,13 +51,13 @@ const search = async (req, res) => {
       .withGraphFetched(`[location]`)
       .orderBy("id", "asc");
     let dishes = [];
-    if (_.isNumber(minPrice) && _.isNumber(maxPrice)) {
+    if (_.isNumber(min_price) && _.isNumber(max_price)) {
       dishes = await models.OutletVenueMenu.query()
         .withGraphFetched(
           `[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
         )
-        .where("price", ">=", minPrice)
-        .where("price", "<=", maxPrice)
+        .where("price", ">=", min_price)
+        .where("price", "<=", max_price)
         .orderBy("id", "asc");
     } else {
       dishes = await models.OutletVenueMenu.query()
