@@ -777,16 +777,16 @@ const searchVenues = async (req, res) => {
       product_tags,
       product_cuisine_types,
       drinks,
-      minPrice,
-      maxPrice,
+      min_price,
+      max_price,
       delivery_options,
     } = req.body;
     const { venue_id } = req.params;
     if (
       _.isEmpty(req.body) ||
       (!keyword &&
-        !minPrice &&
-        !maxPrice &&
+        !min_price &&
+        !max_price &&
         _.isEmpty(product_categories) &&
         _.isEmpty(product_tags) &&
         _.isEmpty(delivery_options) &&
@@ -797,14 +797,14 @@ const searchVenues = async (req, res) => {
     let venue = await models.OutletVenue.query().findById(venue_id);
     if (!venue) return res.status(400).json("Invalid venue Id");
     let dishes = [];
-    if (_.isNumber(minPrice) && _.isNumber(maxPrice)) {
+    if (_.isNumber(min_price) && _.isNumber(max_price)) {
       dishes = await models.OutletVenueMenu.query()
         .withGraphFetched(
           `[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
         )
         .where("outlet_venue_id", venue_id)
-        .where("price", ">=", minPrice)
-        .where("price", "<=", maxPrice)
+        .where("price", ">=", min_price)
+        .where("price", "<=", max_price)
         .orderBy("id", "asc");
     } else {
       dishes = await models.OutletVenueMenu.query()
