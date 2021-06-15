@@ -7,27 +7,6 @@
     "currency_symbol": "Kz"
   },
   {
-    "name": "Brazil",
-    "is_country": true,
-    "parent_location": null,
-    "currency": "BRL",
-    "currency_symbol": "R$"
-  },
-  {
-    "name": "Colombia",
-    "is_country": true,
-    "parent_location": null,
-    "currency": "COP",
-    "currency_symbol": "$"
-  },
-  {
-    "name": "France",
-    "is_country": true,
-    "parent_location": null,
-    "currency": "EUR",
-    "currency_symbol": "€"
-  },
-  {
     "name": "Ghana",
     "is_country": true,
     "parent_location": null,
@@ -49,38 +28,59 @@
     "currency_symbol": "₦"
   },
   {
-    "name": "Poland",
+    "name": "Benin",
     "is_country": true,
     "parent_location": null,
-    "currency": "PLN",
-    "currency_symbol": "zł"
+    "currency": "XOF",
+    "currency_symbol": "CFA"
   },
   {
-    "name": "South Africa",
+    "name": "Cameroon",
     "is_country": true,
     "parent_location": null,
-    "currency": "ZAR",
-    "currency_symbol": "R"
+    "currency": "XAF",
+    "currency_symbol": "FCFA"
   },
   {
-    "name": "Spain",
+    "name": "Cote d’Ivoire",
     "is_country": true,
     "parent_location": null,
-    "currency": "EUR",
-    "currency_symbol": "€"
+    "currency": "XOF",
+    "currency_symbol": "CFA"
   },
   {
-    "name": "United Arab Emirates",
+    "name": "Gambia",
     "is_country": true,
     "parent_location": null,
-    "currency": "AED",
-    "currency_symbol": "د.إ"
+    "currency": "GMD",
+    "currency_symbol": "D"
   },
   {
-    "name": "United Kingdom",
+    "name": "Morocco",
     "is_country": true,
     "parent_location": null,
-    "currency": "GBP",
-    "currency_symbol": "£"
+    "currency": "MAD",
+    "currency_symbol": "DH"
+  },
+  {
+    "name": "Rwanda",
+    "is_country": true,
+    "parent_location": null,
+    "currency": "RWF",
+    "currency_symbol": "RF"
+  },
+  {
+    "name": "Senegal",
+    "is_country": true,
+    "parent_location": null,
+    "currency": "XOF",
+    "currency_symbol": "CFA"
+  },
+  {
+    "name": "Togo",
+    "is_country": true,
+    "parent_location": null,
+    "currency": "XOF",
+    "currency_symbol": "CFA"
   }
 ]
