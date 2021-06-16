@@ -803,6 +803,7 @@ const searchVenues = async (req, res) => {
           `[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
         )
         .where("outlet_venue_id", venue_id)
+        .where("is_published", true)
         .where("price", ">=", min_price)
         .where("price", "<=", max_price)
         .orderBy("id", "asc");
@@ -812,6 +813,7 @@ const searchVenues = async (req, res) => {
           `[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
         )
         .where("outlet_venue_id", venue_id)
+        .where("is_published", true)
         .orderBy("id", "asc");
     }
     dishes = appendProductDetails(dishes);
