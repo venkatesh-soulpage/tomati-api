@@ -54,16 +54,18 @@ const search = async (req, res) => {
     if (_.isNumber(min_price) && _.isNumber(max_price)) {
       dishes = await models.OutletVenueMenu.query()
         .withGraphFetched(
-          `[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
+          `[outlet_venue.[location],product_categories.[category_detail],menu_categories.[menu_category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
         )
+        .where("is_published", true)
         .where("price", ">=", min_price)
         .where("price", "<=", max_price)
         .orderBy("id", "asc");
     } else {
       dishes = await models.OutletVenueMenu.query()
         .withGraphFetched(
-          `[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
+          `[outlet_venue.[location],product_categories.[category_detail],menu_categories.[menu_category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
         )
+        .where("is_published", true)
         .orderBy("id", "asc");
     }
 
