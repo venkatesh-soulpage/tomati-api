@@ -7,7 +7,7 @@ import VerifyRole from "../utils/verification_role";
 //Tomati Controllers
 
 router.post(
-  "/create-menu-category",
+  "/create-category",
   VerifyToken,
   productMenuCategoryController.createproductMenuCategory
 );

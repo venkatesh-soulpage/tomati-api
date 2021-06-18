@@ -25,8 +25,11 @@ const createproductMenuCategory = async (req, res, next) => {
         .status(400)
         .send("This user has no privileges to create category");
 
-    const { name, sequence } = req.body;
-    if (!name || !sequence) return res.status(400).send("Invalid payload");
+    const { name, sequence, venue } = req.body;
+    if (!name || !sequence || !venue)
+      return res.status(400).send("Invalid payload");
+    const outlet_venue = await models.OutletVenue.query().findById(venue);
+    if (!outlet_venue) return res.status(400).json("invalid venue");
     const menu_category = await models.ProductMenuCategory.query().findOne({
       name,
     });
@@ -48,6 +51,7 @@ const createproductMenuCategory = async (req, res, next) => {
     await models.ProductMenuCategory.query().insert({
       name,
       sequence,
+      outlet_venue_id: venue,
     });
     return res.status(200).send("Created Successfully");
   } catch (e) {
@@ -88,13 +92,19 @@ const updateProductMenuCategory = async (req, res, next) => {
         .status(400)
         .send("This user has no privileges to update category");
 
-    const { name, sequence } = req.body;
+    const { name, sequence, venue } = req.body;
 
     const { menu_category_id } = req.params;
     const foundMenuCategory = await models.ProductMenuCategory.query().findById(
       menu_category_id
     );
     if (!foundMenuCategory) return res.status(400).send("Invalid category id");
+    let outlet_venue_id;
+    if (venue) {
+      const outlet_venue = await models.OutletVenue.query().findById(venue);
+      if (!outlet_venue) return res.status(400).json("invalid venue");
+      outlet_venue_id = venue;
+    }
     const menu_category =
       name && (await models.ProductMenuCategory.query().findOne({ name }));
     const menu_category_sequence =
@@ -113,7 +123,7 @@ const updateProductMenuCategory = async (req, res, next) => {
           "Menu category with same sequence already exists please try other"
         );
     await models.ProductMenuCategory.query()
-      .update({ name, sequence })
+      .update({ name, sequence, outlet_venue_id })
       .where("id", menu_category_id);
     return res.status(200).send("Updated Successfully");
   } catch (e) {
