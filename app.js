@@ -42,6 +42,7 @@ var productTagRoute = require("./routes/product_tags");
 var cuisineTypeRoute = require("./routes/cuisine_type");
 var SearchRoute = require("./routes/search");
 var drinksRoute = require("./routes/drinks");
+var productMenuCategoryRoute = require("./routes/product_menu_category");
 
 var app = express();
 Sentry.init({
@@ -115,6 +116,7 @@ app.use("/api/producttags", productTagRoute);
 app.use("/api/cuisines", cuisineTypeRoute);
 app.use("/api/search", SearchRoute);
 app.use("/api/drinks", drinksRoute);
+app.use("/api/productmenucategory", productMenuCategoryRoute);
 
 // check
 // catch 404 and forward to error handler

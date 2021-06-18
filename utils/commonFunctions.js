@@ -65,6 +65,16 @@ const appendProductDetails = (menu) => {
           id: item.category_detail.id,
         };
       }),
+      menu_categories: _.map(product.menu_categories, (item) => {
+        return {
+          name: item.menu_category_detail.name,
+          sequence: item.menu_category_detail.sequence,
+          id: item.menu_category_detail.id,
+          outlet_venue_id: item.outlet_venue_id,
+          created_at: item.created_at,
+          updated_at: item.updated_at,
+        };
+      }),
       product_tag: _.map(product.product_tag, (item) => {
         return {
           name: item.tag_detail.name,

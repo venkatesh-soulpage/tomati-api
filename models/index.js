@@ -63,6 +63,8 @@ import MenuProductFreeSides from "./menu_free_sides";
 import MenuProductPaidSides from "./menu_paid_sides";
 import Drinks from "./drinks";
 import MenuDrinks from "./menu_drinks";
+import ProductMenuCategory from "./product_menu_category";
+import MenuCategory from "./menu_category";
 
 export default {
   Location,
@@ -130,4 +132,6 @@ export default {
   MenuProductPaidSides,
   Drinks,
   MenuDrinks,
+  ProductMenuCategory,
+  MenuCategory,
 };
