@@ -116,7 +116,7 @@ app.use("/api/producttags", productTagRoute);
 app.use("/api/cuisines", cuisineTypeRoute);
 app.use("/api/search", SearchRoute);
 app.use("/api/drinks", drinksRoute);
-app.use("/api/productmenucategories", productMenuCategoryRoute);
+app.use("/api/menucategories", productMenuCategoryRoute);
 
 // check
 // catch 404 and forward to error handler

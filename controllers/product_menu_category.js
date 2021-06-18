@@ -16,6 +16,20 @@ const getProductMenuCategories = async (req, res, next) => {
     return res.status(500).json(JSON.stringify(e));
   }
 };
+const getProductMenuCategory = async (req, res, next) => {
+  try {
+    const { menu_category_id } = req.params;
+    const menu_category = await models.ProductMenuCategory.query().findById(
+      menu_category_id
+    );
+    if (!menu_category) return res.status(400).send("Invalid payload");
+    // Send the clientss
+    return res.status(200).send(menu_category);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
 
 const createproductMenuCategory = async (req, res, next) => {
   try {
@@ -137,6 +151,7 @@ const productMenuCategoryController = {
   createproductMenuCategory,
   deleteProductMenuCategory,
   updateProductMenuCategory,
+  getProductMenuCategory,
 };
 
 export default productMenuCategoryController;
