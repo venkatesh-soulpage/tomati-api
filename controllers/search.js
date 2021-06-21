@@ -48,7 +48,7 @@ const search = async (req, res) => {
     }
     let venuesWithKeyword = [];
     let venues = await models.OutletVenue.query()
-      .withGraphFetched(`[location]`)
+      .withGraphFetched(`[location,menu_categories]`)
       .orderBy("id", "asc");
     let dishes = [];
     if (_.isNumber(min_price) && _.isNumber(max_price)) {
