@@ -442,10 +442,10 @@ const deleteVenue = async (req, res, next) => {
     await models.CollaboratorInvitation.query().delete().where({
       venue_id: outlet_venue_id,
     });
+    await models.MenuCategory.query().delete().where({ outlet_venue_id });
     await models.MenuProductCategory.query()
       .delete()
       .where({ outlet_venue_id });
-    await models.MenuCategory.query().delete().where({ outlet_venue_id });
     await models.ProductMenuCategory.query()
       .delete()
       .where({ outlet_venue_id });
@@ -519,6 +519,9 @@ const createVenueMenu = async (req, res, next) => {
 
     if (menu.length > 0) {
       await models.MenuCategory.query().delete().where({ outlet_venue_id });
+      await models.ProductMenuCategory.query()
+        .delete()
+        .where({ outlet_venue_id });
       await models.MenuProductCategory.query()
         .delete()
         .where({ outlet_venue_id });
@@ -936,11 +939,11 @@ const getVenueMenuCategories = async (req, res, next) => {
   try {
     // Get brief
     const { outlet_venue_id } = req.params;
+    const venue = await models.OutletVenue.query().findById(outlet_venue_id);
+    if (!venue) return res.status(400).send("Invalid venue id");
     const menu_categories = await models.ProductMenuCategory.query()
       .withGraphFetched(`[outlet_venue]`)
       .where({ outlet_venue_id });
-    if (menu_categories.length === 0)
-      return res.status(400).send("No Menu Categories");
     // Send the clientss
     return res.status(200).send(menu_categories);
   } catch (e) {
