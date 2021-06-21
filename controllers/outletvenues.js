@@ -442,10 +442,10 @@ const deleteVenue = async (req, res, next) => {
     await models.CollaboratorInvitation.query().delete().where({
       venue_id: outlet_venue_id,
     });
+    await models.MenuCategory.query().delete().where({ outlet_venue_id });
     await models.MenuProductCategory.query()
       .delete()
       .where({ outlet_venue_id });
-    await models.MenuCategory.query().delete().where({ outlet_venue_id });
     await models.ProductMenuCategory.query()
       .delete()
       .where({ outlet_venue_id });
@@ -519,6 +519,9 @@ const createVenueMenu = async (req, res, next) => {
 
     if (menu.length > 0) {
       await models.MenuCategory.query().delete().where({ outlet_venue_id });
+      await models.ProductMenuCategory.query()
+        .delete()
+        .where({ outlet_venue_id });
       await models.MenuProductCategory.query()
         .delete()
         .where({ outlet_venue_id });
