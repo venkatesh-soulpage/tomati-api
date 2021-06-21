@@ -936,11 +936,11 @@ const getVenueMenuCategories = async (req, res, next) => {
   try {
     // Get brief
     const { outlet_venue_id } = req.params;
+    const venue = await models.OutletVenue.query().findById(outlet_venue_id);
+    if (!venue) return res.status(400).send("Invalid venue id");
     const menu_categories = await models.ProductMenuCategory.query()
       .withGraphFetched(`[outlet_venue]`)
       .where({ outlet_venue_id });
-    if (menu_categories.length === 0)
-      return res.status(400).send("No Menu Categories");
     // Send the clientss
     return res.status(200).send(menu_categories);
   } catch (e) {
