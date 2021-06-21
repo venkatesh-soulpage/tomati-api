@@ -7,7 +7,10 @@ import _ from "lodash";
 const getProductMenuCategories = async (req, res, next) => {
   try {
     // Get brief
-    const menu_categories = await models.ProductMenuCategory.query();
+    const menu_categories =
+      await models.ProductMenuCategory.query().withGraphFetched(
+        `[outlet_venue]`
+      );
 
     // Send the clientss
     return res.status(200).send(menu_categories);
@@ -19,9 +22,9 @@ const getProductMenuCategories = async (req, res, next) => {
 const getProductMenuCategory = async (req, res, next) => {
   try {
     const { menu_category_id } = req.params;
-    const menu_category = await models.ProductMenuCategory.query().findById(
-      menu_category_id
-    );
+    const menu_category = await models.ProductMenuCategory.query()
+      .withGraphFetched(`[outlet_venue]`)
+      .findById(menu_category_id);
     if (!menu_category) return res.status(400).send("Invalid payload");
     // Send the clientss
     return res.status(200).send(menu_category);
