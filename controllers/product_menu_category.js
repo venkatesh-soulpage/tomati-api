@@ -49,10 +49,12 @@ const createproductMenuCategory = async (req, res, next) => {
     if (!outlet_venue) return res.status(400).json("invalid venue");
     const menu_category = await models.ProductMenuCategory.query().findOne({
       name,
+      outlet_venue_id: venue,
     });
     const menu_category_sequence =
       await models.ProductMenuCategory.query().findOne({
         sequence,
+        outlet_venue_id: venue,
       });
     if (menu_category)
       return res
@@ -123,11 +125,16 @@ const updateProductMenuCategory = async (req, res, next) => {
       outlet_venue_id = venue;
     }
     const menu_category =
-      name && (await models.ProductMenuCategory.query().findOne({ name }));
+      name &&
+      (await models.ProductMenuCategory.query().findOne({
+        name,
+        outlet_venue_id: venue,
+      }));
     const menu_category_sequence =
       sequence &&
       (await models.ProductMenuCategory.query().findOne({
         sequence,
+        outlet_venue_id: venue,
       }));
     if (menu_category)
       return res
