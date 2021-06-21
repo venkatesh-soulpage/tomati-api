@@ -446,6 +446,9 @@ const deleteVenue = async (req, res, next) => {
       .delete()
       .where({ outlet_venue_id });
     await models.MenuCategory.query().delete().where({ outlet_venue_id });
+    await models.ProductMenuCategory.query()
+      .delete()
+      .where({ outlet_venue_id });
     await models.MenuProductTags.query().delete().where({ outlet_venue_id });
     await models.MenuCuisineType.query().delete().where({ outlet_venue_id });
     await models.MenuDrinks.query().delete().where({ outlet_venue_id });
