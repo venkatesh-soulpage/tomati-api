@@ -37,7 +37,7 @@ const getProductMenuCategory = async (req, res, next) => {
 const createproductMenuCategory = async (req, res, next) => {
   try {
     const { role } = req;
-    if (role !== "ADMIN")
+    if (!_.includes(["ADMIN", "MANAGER"], role))
       return res
         .status(400)
         .send("This user has no privileges to create category");
@@ -82,7 +82,7 @@ const createproductMenuCategory = async (req, res, next) => {
 const deleteProductMenuCategory = async (req, res, next) => {
   try {
     const { role } = req;
-    if (role !== "ADMIN")
+    if (!_.includes(["ADMIN", "MANAGER"], role))
       return res
         .status(400)
         .send("This user has no privileges to delete category");
@@ -106,7 +106,7 @@ const deleteProductMenuCategory = async (req, res, next) => {
 const updateProductMenuCategory = async (req, res, next) => {
   try {
     const { role } = req;
-    if (role !== "ADMIN")
+    if (!_.includes(["ADMIN", "MANAGER"], role))
       return res
         .status(400)
         .send("This user has no privileges to update category");
