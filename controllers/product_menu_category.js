@@ -43,29 +43,9 @@ const createproductMenuCategory = async (req, res, next) => {
         .send("This user has no privileges to create category");
 
     const { name, sequence, venue } = req.body;
-    if (!name || !sequence || !venue)
-      return res.status(400).send("Invalid payload");
+    if (!name || !venue) return res.status(400).send("Invalid payload");
     const outlet_venue = await models.OutletVenue.query().findById(venue);
     if (!outlet_venue) return res.status(400).json("invalid venue");
-    const menu_category = await models.ProductMenuCategory.query().findOne({
-      name,
-      outlet_venue_id: venue,
-    });
-    const menu_category_sequence =
-      await models.ProductMenuCategory.query().findOne({
-        sequence,
-        outlet_venue_id: venue,
-      });
-    if (menu_category)
-      return res
-        .status(400)
-        .send("Menu category with same name already exists please try other");
-    if (menu_category_sequence)
-      return res
-        .status(400)
-        .send(
-          "Menu category with same sequence already exists please try other"
-        );
 
     await models.ProductMenuCategory.query().insert({
       name,
@@ -124,28 +104,7 @@ const updateProductMenuCategory = async (req, res, next) => {
       if (!outlet_venue) return res.status(400).json("invalid venue");
       outlet_venue_id = venue;
     }
-    const menu_category =
-      name &&
-      (await models.ProductMenuCategory.query().findOne({
-        name,
-        outlet_venue_id: venue,
-      }));
-    const menu_category_sequence =
-      sequence &&
-      (await models.ProductMenuCategory.query().findOne({
-        sequence,
-        outlet_venue_id: venue,
-      }));
-    if (menu_category)
-      return res
-        .status(400)
-        .send("Menu category with same name already exists please try other");
-    if (menu_category_sequence)
-      return res
-        .status(400)
-        .send(
-          "Menu category with same sequence already exists please try other"
-        );
+
     await models.ProductMenuCategory.query()
       .update({ name, sequence, outlet_venue_id })
       .where("id", menu_category_id);
