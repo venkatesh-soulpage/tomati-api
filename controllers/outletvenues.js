@@ -27,7 +27,7 @@ const getVenues = async (req, res, next) => {
     // Get brief
     let venues = await models.OutletVenue.query()
       .withGraphFetched(
-        `[menu_categories,menu.[outlet_venue.[location],product_categories.[category_detail],menu_categories.[menu_category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
+        `[menu_categories,menu.[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
       )
       .orderBy("created_at", "desc");
     venues = _.map(venues, (venue) => {
@@ -59,7 +59,7 @@ const getUserVenues = async (req, res, next) => {
     // Get brief
     let venues = await models.OutletVenue.query()
       .withGraphFetched(
-        `[menu_categories,menu.[outlet_venue.[location],product_categories.[category_detail],menu_categories.[menu_category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
+        `[menu_categories,menu.[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
       )
       .orderBy("created_at", "desc")
       .where("is_live", true)
@@ -131,7 +131,7 @@ const getVenue = async (req, res, next) => {
 
     venue = await models.OutletVenue.query()
       .withGraphFetched(
-        `[menu_categories,menu.[outlet_venue.[location],product_categories.[category_detail],menu_categories.[menu_category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
+        `[menu_categories,menu.[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
       )
       .findById(outlet_venue_id);
 
@@ -452,7 +452,6 @@ const deleteVenue = async (req, res, next) => {
     // await models.CollaboratorInvitation.query().delete().where({
     //   venue_id: outlet_venue_id,
     // });
-    // await models.MenuCategory.query().delete().where({ outlet_venue_id });
     // await models.MenuProductCategory.query()
     //   .delete()
     //   .where({ outlet_venue_id });
@@ -530,10 +529,6 @@ const createVenueMenu = async (req, res, next) => {
     });
 
     if (menu.length > 0) {
-      await models.MenuCategory.query().delete().where({ outlet_venue_id });
-      await models.ProductMenuCategory.query()
-        .delete()
-        .where({ outlet_venue_id });
       await models.MenuProductCategory.query()
         .delete()
         .where({ outlet_venue_id });
@@ -547,6 +542,9 @@ const createVenueMenu = async (req, res, next) => {
         .delete()
         .where({ outlet_venue_id });
       await models.OutletVenueMenu.query().delete().where({ outlet_venue_id });
+      await models.ProductMenuCategory.query()
+        .delete()
+        .where({ outlet_venue_id });
     } else {
       generateQRCode(outlet_venue_id);
     }
@@ -578,7 +576,11 @@ const createVenueMenu = async (req, res, next) => {
             outlet_venue_id,
           }));
       }
-      delete item.menu_category;
+      const category = await models.ProductMenuCategory.query().findOne({
+        name: item.menu_category,
+        outlet_venue_id,
+      });
+      item.menu_category = category.id;
       const menu = await models.OutletVenueMenu.query().insert(item);
       const { product_categories, product_tag, cuisine_type, drinks } = item;
 
@@ -592,16 +594,6 @@ const createVenueMenu = async (req, res, next) => {
           };
         }
       );
-      // const product_menu_category_data = _.map(
-      //   menu_category,
-      //   (product, index) => {
-      //     return {
-      //       menu_product_id: menu.id,
-      //       menu_category: product,
-      //       outlet_venue_id,
-      //     };
-      //   }
-      // );
       const product_tag_data = _.map(product_tag, (product, index) => {
         return {
           menu_product_id: menu.id,
@@ -629,7 +621,6 @@ const createVenueMenu = async (req, res, next) => {
       await models.MenuProductTags.query().insertGraph(product_tag_data);
       await models.MenuCuisineType.query().insertGraph(cuisine_type_data);
       await models.MenuDrinks.query().insertGraph(drinks_data);
-      // await models.MenuCategory.query().insert(product_menu_category_data);
     });
 
     // Send the clients
@@ -846,7 +837,7 @@ const searchVenues = async (req, res) => {
     if (_.isNumber(min_price) && _.isNumber(max_price)) {
       dishes = await models.OutletVenueMenu.query()
         .withGraphFetched(
-          `[outlet_venue.[location,menu_categories],product_categories.[category_detail],menu_categories.[menu_category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
+          `[outlet_venue.[location,menu_categories],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
         )
         .where("outlet_venue_id", venue_id)
         .where("is_published", true)
@@ -856,7 +847,7 @@ const searchVenues = async (req, res) => {
     } else {
       dishes = await models.OutletVenueMenu.query()
         .withGraphFetched(
-          `[outlet_venue.[location,menu_categories],product_categories.[category_detail],menu_categories.[menu_category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
+          `[outlet_venue.[location,menu_categories],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]]`
         )
         .where("outlet_venue_id", venue_id)
         .where("is_published", true)
