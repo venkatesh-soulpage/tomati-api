@@ -567,20 +567,21 @@ const createVenueMenu = async (req, res, next) => {
       }
       if (
         !_.includes(menu_category, item.menu_category) &&
-        item.menu_category
+        item.menu_category &&
+        item.menu_category !== ""
       ) {
         menu_category.push(item.menu_category);
-        item.menu_category &&
-          (await models.ProductMenuCategory.query().insert({
-            name: item.menu_category,
-            outlet_venue_id,
-          }));
+        await models.ProductMenuCategory.query().insert({
+          name: item.menu_category,
+          outlet_venue_id,
+        });
       }
       const category = await models.ProductMenuCategory.query().findOne({
         name: item.menu_category,
         outlet_venue_id,
       });
-      item.menu_category = category.id;
+      item.menu_category = category ? category.id : null;
+      item.price = item.price.replace(",", "");
       const menu = await models.OutletVenueMenu.query().insert(item);
       const { product_categories, product_tag, cuisine_type, drinks } = item;
 
