@@ -132,7 +132,7 @@ const retriveSubscriptionById = async (req, res, next) => {
         return res.status(400).json("No user active with this account Id");
       await models.OutletVenue.query()
         .update({ is_venue_active: false })
-        .where({ account_id, is_venue_active: true });
+        .where({ account_id, is_venue_active: true, is_live: true });
     }
     return res.status(200).json(details);
   } catch (e) {

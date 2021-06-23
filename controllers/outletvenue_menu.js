@@ -15,7 +15,7 @@ const getVenueMenu = async (req, res, next) => {
     const { outlet_venue_id } = req.params;
     let menu = await models.OutletVenueMenu.query()
       .withGraphFetched(
-        "[outlet_venue.[location],product_categories.[category_detail],menu_categories.[menu_category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]]"
+        "[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]]"
       )
       .where("outlet_venue_id", outlet_venue_id);
 
@@ -57,6 +57,8 @@ const createVenueMenuProduct = async (req, res, next) => {
     const { outlet_venue_id } = req.params;
     const venue = await models.OutletVenue.query().findById(outlet_venue_id);
     if (!venue) return res.status(400).send("Invalid venue id");
+    if (venue.is_live === false)
+      return res.status(400).send("Deleted venue id");
     const item = req.body;
     const diff = _.difference(_.keys(item), [
       ...outletMenueKeys,
@@ -86,8 +88,8 @@ const createVenueMenuProduct = async (req, res, next) => {
     delete item.free_sides;
     const paid_sides = item.paid_sides;
     delete item.paid_sides;
-    const menu_category = item.menu_category;
-    delete item.menu_category;
+    item.menu_category =
+      item.menu_category.length > 0 ? item.menu_category[0] : null;
     const menu = await models.OutletVenueMenu.query().insert(item);
     const { product_categories, product_tag, cuisine_type, drinks } = item;
     const product_category_data = _.map(
@@ -96,16 +98,6 @@ const createVenueMenuProduct = async (req, res, next) => {
         return {
           menu_product_id: menu.id,
           menu_product_category: product,
-          outlet_venue_id,
-        };
-      }
-    );
-    const product_menu_category_data = _.map(
-      menu_category,
-      (product, index) => {
-        return {
-          menu_product_id: menu.id,
-          menu_category: product,
           outlet_venue_id,
         };
       }
@@ -151,7 +143,6 @@ const createVenueMenuProduct = async (req, res, next) => {
     await models.MenuDrinks.query().insert(drinks_data);
     await models.MenuProductFreeSides.query().insert(free_sides_data);
     await models.MenuProductPaidSides.query().insert(paid_sides_data);
-    await models.MenuCategory.query().insert(product_menu_category_data);
     // Send the clientss
     return res.status(200).send("Created Successfully");
   } catch (e) {
@@ -184,7 +175,7 @@ const updateVenueMenuProduct = async (req, res, next) => {
         })
         .where("id", venue_menu_id);
     }
-    const {
+    let {
       name,
       price,
       description,
@@ -202,12 +193,13 @@ const updateVenueMenuProduct = async (req, res, next) => {
       product_options,
       currency,
     } = req.body;
-
+    menu_category = menu_category.length > 0 ? menu_category[0] : null;
     await models.OutletVenueMenu.query()
       .update({
         name,
         price,
         description,
+        menu_category,
         product_category,
         maximum_sides,
         preparation_time,
@@ -232,23 +224,6 @@ const updateVenueMenuProduct = async (req, res, next) => {
         .delete()
         .where({ menu_product_id: venue_menu_id });
       await models.MenuProductCategory.query().insert(product_category_data);
-    }
-
-    if (menu_category && menu_category.length >= 0) {
-      const product_menu_category_data = _.map(
-        menu_category,
-        (product, index) => {
-          return {
-            menu_product_id: menu.id,
-            menu_category: product,
-            outlet_venue_id: menu.outlet_venue_id,
-          };
-        }
-      );
-      await models.MenuCategory.query()
-        .delete()
-        .where({ menu_product_id: venue_menu_id });
-      await models.MenuCategory.query().insert(product_menu_category_data);
     }
 
     if (product_tag && product_tag.length >= 0) {
@@ -337,9 +312,6 @@ const deleteVenueMenuProduct = async (req, res, next) => {
     await models.MenuProductCategory.query()
       .delete()
       .where({ menu_product_id: venue_menu_id });
-    await models.MenuCategory.query()
-      .delete()
-      .where({ menu_product_id: venue_menu_id });
     await models.MenuProductTags.query()
       .delete()
       .where({ menu_product_id: venue_menu_id });
@@ -372,7 +344,7 @@ const getVenueMenuProduct = async (req, res, next) => {
     const { venue_menu_id } = req.params;
     const menu = await models.OutletVenueMenu.query()
       .withGraphFetched(
-        "[product_categories.[category_detail],menu_categories.[menu_category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]]"
+        "[product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]]"
       )
       .findById(venue_menu_id);
     if (!menu) return res.status(400).send("Invalid venuemenu id");
