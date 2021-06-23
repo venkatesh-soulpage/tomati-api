@@ -62,6 +62,7 @@ const getUserVenues = async (req, res, next) => {
         `[menu_categories,menu.[outlet_venue.[location],product_categories.[category_detail],menu_categories.[menu_category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
       )
       .orderBy("created_at", "desc")
+      .where("is_live", true)
       .where("account_id", account_id);
     venues = _.map(venues, (venue) => {
       return {
@@ -88,6 +89,7 @@ const getVenue = async (req, res, next) => {
 
     let venue = await models.OutletVenue.query().findById(outlet_venue_id);
     if (venue === undefined) return res.status(400).json("invalid");
+    if (venue.is_live === false) return res.status(400).json("deleted");
     const account = await models.Account.query().findById(venue.account_id);
 
     const { subscription } = await chargebee.subscription
@@ -99,6 +101,7 @@ const getVenue = async (req, res, next) => {
     const managerActiveMenus = await models.OutletVenue.query().where({
       is_venue_active: true,
       account_id: account.id,
+      is_live: true,
     });
 
     if (
@@ -214,7 +217,9 @@ const createVenue = async (req, res, next) => {
       is_flat_fee_active,
       is_variable_fee_active,
     } = req.body;
-    const venue = await models.OutletVenue.query().findOne("name", name);
+    const venue = await models.OutletVenue.query()
+      .findOne("name", name)
+      .where("is_live", true);
     if (venue)
       return res
         .status(400)
@@ -320,6 +325,8 @@ const updateVenue = async (req, res, next) => {
 
     if (!outlet_venue_id || !outletvenue)
       return res.status(400).json("Invalid ID");
+    if (outletvenue.is_live === false)
+      return res.status(400).json("Deleted ID");
     // if (_.size(req.body) < 1) return res.status(400).json("No Data to update");
 
     const {
@@ -436,33 +443,36 @@ const deleteVenue = async (req, res, next) => {
     if (!outlet_venue_id || !outletvenue)
       return res.status(400).json("Invalid ID");
 
-    await models.OutletWaiter.query().delete().where({
-      outletvenue_id: outlet_venue_id,
-    });
-    await models.CollaboratorInvitation.query().delete().where({
-      venue_id: outlet_venue_id,
-    });
-    await models.MenuCategory.query().delete().where({ outlet_venue_id });
-    await models.MenuProductCategory.query()
-      .delete()
-      .where({ outlet_venue_id });
-    await models.ProductMenuCategory.query()
-      .delete()
-      .where({ outlet_venue_id });
-    await models.MenuProductTags.query().delete().where({ outlet_venue_id });
-    await models.MenuCuisineType.query().delete().where({ outlet_venue_id });
-    await models.MenuDrinks.query().delete().where({ outlet_venue_id });
-    await models.MenuProductFreeSides.query()
-      .delete()
-      .where({ outlet_venue_id });
-    await models.MenuProductPaidSides.query()
-      .delete()
-      .where({ outlet_venue_id });
-    await models.OutletVenueMenu.query().delete().where({ outlet_venue_id });
-    await models.OutletBusinessHours.query()
-      .delete()
-      .where({ outlet_venue_id });
-    await models.OutletVenue.query().deleteById(outlet_venue_id);
+    await models.OutletVenue.query()
+      .update({ is_live: false })
+      .where("id", outlet_venue_id);
+    // await models.OutletWaiter.query().delete().where({
+    //   outletvenue_id: outlet_venue_id,
+    // });
+    // await models.CollaboratorInvitation.query().delete().where({
+    //   venue_id: outlet_venue_id,
+    // });
+    // await models.MenuCategory.query().delete().where({ outlet_venue_id });
+    // await models.MenuProductCategory.query()
+    //   .delete()
+    //   .where({ outlet_venue_id });
+    // await models.ProductMenuCategory.query()
+    //   .delete()
+    //   .where({ outlet_venue_id });
+    // await models.MenuProductTags.query().delete().where({ outlet_venue_id });
+    // await models.MenuCuisineType.query().delete().where({ outlet_venue_id });
+    // await models.MenuDrinks.query().delete().where({ outlet_venue_id });
+    // await models.MenuProductFreeSides.query()
+    //   .delete()
+    //   .where({ outlet_venue_id });
+    // await models.MenuProductPaidSides.query()
+    //   .delete()
+    //   .where({ outlet_venue_id });
+    // await models.OutletVenueMenu.query().delete().where({ outlet_venue_id });
+    // await models.OutletBusinessHours.query()
+    //   .delete()
+    //   .where({ outlet_venue_id });
+    // await models.OutletVenue.query().deleteById(outlet_venue_id);
 
     return res.status(200).json("Succesfully Deleted");
   } catch (e) {
@@ -505,6 +515,8 @@ const createVenueMenu = async (req, res, next) => {
 
     if (!outlet_venue_id || !outletvenue)
       return res.status(400).json("Invalid ID");
+    if (outletvenue.is_live === false)
+      return res.status(400).json("Deleted ID");
 
     const diff = _.difference(_.keys(req.body[0]), outletMenueKeys);
     if (diff.length > 0) {
@@ -642,6 +654,7 @@ const inactivateMenu = async (req, res, next) => {
       const activeVenues = await models.OutletVenue.query().where({
         account_id: venue.account_id,
         is_venue_active: true,
+        is_live: true,
       });
       const manager = await models.Account.query().findById(venue.account_id);
       const subscriptionDetails = await chargebee.subscription
@@ -672,7 +685,7 @@ const inactivateMenu = async (req, res, next) => {
     );
     const venues = await models.OutletVenue.query()
       .orderBy("created_at", "asc")
-      .where({ account_id });
+      .where({ account_id, is_live: true });
     const activeMenus = _.filter(venues, ["is_venue_active", true]);
     if (status && menuAddon.quantity <= activeMenus.length) {
       return res.status(400).json({
@@ -734,10 +747,10 @@ const updateMenuStatusByPlan = async (req, res, next) => {
     );
     const activeMenus = await models.OutletVenue.query()
       .orderBy("created_at", "desc")
-      .where({ account_id, is_venue_active: true });
+      .where({ account_id, is_venue_active: true, is_live: true });
     const inactiveMenus = await models.OutletVenue.query()
       .orderBy("created_at", "desc")
-      .where({ account_id, is_venue_active: false });
+      .where({ account_id, is_venue_active: false, is_live: true });
     const activeMenusIds = _.map(
       _.slice(activeMenus, 0, menuAddon.quantity),
       "id"
@@ -748,7 +761,7 @@ const updateMenuStatusByPlan = async (req, res, next) => {
     ) {
       await models.OutletVenue.query()
         .update({ is_venue_active: false })
-        .where({ account_id, is_venue_active: true });
+        .where({ account_id, is_venue_active: true, is_live: true });
     }
     if (!user.previous_plan || !user.previous_status) {
       await models.Account.query()
@@ -769,7 +782,7 @@ const updateMenuStatusByPlan = async (req, res, next) => {
       if (menuAddon.quantity < activeMenus.length) {
         await models.OutletVenue.query()
           .update({ is_venue_active: false })
-          .where({ account_id, is_venue_active: true })
+          .where({ account_id, is_venue_active: true, is_live: true })
           .whereNotIn("id", activeMenusIds);
       } else {
         const inactiveMenusIds = _.map(
@@ -778,7 +791,7 @@ const updateMenuStatusByPlan = async (req, res, next) => {
         );
         await models.OutletVenue.query()
           .update({ is_venue_active: true })
-          .where({ account_id, is_venue_active: false })
+          .where({ account_id, is_venue_active: false, is_live: true })
           .whereIn("id", inactiveMenusIds);
       }
       await models.Account.query()
@@ -827,6 +840,8 @@ const searchVenues = async (req, res) => {
       return res.status(400).json("Please input keyword");
     let venue = await models.OutletVenue.query().findById(venue_id);
     if (!venue) return res.status(400).json("Invalid venue Id");
+    if (venue.is_live === false)
+      return res.status(400).json("Deleted venue Id");
     let dishes = [];
     if (_.isNumber(min_price) && _.isNumber(max_price)) {
       dishes = await models.OutletVenueMenu.query()

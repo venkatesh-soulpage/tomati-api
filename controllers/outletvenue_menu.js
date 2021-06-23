@@ -57,6 +57,8 @@ const createVenueMenuProduct = async (req, res, next) => {
     const { outlet_venue_id } = req.params;
     const venue = await models.OutletVenue.query().findById(outlet_venue_id);
     if (!venue) return res.status(400).send("Invalid venue id");
+    if (venue.is_live === false)
+      return res.status(400).send("Deleted venue id");
     const item = req.body;
     const diff = _.difference(_.keys(item), [
       ...outletMenueKeys,
