@@ -549,38 +549,45 @@ const createVenueMenu = async (req, res, next) => {
       generateQRCode(outlet_venue_id);
     }
 
-    let menu_category = [];
+    let menu_categories = _.without(
+      _.map(_.uniqBy(req.body, "menu_category"), "menu_category"),
+      "",
+      null
+    );
+
+    menu_categories = _.map(menu_categories, (cat) => {
+      return { name: cat, outlet_venue_id };
+    });
+
+    await models.ProductMenuCategory.query().insertGraph(menu_categories);
+
     _.map(req.body, async (item, index) => {
       item["outlet_venue_id"] = outlet_venue_id;
       let buf, product_image;
       if (item.product_image) {
         product_image = item.product_image;
-        buf = Buffer.from(
-          product_image.data.replace(/^data:image\/\w+;base64,/, ""),
-          "base64"
-        );
+        if (product_image.data) {
+          buf = Buffer.from(
+            product_image.data.replace(/^data:image\/\w+;base64,/, ""),
+            "base64"
+          );
+        }
+        if (buf && product_image) {
+          let key = `public/cover_images/outletvenues/${product_image.name}`;
+          uploadImage({ key, buf });
+          item.product_image = `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`;
+        }
       }
-      if (buf && product_image) {
-        let key = `public/cover_images/outletvenues/${product_image.name}`;
-        uploadImage({ key, buf });
-        item.product_image = `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`;
-      }
-      if (
-        !_.includes(menu_category, item.menu_category) &&
-        item.menu_category &&
-        item.menu_category !== ""
-      ) {
-        menu_category.push(item.menu_category);
-        await models.ProductMenuCategory.query().insert({
-          name: item.menu_category,
-          outlet_venue_id,
-        });
-      }
+
       const category = await models.ProductMenuCategory.query().findOne({
         name: item.menu_category,
         outlet_venue_id,
       });
-      item.menu_category = category ? category.id : null;
+
+      if (category) {
+        item.menu_category = category.id;
+      }
+
       item.price = item.price.replace(",", "");
       const menu = await models.OutletVenueMenu.query().insert(item);
       const { product_categories, product_tag, cuisine_type, drinks } = item;
