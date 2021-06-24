@@ -93,6 +93,56 @@ const appendProductDetails = (menu) => {
   });
 };
 
+const toString = (menu) => {
+  return _.map(menu, (product) => {
+    const item = _.pick(
+      product,
+      "name",
+      "description",
+      "product_category",
+      "outlet_category",
+      "maximum_sides",
+      "product_image",
+      "price",
+      "currency",
+      "product_options",
+      "preparation_time",
+      "is_published",
+      "menu_category",
+      "product_categories",
+      "product_tag",
+      "cuisine_type",
+      "drinks",
+      "paid_sides",
+      "free_sides"
+    );
+    const menu_category =
+      product.menu_category_detail && product.menu_category_detail.name;
+    return {
+      ...item,
+      menu_category: menu_category,
+      product_categories: _.map(item.product_categories, (item) => {
+        return item.category_detail.name;
+      }).toString(),
+      product_tag: _.map(item.product_tag, (item) => {
+        return item.tag_detail.name;
+      }).toString(),
+      cuisine_type: _.map(item.cuisine_type, (item) => {
+        return item.cuisine_detail.name;
+      }).toString(),
+      drinks: _.map(item.drinks, (item) => {
+        return item.drinks_detail.name;
+      }).toString(),
+      free_sides: _.map(item.free_sides, (item) => {
+        return item.side_detail.name;
+      }).toString(),
+      paid_sides: _.map(item.paid_sides, (item) => {
+        return item.side_detail.name;
+      }).toString(),
+    };
+  });
+};
+
 const distance = (lat1, lon1, lat2, lon2) => {
   if (lat1 == lat2 && lon1 == lon2) {
     return 0;
@@ -117,6 +167,7 @@ const distance = (lat1, lon1, lat2, lon2) => {
 module.exports = {
   desiredValues,
   appendProductDetails,
+  toString,
   outletMenueKeys,
   distance,
 };

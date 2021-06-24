@@ -1,6 +1,7 @@
 import models from "../models";
 const {
   appendProductDetails,
+  toString,
   desiredValues,
   outletMenueKeys,
 } = require("../utils/commonFunctions");
@@ -22,6 +23,29 @@ const getVenueMenu = async (req, res, next) => {
     if (menu.length === 0) return res.status(400).send("Invalid venue id");
 
     menu = appendProductDetails(menu);
+
+    // Send the clientss
+    return res.status(200).send(menu);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(JSON.stringify(e));
+  }
+};
+
+const downloadVenueMenu = async (req, res, next) => {
+  try {
+    // Get brief
+    const { outlet_venue_id } = req.params;
+    let menu = await models.OutletVenueMenu.query()
+      .withGraphFetched(
+        "[menu_category_detail,outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]]"
+      )
+      .orderBy("id", "ASC")
+      .where("outlet_venue_id", outlet_venue_id);
+
+    if (menu.length === 0) return res.status(400).send("Invalid venue id");
+
+    menu = toString(menu);
 
     // Send the clientss
     return res.status(200).send(menu);
@@ -193,7 +217,8 @@ const updateVenueMenuProduct = async (req, res, next) => {
       product_options,
       currency,
     } = req.body;
-    menu_category = menu_category.length > 0 ? menu_category[0] : null;
+    if (menu_category)
+      menu_category = menu_category.length > 0 ? menu_category[0] : null;
     await models.OutletVenueMenu.query()
       .update({
         name,
@@ -366,6 +391,7 @@ const getVenueMenuProduct = async (req, res, next) => {
 
 const planController = {
   getVenueMenu,
+  downloadVenueMenu,
   createVenueMenuProduct,
   updateVenueMenuProduct,
   deleteVenueMenuProduct,
