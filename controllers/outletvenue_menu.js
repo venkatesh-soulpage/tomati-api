@@ -83,6 +83,11 @@ const createVenueMenuProduct = async (req, res, next) => {
     if (!venue) return res.status(400).send("Invalid venue id");
     if (venue.is_live === false)
       return res.status(400).send("Deleted venue id");
+    const category = await models.ProductMenuCategory.query().findOne({
+      id: req.body.menu_category,
+      outlet_venue_id,
+    });
+    if (!category) return res.status(400).send("Invalid menu category");
     const item = req.body;
     const diff = _.difference(_.keys(item), [
       ...outletMenueKeys,
@@ -112,8 +117,6 @@ const createVenueMenuProduct = async (req, res, next) => {
     delete item.free_sides;
     const paid_sides = item.paid_sides;
     delete item.paid_sides;
-    item.menu_category =
-      item.menu_category.length > 0 ? item.menu_category[0] : null;
     const menu = await models.OutletVenueMenu.query().insert(item);
     const { product_categories, product_tag, cuisine_type, drinks } = item;
     const product_category_data = _.map(
@@ -178,10 +181,15 @@ const createVenueMenuProduct = async (req, res, next) => {
 const updateVenueMenuProduct = async (req, res, next) => {
   try {
     // Get brief
-    const { venue_menu_id } = req.params;
+    const { outlet_venue_id, venue_menu_id } = req.params;
     const menu = await models.OutletVenueMenu.query().findById(venue_menu_id);
     if (!menu) return res.status(400).send("Invalid venuemenu id");
 
+    const category = await models.ProductMenuCategory.query().findOne({
+      id: req.body.menu_category,
+      outlet_venue_id,
+    });
+    if (!category) return res.status(400).send("Invalid menu category");
     let buf, product_image;
     if (req.body.product_image) {
       product_image = req.body.product_image;
@@ -217,8 +225,7 @@ const updateVenueMenuProduct = async (req, res, next) => {
       product_options,
       currency,
     } = req.body;
-    if (menu_category)
-      menu_category = menu_category.length > 0 ? menu_category[0] : null;
+
     await models.OutletVenueMenu.query()
       .update({
         name,
