@@ -72,6 +72,9 @@ const deleteProductMenuCategory = async (req, res, next) => {
       menu_category_id
     );
     if (!menu_category) return res.status(400).send("Invalid payload");
+    await models.OutletVenueMenu.query()
+      .update({ menu_category: null })
+      .where({ menu_category: menu_category_id });
     await models.ProductMenuCategory.query().deleteById(menu_category_id);
     return res.status(200).send("Deleted Successfully");
   } catch (e) {
