@@ -27,7 +27,7 @@ const getVenues = async (req, res, next) => {
     // Get brief
     let venues = await models.OutletVenue.query()
       .withGraphFetched(
-        `[menu_categories,menu.[outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
+        `[menu_categories,menu.[menu_category_detail,outlet_venue.[location],product_categories.[category_detail],product_tag.[tag_detail],cuisine_type.[cuisine_detail],drinks.[drinks_detail],free_sides.[side_detail],paid_sides.[side_detail]],collaborators,location,business_hours]`
       )
       .orderBy("created_at", "desc");
     venues = _.map(venues, (venue) => {
