@@ -89,7 +89,7 @@ router.get(
 
 router.get(
   "/:outlet_venue_id/menu-download",
-  // VerifyToken,
+  VerifyToken,
   // VerifyRole([
   //   { scope: "OUTLET", role: "MANAGER" },
   //   { scope: "OUTLET", role: "OWNER" },

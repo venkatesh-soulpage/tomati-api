@@ -5,6 +5,7 @@ const {
   desiredValues,
   outletMenueKeys,
 } = require("../utils/commonFunctions");
+const path = require("path");
 const { s3 } = require("../utils/s3Config");
 import _ from "lodash";
 
@@ -74,6 +75,22 @@ const uploadImage = async (file_data) => {
     }
   });
 };
+const deleteImage = async (file_data) => {
+  const { key } = file_data;
+
+  var data = {
+    Key: key,
+    Bucket: process.env.BUCKETEER_BUCKET_NAME,
+  };
+  await s3.deleteObject(data, function (err, data) {
+    if (err) {
+      console.log(err);
+      console.log("Error uploading data: ", data);
+    } else {
+      console.log("successfully uploaded the image!", data);
+    }
+  });
+};
 
 const createVenueMenuProduct = async (req, res, next) => {
   try {
@@ -106,11 +123,12 @@ const createVenueMenuProduct = async (req, res, next) => {
         product_image.data.replace(/^data:image\/\w+;base64,/, ""),
         "base64"
       );
-    }
-    if (buf && product_image) {
-      let key = `public/cover_images/outletvenues/${product_image.name}`;
-      uploadImage({ key, buf });
-      item.product_image = `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`;
+
+      if (buf && product_image) {
+        let key = `public/cover_images/outletvenues/${outlet_venue_id}/menu/${product_image.name}`;
+        uploadImage({ key, buf });
+        item.product_image = `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`;
+      }
     }
     item.outlet_venue_id = outlet_venue_id;
     const free_sides = item.free_sides;
@@ -193,18 +211,28 @@ const updateVenueMenuProduct = async (req, res, next) => {
     }
 
     let buf, product_image;
+    if (req.body.product_image === null || req.body.product_image) {
+      if (menu.product_image) {
+        let deletekey = `public/cover_images/outletvenues/${outlet_venue_id}/menu/${path.basename(
+          menu.product_image
+        )}`;
+        deleteImage({ key: deletekey });
+      }
+    }
     if (req.body.product_image) {
       product_image = req.body.product_image;
       buf = Buffer.from(
         product_image.data.replace(/^data:image\/\w+;base64,/, ""),
         "base64"
       );
+
+      if (buf && product_image) {
+        let key = `public/cover_images/outletvenues/${outlet_venue_id}/menu/${product_image.name}`;
+        uploadImage({ key, buf });
+        req.body.product_image = `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`;
+      }
     }
-    if (buf && product_image) {
-      let key = `public/cover_images/outletvenues/${product_image.name}`;
-      uploadImage({ key, buf });
-      req.body.product_image = `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`;
-    }
+
     let {
       product_categories,
       product_tag,
@@ -313,7 +341,7 @@ const updateVenueMenuProduct = async (req, res, next) => {
 const deleteVenueMenuProduct = async (req, res, next) => {
   try {
     // Get brief
-    const { venue_menu_id } = req.params;
+    const { outlet_venue_id, venue_menu_id } = req.params;
     const menu = await models.OutletVenueMenu.query().findById(venue_menu_id);
     if (!menu) return res.status(400).send("Invalid venuemenu id");
 
@@ -338,6 +366,12 @@ const deleteVenueMenuProduct = async (req, res, next) => {
       .where({ menu_product_id: venue_menu_id })
       .orWhere({ product_side_id: venue_menu_id });
     await models.OutletVenueMenu.query().where("id", venue_menu_id).delete();
+    if (menu.product_image) {
+      let deletekey = `public/cover_images/outletvenues/${outlet_venue_id}/menu/${path.basename(
+        menu.product_image
+      )}`;
+      deleteImage({ key: deletekey });
+    }
     // Send the clientss
     return res.status(200).send("Deleted successfully");
   } catch (e) {

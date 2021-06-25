@@ -179,6 +179,23 @@ const uploadImage = async (file_data) => {
   });
 };
 
+const deleteImage = async (file_data) => {
+  const { key } = file_data;
+
+  var data = {
+    Key: key,
+    Bucket: process.env.BUCKETEER_BUCKET_NAME,
+  };
+  await s3.deleteObject(data, function (err, data) {
+    if (err) {
+      console.log(err);
+      console.log("Error uploading data: ", data);
+    } else {
+      console.log("successfully uploaded the image!", data);
+    }
+  });
+};
+
 const uploadHtmlPage = async (file_data) => {
   const { key, htmlData } = file_data;
 
@@ -253,10 +270,10 @@ const createVenue = async (req, res, next) => {
       );
     }
     if (buf && cover_image) {
-      const key = `public/cover_images/outletvenues/${cover_image.name}`;
-      const largeCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-large`;
-      const mediumCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-medium`;
-      const smallCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-small`;
+      const key = `public/cover_images/outletvenues/cover/${cover_image.name}`;
+      const largeCoverImageKey = `public/cover_images/outletvenues/cover/${cover_image.name}-large`;
+      const mediumCoverImageKey = `public/cover_images/outletvenues/cover/${cover_image.name}-medium`;
+      const smallCoverImageKey = `public/cover_images/outletvenues/cover/${cover_image.name}-small`;
       const largeResizedImage = await sharp(buf).resize(1200, 800).toBuffer();
       const mediumResizedImage = await sharp(buf).resize(600, 400).toBuffer();
       const smallResizedImage = await sharp(buf).resize(300, 200).toBuffer();
@@ -267,7 +284,7 @@ const createVenue = async (req, res, next) => {
       cover_image = `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`;
     }
     if (logobuf && logo_image) {
-      const key2 = `public/cover_images/outletvenues/${logo_image.name}`;
+      const key2 = `public/cover_images/outletvenues/logo/${logo_image.name}`;
       uploadImage({ key: key2, buf: logobuf });
       logo_image = `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key2}`;
     }
@@ -372,19 +389,23 @@ const updateVenue = async (req, res, next) => {
       );
     }
     if (logobuf && logo_image) {
-      const key = `public/cover_images/outletvenues/${logo_image.name}`;
+      const key = `public/cover_images/outletvenues/logo/${logo_image.name}`;
       uploadImage({ key, buf: logobuf });
       await models.OutletVenue.query()
         .update({
           logo_img: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
         })
         .where("id", outlet_venue_id);
+      let deletekey = `public/cover_images/outletvenues/logo/${path.basename(
+        outletvenue.logo_img
+      )}`;
+      deleteImage({ key: deletekey });
     }
     if (buf && cover_image) {
-      const key = `public/cover_images/outletvenues/${cover_image.name}`;
-      const largeCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-large`;
-      const mediumCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-medium`;
-      const smallCoverImageKey = `public/cover_images/outletvenues/${cover_image.name}-small`;
+      const key = `public/cover_images/outletvenues/cover/${cover_image.name}`;
+      const largeCoverImageKey = `public/cover_images/outletvenues/cover/${cover_image.name}-large`;
+      const mediumCoverImageKey = `public/cover_images/outletvenues/cover/${cover_image.name}-medium`;
+      const smallCoverImageKey = `public/cover_images/outletvenues/cover/${cover_image.name}-small`;
       const largeResizedImage = await sharp(buf).resize(1200, 800).toBuffer();
       const mediumResizedImage = await sharp(buf).resize(600, 400).toBuffer();
       const smallResizedImage = await sharp(buf).resize(300, 200).toBuffer();
@@ -397,6 +418,22 @@ const updateVenue = async (req, res, next) => {
           cover_image: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
         })
         .where("id", outlet_venue_id);
+      let deletekey = `public/cover_images/outletvenues/cover/${path.basename(
+        outletvenue.cover_image
+      )}`;
+      let deletekeya = `public/cover_images/outletvenues/cover/${path.basename(
+        outletvenue.cover_image
+      )}-large`;
+      let deletekeyb = `public/cover_images/outletvenues/cover/${path.basename(
+        outletvenue.cover_image
+      )}-medium`;
+      let deletekeyc = `public/cover_images/outletvenues/cover/${path.basename(
+        outletvenue.cover_image
+      )}-small`;
+      deleteImage({ key: deletekey });
+      deleteImage({ key: deletekeya });
+      deleteImage({ key: deletekeyb });
+      deleteImage({ key: deletekeyc });
     }
     await models.OutletVenue.query()
       .update({
@@ -506,6 +543,30 @@ const generateQRCode = async (outlet_venue_id) => {
     .where({ id: outlet_venue_id });
 };
 
+async function emptyS3Directory(outlet_venue_id) {
+  const listParams = {
+    Bucket: process.env.BUCKETEER_BUCKET_NAME,
+    Prefix: `public/cover_images/outletvenues/${outlet_venue_id}/menu`,
+  };
+
+  const listedObjects = await s3.listObjectsV2(listParams).promise();
+
+  if (listedObjects.Contents.length === 0) return;
+
+  const deleteParams = {
+    Bucket: process.env.BUCKETEER_BUCKET_NAME,
+    Delete: { Objects: [] },
+  };
+
+  listedObjects.Contents.forEach(({ Key }) => {
+    deleteParams.Delete.Objects.push({ Key });
+  });
+  await s3.deleteObjects(deleteParams).promise();
+
+  if (listedObjects.IsTruncated)
+    await emptyS3Directory(process.env.BUCKETEER_BUCKET_NAME, outlet_venue_id);
+}
+
 const createVenueMenu = async (req, res, next) => {
   try {
     const { account_id, scope } = req;
@@ -551,6 +612,7 @@ const createVenueMenu = async (req, res, next) => {
       await models.ProductMenuCategory.query()
         .delete()
         .where({ outlet_venue_id });
+      await emptyS3Directory(outlet_venue_id);
     } else {
       generateQRCode(outlet_venue_id);
     }
@@ -599,7 +661,7 @@ const createVenueMenu = async (req, res, next) => {
           );
         }
         if (buf && product_image) {
-          let key = `public/cover_images/outletvenues/${product_image.name}`;
+          let key = `public/cover_images/outletvenues/${outlet_venue_id}/menu/${product_image.name}`;
           uploadImage({ key, buf });
           item.product_image = `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`;
         }
@@ -620,7 +682,41 @@ const createVenueMenu = async (req, res, next) => {
       if (!item.preparation_time) item.preparation_time = null;
       if (!item.product_options) item.product_options = [];
       const menu = await models.OutletVenueMenu.query().insert(item);
-      const { product_categories, product_tag, cuisine_type, drinks } = item;
+      const {
+        product_categories,
+        product_tag,
+        cuisine_type,
+        drinks,
+        free_sides,
+        paid_sides,
+      } = item;
+
+      if (free_sides) {
+        _.map(free_sides.split(","), async (name, index) => {
+          const product = await models.OutletVenueMenu.query().findOne({
+            name,
+          });
+          product &&
+            (await models.MenuProductFreeSides.query().insertGraph({
+              menu_product_id: menu.id,
+              product_side_id: product.id,
+              outlet_venue_id,
+            }));
+        });
+      }
+      if (paid_sides) {
+        _.map(paid_sides.split(","), async (name, index) => {
+          const product = await models.OutletVenueMenu.query().findOne({
+            name,
+          });
+          product &&
+            (await models.MenuProductPaidSides.query().insertGraph({
+              menu_product_id: menu.id,
+              product_side_id: product.id,
+              outlet_venue_id,
+            }));
+        });
+      }
 
       if (product_categories) {
         const product = await models.ProductCategory.query().findOne({
@@ -633,77 +729,47 @@ const createVenueMenu = async (req, res, next) => {
             outlet_venue_id,
           }));
       }
-      _.map(product_tag.split(","), async (name, index) => {
-        const product = await models.ProductTags.query().findOne({
-          name,
-        });
-        product &&
-          (await models.MenuProductTags.query().insertGraph({
-            menu_product_id: menu.id,
-            menu_product_tags: product.id,
-            outlet_venue_id,
-          }));
-      });
-      _.map(cuisine_type.split(","), async (name, index) => {
-        const product = await models.CuisineType.query().findOne({
-          name,
-        });
-        product &&
-          (await models.MenuCuisineType.query().insertGraph({
-            menu_product_id: menu.id,
-            menu_cuisine_type: product.id,
-            outlet_venue_id,
-          }));
-      });
-      _.map(drinks.split(","), async (name, index) => {
-        const product = await models.Drinks.query().findOne({
-          name,
-        });
-        product &&
-          (await models.MenuDrinks.query().insertGraph({
-            menu_product_id: menu.id,
-            menu_drinks: product.id,
-            outlet_venue_id,
-          }));
-      });
-    });
-
-    _.map(req.body, async (item, index) => {
-      const category = await models.ProductMenuCategory.query().findOne({
-        name: item.menu_category,
-        outlet_venue_id,
-      });
-
-      const menu = await models.OutletVenueMenu.query().findOne({
-        name: item.name,
-        outlet_venue_id,
-      });
-
-      if (menu) {
-        _.map(item.free_sides.split(","), async (name, index) => {
-          const product = await models.OutletVenueMenu.query().findOne({
+      if (product_tag) {
+        _.map(product_tag.split(","), async (name, index) => {
+          const product = await models.ProductTags.query().findOne({
             name,
           });
           product &&
-            (await models.MenuProductFreeSides.query().insertGraph({
+            (await models.MenuProductTags.query().insertGraph({
               menu_product_id: menu.id,
-              product_side_id: product.id,
+              menu_product_tags: product.id,
               outlet_venue_id,
             }));
         });
-        _.map(item.paid_sides.split(","), async (name, index) => {
-          const product = await models.OutletVenueMenu.query().findOne({
+      }
+      if (cuisine_type) {
+        _.map(cuisine_type.split(","), async (name, index) => {
+          const product = await models.CuisineType.query().findOne({
             name,
           });
           product &&
-            (await models.MenuProductPaidSides.query().insertGraph({
+            (await models.MenuCuisineType.query().insertGraph({
               menu_product_id: menu.id,
-              product_side_id: product.id,
+              menu_cuisine_type: product.id,
+              outlet_venue_id,
+            }));
+        });
+      }
+      if (drinks) {
+        _.map(drinks.split(","), async (name, index) => {
+          const product = await models.Drinks.query().findOne({
+            name,
+          });
+          product &&
+            (await models.MenuDrinks.query().insertGraph({
+              menu_product_id: menu.id,
+              menu_drinks: product.id,
               outlet_venue_id,
             }));
         });
       }
     });
+
     // Send the clients
     return res.status(201).json("VenueMenu Created Successfully");
   } catch (e) {
