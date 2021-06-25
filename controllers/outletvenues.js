@@ -680,7 +680,16 @@ const createVenueMenu = async (req, res, next) => {
       if (!item.maximum_sides) item.maximum_sides = null;
       if (!item.preparation_time) item.preparation_time = null;
       if (!item.preparation_time) item.preparation_time = null;
-      if (!item.product_options) item.product_options = [];
+
+      if (!item.product_options) {
+        item.product_options = [];
+      } else if (item.product_options) {
+        try {
+          item.product_options = JSON.parse(item.product_options);
+        } catch (e) {
+          item.product_options = [];
+        }
+      }
       const menu = await models.OutletVenueMenu.query().insert(item);
       const {
         product_categories,

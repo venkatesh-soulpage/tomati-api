@@ -46,6 +46,12 @@ const downloadVenueMenu = async (req, res, next) => {
 
     if (menu.length === 0) return res.status(400).send("Invalid venue id");
 
+    _.map(menu, (item) => {
+      const { product_options } = item;
+      item.product_options = JSON.stringify(product_options);
+      return item;
+    });
+
     menu = toString(menu);
 
     // Send the clientss
