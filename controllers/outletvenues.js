@@ -4,6 +4,8 @@ const {
   outletMenueKeys,
   distance,
 } = require("../utils/commonFunctions");
+const axios = require("axios");
+const path = require("path");
 import _ from "lodash";
 import moment from "moment";
 import latinize from "latinize";
@@ -517,7 +519,11 @@ const createVenueMenu = async (req, res, next) => {
     if (outletvenue.is_live === false)
       return res.status(400).json("Deleted ID");
 
-    const diff = _.difference(_.keys(req.body[0]), outletMenueKeys);
+    const diff = _.difference(_.keys(req.body[0]), [
+      ...outletMenueKeys,
+      "free_sides",
+      "paid_sides",
+    ]);
     if (diff.length > 0) {
       return res
         .status(400)
@@ -566,6 +572,26 @@ const createVenueMenu = async (req, res, next) => {
       let buf, product_image;
       if (item.product_image) {
         product_image = item.product_image;
+        if (
+          typeof product_image === "string" &&
+          !_.includes(
+            product_image,
+            "https://s3.ap-south-1.amazonaws.com/tomati"
+          )
+        ) {
+          await axios
+            .get(product_image, {
+              responseType: "arraybuffer",
+            })
+            .then((response) => {
+              const name = path.basename(product_image);
+              product_image = {
+                name,
+                data: response.data.toString("base64"),
+              };
+            });
+        }
+
         if (product_image.data) {
           buf = Buffer.from(
             product_image.data.replace(/^data:image\/\w+;base64,/, ""),
@@ -587,50 +613,97 @@ const createVenueMenu = async (req, res, next) => {
       if (category) {
         item.menu_category = category.id;
       }
-
-      item.price = item.price.replace(",", "");
+      if (!item.menu_category) item.menu_category = null;
+      item.price = item.price.toString().replace(",", "");
+      if (!item.maximum_sides) item.maximum_sides = null;
+      if (!item.preparation_time) item.preparation_time = null;
+      if (!item.preparation_time) item.preparation_time = null;
+      if (!item.product_options) item.product_options = [];
       const menu = await models.OutletVenueMenu.query().insert(item);
       const { product_categories, product_tag, cuisine_type, drinks } = item;
 
-      const product_category_data = _.map(
-        product_categories,
-        (product, index) => {
-          return {
+      _.map(product_categories.split(","), async (name, index) => {
+        const product = await models.ProductCategory.query().findOne({
+          name,
+        });
+        product &&
+          (await models.MenuProductCategory.query().insertGraph({
             menu_product_id: menu.id,
-            menu_product_category: product,
+            menu_product_category: product.id,
             outlet_venue_id,
-          };
-        }
-      );
-      const product_tag_data = _.map(product_tag, (product, index) => {
-        return {
-          menu_product_id: menu.id,
-          menu_product_tags: product,
-          outlet_venue_id,
-        };
+          }));
       });
-      const cuisine_type_data = _.map(cuisine_type, (product, index) => {
-        return {
-          menu_product_id: menu.id,
-          menu_cuisine_type: product,
-          outlet_venue_id,
-        };
+      _.map(product_tag.split(","), async (name, index) => {
+        const product = await models.ProductTags.query().findOne({
+          name,
+        });
+        product &&
+          (await models.MenuProductTags.query().insertGraph({
+            menu_product_id: menu.id,
+            menu_product_tags: product.id,
+            outlet_venue_id,
+          }));
       });
-      const drinks_data = _.map(drinks, (product, index) => {
-        return {
-          menu_product_id: menu.id,
-          menu_drinks: product,
-          outlet_venue_id,
-        };
+      _.map(cuisine_type.split(","), async (name, index) => {
+        const product = await models.CuisineType.query().findOne({
+          name,
+        });
+        product &&
+          (await models.MenuCuisineType.query().insertGraph({
+            menu_product_id: menu.id,
+            menu_cuisine_type: product.id,
+            outlet_venue_id,
+          }));
       });
-      await models.MenuProductCategory.query().insertGraph(
-        product_category_data
-      );
-      await models.MenuProductTags.query().insertGraph(product_tag_data);
-      await models.MenuCuisineType.query().insertGraph(cuisine_type_data);
-      await models.MenuDrinks.query().insertGraph(drinks_data);
+      _.map(drinks.split(","), async (name, index) => {
+        const product = await models.Drinks.query().findOne({
+          name,
+        });
+        product &&
+          (await models.MenuDrinks.query().insertGraph({
+            menu_product_id: menu.id,
+            menu_drinks: product.id,
+            outlet_venue_id,
+          }));
+      });
     });
 
+    _.map(req.body, async (item, index) => {
+      const category = await models.ProductMenuCategory.query().findOne({
+        name: item.menu_category,
+        outlet_venue_id,
+      });
+
+      const menu = await models.OutletVenueMenu.query().findOne({
+        name: item.name,
+        outlet_venue_id,
+      });
+
+      if (menu) {
+        _.map(item.free_sides.split(","), async (name, index) => {
+          const product = await models.OutletVenueMenu.query().findOne({
+            name,
+          });
+          product &&
+            (await models.MenuProductFreeSides.query().insertGraph({
+              menu_product_id: menu.id,
+              product_side_id: product.id,
+              outlet_venue_id,
+            }));
+        });
+        _.map(item.paid_sides.split(","), async (name, index) => {
+          const product = await models.OutletVenueMenu.query().findOne({
+            name,
+          });
+          product &&
+            (await models.MenuProductPaidSides.query().insertGraph({
+              menu_product_id: menu.id,
+              product_side_id: product.id,
+              outlet_venue_id,
+            }));
+        });
+      }
+    });
     // Send the clients
     return res.status(201).json("VenueMenu Created Successfully");
   } catch (e) {
