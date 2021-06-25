@@ -203,31 +203,16 @@ const updateVenueMenuProduct = async (req, res, next) => {
     if (buf && product_image) {
       let key = `public/cover_images/outletvenues/${product_image.name}`;
       uploadImage({ key, buf });
-      const menu = await models.OutletVenueMenu.query()
-        .update({
-          product_image: `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`,
-        })
-        .where("id", venue_menu_id);
+      req.body.product_image = `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`;
     }
     let {
-      name,
-      price,
-      description,
-      menu_category,
-      product_category,
-      maximum_sides,
-      preparation_time,
       product_categories,
       product_tag,
       cuisine_type,
       drinks,
-      is_published,
       free_sides,
       paid_sides,
-      product_options,
-      currency,
     } = req.body;
-
     await models.OutletVenueMenu.query()
       .update(req.body)
       .where("id", venue_menu_id);
