@@ -211,6 +211,14 @@ const updateVenueMenuProduct = async (req, res, next) => {
     }
 
     let buf, product_image;
+    if (req.body.product_image === null || req.body.product_image) {
+      if (menu.product_image) {
+        let deletekey = `public/cover_images/outletvenues/${outlet_venue_id}/menu/${path.basename(
+          menu.product_image
+        )}`;
+        deleteImage({ key: deletekey });
+      }
+    }
     if (req.body.product_image) {
       product_image = req.body.product_image;
       buf = Buffer.from(
@@ -224,14 +232,7 @@ const updateVenueMenuProduct = async (req, res, next) => {
         req.body.product_image = `https://s3.${process.env.BUCKETEER_AWS_REGION}.amazonaws.com/${process.env.BUCKETEER_BUCKET_NAME}/${key}`;
       }
     }
-    if (req.body.product_image === null || req.body.product_image) {
-      if (menu.product_image) {
-        let deletekey = `public/cover_images/outletvenues/${outlet_venue_id}/menu/${path.basename(
-          menu.product_image
-        )}`;
-        deleteImage({ key: deletekey });
-      }
-    }
+
     let {
       product_categories,
       product_tag,
