@@ -622,9 +622,9 @@ const createVenueMenu = async (req, res, next) => {
       const menu = await models.OutletVenueMenu.query().insert(item);
       const { product_categories, product_tag, cuisine_type, drinks } = item;
 
-      _.map(product_categories.split(","), async (name, index) => {
+      if (product_categories) {
         const product = await models.ProductCategory.query().findOne({
-          name,
+          name: product_categories,
         });
         product &&
           (await models.MenuProductCategory.query().insertGraph({
@@ -632,7 +632,7 @@ const createVenueMenu = async (req, res, next) => {
             menu_product_category: product.id,
             outlet_venue_id,
           }));
-      });
+      }
       _.map(product_tag.split(","), async (name, index) => {
         const product = await models.ProductTags.query().findOne({
           name,
