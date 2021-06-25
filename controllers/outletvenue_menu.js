@@ -184,12 +184,14 @@ const updateVenueMenuProduct = async (req, res, next) => {
     const { outlet_venue_id, venue_menu_id } = req.params;
     const menu = await models.OutletVenueMenu.query().findById(venue_menu_id);
     if (!menu) return res.status(400).send("Invalid venuemenu id");
+    if (req.body.menu_category) {
+      const category = await models.ProductMenuCategory.query().findOne({
+        id: req.body.menu_category,
+        outlet_venue_id,
+      });
+      if (!category) return res.status(400).send("Invalid menu category");
+    }
 
-    const category = await models.ProductMenuCategory.query().findOne({
-      id: req.body.menu_category,
-      outlet_venue_id,
-    });
-    if (!category) return res.status(400).send("Invalid menu category");
     let buf, product_image;
     if (req.body.product_image) {
       product_image = req.body.product_image;
@@ -227,18 +229,7 @@ const updateVenueMenuProduct = async (req, res, next) => {
     } = req.body;
 
     await models.OutletVenueMenu.query()
-      .update({
-        name,
-        price,
-        description,
-        menu_category,
-        product_category,
-        maximum_sides,
-        preparation_time,
-        is_published,
-        product_options,
-        currency,
-      })
+      .update(req.body)
       .where("id", venue_menu_id);
 
     if (product_categories && product_categories.length >= 0) {
